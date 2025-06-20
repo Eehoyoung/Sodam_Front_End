@@ -1,0 +1,1 @@
+// QnA related type definitions

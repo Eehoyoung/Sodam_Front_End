@@ -1,0 +1,1 @@
+// Home related type definitions

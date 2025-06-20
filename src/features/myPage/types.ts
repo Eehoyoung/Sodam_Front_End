@@ -1,0 +1,1 @@
+// MyPage related type definitions
