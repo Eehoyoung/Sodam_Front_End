@@ -1,0 +1,184 @@
+import React, {useCallback, useEffect, useRef} from 'react';
+import {Animated, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle,} from 'react-native';
+
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
+
+interface ToastProps {
+    visible: boolean;
+    message: string;
+    type?: ToastType;
+    duration?: number;
+    onClose?: () => void;
+    position?: 'top' | 'bottom';
+    style?: ViewStyle;
+    textStyle?: TextStyle;
+    showCloseButton?: boolean;
+}
+
+const Toast: React.FC<ToastProps> = ({
+                                         visible,
+                                         message,
+                                         type = 'info',
+                                         duration = 3000,
+                                         onClose,
+                                         position = 'bottom',
+                                         style,
+                                         textStyle,
+                                         showCloseButton = true,
+                                     }) => {
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleClose = useCallback(() => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+
+        // 페이드 아웃 애니메이션 실행 후 onClose 콜백 호출
+        Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => {
+            if (onClose) {
+                onClose();
+            }
+        });
+    }, [fadeAnim, onClose]);
+
+    useEffect(() => {
+        if (visible) {
+            // 토스트가 보이면 페이드 인 애니메이션 실행
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+
+            // 지정된 시간 후에 토스트 닫기
+            if (duration > 0) {
+                timeoutRef.current = setTimeout(() => {
+                    handleClose();
+                }, duration);
+            }
+        } else {
+            // 토스트가 사라지면 페이드 아웃 애니메이션 실행
+            Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        }
+
+        // 컴포넌트 언마운트 시 타이머 정리
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [visible, duration, fadeAnim, handleClose]);
+
+    // 토스트 타입에 따른 배경색 설정
+    const getBackgroundColor = () => {
+        switch (type) {
+            case 'success':
+                return '#2ecc71';
+            case 'error':
+                return '#e74c3c';
+            case 'warning':
+                return '#f39c12';
+            case 'info':
+            default:
+                return '#3498db';
+        }
+    };
+
+    // 토스트가 보이지 않으면 렌더링하지 않음
+    if (!visible && fadeAnim.value === 0) {
+        return null;
+    }
+
+    return (
+        <Animated.View
+            style={[
+                styles.container,
+                position === 'top' ? styles.topPosition : styles.bottomPosition,
+                {
+                    backgroundColor: getBackgroundColor(),
+                    opacity: fadeAnim,
+                    transform: [
+                        {
+                            translateY: fadeAnim.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [position === 'top' ? -20 : 20, 0],
+                            }),
+                        },
+                    ],
+                },
+                style,
+            ]}
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite">
+            <Text style={[styles.message, textStyle]}>{message}</Text>
+            {showCloseButton && (
+                <TouchableOpacity
+                    onPress={handleClose}
+                    style={styles.closeButton}
+                    accessibilityRole="button"
+                    accessibilityLabel="닫기"
+                    accessibilityHint="알림을 닫습니다">
+                    <Text style={styles.closeButtonText}>✕</Text>
+                </TouchableOpacity>
+            )}
+        </Animated.View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        position: 'absolute',
+        left: 16,
+        right: 16,
+        padding: 16,
+        borderRadius: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: {width: 0, height: 2},
+                shadowOpacity: 0.3,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 6,
+            },
+        }),
+        zIndex: 9999,
+    },
+    topPosition: {
+        top: Platform.OS === 'ios' ? 50 : 20,
+    },
+    bottomPosition: {
+        bottom: 20,
+    },
+    message: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '500',
+        flex: 1,
+    },
+    closeButton: {
+        marginLeft: 8,
+        padding: 4,
+    },
+    closeButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+});
+
+export default Toast;
