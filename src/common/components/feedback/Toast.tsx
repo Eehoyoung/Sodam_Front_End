@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle,} from 'react-native';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -27,7 +27,19 @@ const Toast: React.FC<ToastProps> = ({
                                          showCloseButton = true,
                                      }) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const timeoutRef = useRef<number | null>(null);
+    const [animationValue, setAnimationValue] = useState(0);
+
+    // Add listener to track animation value
+    useEffect(() => {
+        const id = fadeAnim.addListener(state => {
+            setAnimationValue(state.value);
+        });
+
+        return () => {
+            fadeAnim.removeListener(id);
+        };
+    }, [fadeAnim]);
 
     const handleClose = useCallback(() => {
         if (timeoutRef.current) {
@@ -95,7 +107,7 @@ const Toast: React.FC<ToastProps> = ({
     };
 
     // 토스트가 보이지 않으면 렌더링하지 않음
-    if (!visible && fadeAnim.value === 0) {
+    if (!visible && animationValue === 0) {
         return null;
     }
 

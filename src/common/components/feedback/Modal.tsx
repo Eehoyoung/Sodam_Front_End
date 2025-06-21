@@ -26,8 +26,8 @@ interface ModalProps {
     titleStyle?: TextStyle;
     contentStyle?: ViewStyle;
     footerStyle?: ViewStyle;
-    width?: number | string;
-    height?: number | string;
+    width?: number | "auto" | `${number}%`;
+    height?: number | "auto" | `${number}%`;
 }
 
 /**
@@ -49,7 +49,7 @@ const Modal: React.FC<ModalProps> = ({
                                          titleStyle,
                                          contentStyle,
                                          footerStyle,
-                                         width = '80%',
+                                         width = `80%`,
                                          height,
                                      }) => {
     // 애니메이션 값
@@ -94,7 +94,11 @@ const Modal: React.FC<ModalProps> = ({
                         <Animated.View
                             style={[
                                 styles.modalContainer,
-                                {opacity: fadeAnim, width, height},
+                                {
+                                    opacity: fadeAnim,
+                                    width: typeof width === 'string' && !width.endsWith('%') && width !== 'auto' ? undefined : width,
+                                    height: typeof height === 'string' && !height.endsWith('%') && height !== 'auto' ? undefined : height,
+                                },
                                 style,
                             ]}
                         >

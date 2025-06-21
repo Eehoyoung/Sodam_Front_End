@@ -84,16 +84,16 @@ const Footer = () => {
 
                 <View style={[styles.footerSection, dynamicStyles.footerSection]}>
                     <Text style={[styles.footerSectionTitle, dynamicStyles.footerSectionTitle]}>주요 서비스</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('LaborInfoDetail')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('LaborInfoDetail', {laborInfoId: 1})}>
                         <Text style={[styles.footerLink, dynamicStyles.footerLink]}>근태관리</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('TaxInfoDetail')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('TaxInfoDetail', {taxInfoId: 1})}>
                         <Text style={[styles.footerLink, dynamicStyles.footerLink]}>세무관리</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('TipsDetail')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('TipsDetail', {tipId: 1})}>
                         <Text style={[styles.footerLink, dynamicStyles.footerLink]}>마케팅 도구</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('PolicyDetail')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('PolicyDetail', {policyId: 1})}>
                         <Text style={[styles.footerLink, dynamicStyles.footerLink]}>상권분석</Text>
                     </TouchableOpacity>
                 </View>
@@ -106,7 +106,7 @@ const Footer = () => {
                     <TouchableOpacity onPress={() => sendEmail('contact@soodam.kr')}>
                         <Text style={[styles.footerLink, dynamicStyles.footerLink]}>문의하기</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('TipsDetail')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('TipsDetail', {tipId: 1})}>
                         <Text style={[styles.footerLink, dynamicStyles.footerLink]}>서비스 가이드</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate('Home')}>

@@ -5,6 +5,7 @@
  * @format
  */
 
+import React from 'react';
 import { NewAppScreen } from '@react-native/new-app-screen';
 import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 
@@ -14,7 +15,7 @@ function App() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NewAppScreen templateFileName="App.tsx" />
+      {NewAppScreen({templateFileName: "App.tsx"}) as React.ReactElement}
     </View>
   );
 }

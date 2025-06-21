@@ -1,25 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
 import {Button, Input, MainLayout} from '../../../common/components';
 import {useAuth} from '../../../contexts/AuthContext';
-
-
-// 네비게이션 타입 정의
-type AuthStackParamList = {
-    Login: undefined;
-    Signup: undefined;
-};
-
-// AppNavigator에서 사용하는 타입
-type RootStackParamList = {
-    Auth: undefined;
-    Main: undefined;
-};
-
-type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList>;
-type RootNavigationProp = StackNavigationProp<RootStackParamList>;
+import {LoginScreenNavigationProp, RootNavigationProp} from '../../../navigation/types';
 
 // 캡챠 검증을 위한 간단한 컴포넌트
 interface CaptchaVerificationProps {

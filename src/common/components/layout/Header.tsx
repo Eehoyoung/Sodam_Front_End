@@ -16,8 +16,11 @@ type HeaderNavigationProp = CompositeNavigationProp<
     StackNavigationProp<HomeStackParamList>
 >;
 
+interface HeaderProps {
+    title?: string;
+}
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = ({title}) => {
     const {isSmallScreen, responsiveStyles} = useResponsiveStyles();
     const screenWidth = Dimensions.get('window').width;
 
@@ -169,7 +172,10 @@ const Header = () => {
 
     return (
         <View style={[styles.header, dynamicStyles.header]}>
-            <Text style={[styles.logo, dynamicStyles.logo]}>SOODAM</Text>
+            <View style={styles.leftContainer}>
+                <Text style={[styles.logo, dynamicStyles.logo]}>SOODAM</Text>
+                {title && <Text style={styles.title}>{title}</Text>}
+            </View>
             {renderNavButtons()}
         </View>
     );
@@ -183,10 +189,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#3498db',
         width: '100%',
     },
+    leftContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     logo: {
         fontWeight: 'bold',
         color: '#fff',
         letterSpacing: 5,
+    },
+    title: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: '600',
+        marginLeft: 15,
     },
     navButtons: {
         flexDirection: 'row',

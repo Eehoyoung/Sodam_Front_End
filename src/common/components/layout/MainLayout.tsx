@@ -6,9 +6,10 @@ import {useResponsiveStyles} from '../../../utils/responsive';
 
 interface MainLayoutProps {
     children: ReactNode;
+    title?: string;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({children}) => {
+const MainLayout: React.FC<MainLayoutProps> = ({children, title}) => {
     const {responsiveStyles} = useResponsiveStyles();
     const scrollY = useRef(new Animated.Value(0)).current;
     const scrollViewRef = useRef<ScrollView>(null);
@@ -22,7 +23,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({children}) => {
 
     return (
         <View style={styles.container}>
-            <Header/>
+            <Header title={title}/>
             <Animated.ScrollView
                 ref={scrollViewRef}
                 style={styles.scrollView}
