@@ -9,6 +9,7 @@ interface ButtonProps {
     size?: 'small' | 'medium' | 'large';
     disabled?: boolean;
     loading?: boolean;
+    fullWidth?: boolean;
     style?: ViewStyle;
     textStyle?: TextStyle;
     icon?: React.ReactNode;
@@ -26,6 +27,7 @@ const Button: React.FC<ButtonProps> = ({
                                            size = 'medium',
                                            disabled = false,
                                            loading = false,
+                                           fullWidth = false,
                                            style,
                                            textStyle,
                                            icon,
@@ -97,6 +99,7 @@ const Button: React.FC<ButtonProps> = ({
                 getButtonStyle(),
                 getButtonSizeStyle(),
                 disabled && styles.disabledButton,
+                fullWidth && styles.fullWidthButton,
                 style,
             ]}
             onPress={onPress}
@@ -161,6 +164,9 @@ const styles = StyleSheet.create({
     disabledButton: {
         backgroundColor: '#E5E5EA',
         borderColor: '#E5E5EA',
+    },
+    fullWidthButton: {
+        width: '100%',
     },
     text: {
         fontWeight: '600',

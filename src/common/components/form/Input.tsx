@@ -16,6 +16,7 @@ interface InputProps {
     autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
     editable?: boolean;
     style?: ViewStyle;
+    containerStyle?: ViewStyle;
     inputStyle?: TextStyle;
     labelStyle?: TextStyle;
     errorStyle?: TextStyle;
@@ -44,6 +45,7 @@ const Input: React.FC<InputProps> = ({
                                          autoCapitalize = 'none',
                                          editable = true,
                                          style,
+                                         containerStyle,
                                          inputStyle,
                                          labelStyle,
                                          errorStyle,
@@ -73,15 +75,15 @@ const Input: React.FC<InputProps> = ({
     };
 
     return (
-        <View style={[styles.container, style]}>
-            {label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
+        <View style={[styles.container, style || null, containerStyle || null]}>
+            {label && <Text style={[styles.label, labelStyle || null]}>{label}</Text>}
 
             <View
                 style={[
                     styles.inputContainer,
-                    isFocused && styles.focusedInput,
-                    error && styles.errorInput,
-                    !editable && styles.disabledInput,
+                    isFocused ? styles.focusedInput : null,
+                    error ? styles.errorInput : null,
+                    !editable ? styles.disabledInput : null,
                 ]}
             >
                 {leftIcon && <View style={styles.leftIconContainer}>{leftIcon}</View>}
@@ -89,10 +91,10 @@ const Input: React.FC<InputProps> = ({
                 <TextInput
                     style={[
                         styles.input,
-                        multiline && styles.multilineInput,
-                        leftIcon && styles.inputWithLeftIcon,
-                        rightIcon && styles.inputWithRightIcon,
-                        inputStyle,
+                        multiline ? styles.multilineInput : null,
+                        leftIcon ? styles.inputWithLeftIcon : null,
+                        rightIcon ? styles.inputWithRightIcon : null,
+                        inputStyle || null,
                     ]}
                     value={value}
                     onChangeText={onChangeText}
@@ -125,7 +127,7 @@ const Input: React.FC<InputProps> = ({
                 )}
             </View>
 
-            {error && <Text style={[styles.errorText, errorStyle]}>{error}</Text>}
+            {error && <Text style={[styles.errorText, errorStyle || null]}>{error}</Text>}
         </View>
     );
 };
