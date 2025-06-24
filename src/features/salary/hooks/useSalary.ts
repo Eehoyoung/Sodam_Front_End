@@ -17,6 +17,7 @@ export const useSalary = () => {
         const fetchSalary = async () => {
             try {
                 setIsLoading(true);
+                // TODO: API 연결 필요 - 급여 정보를 가져오는 API 호출로 대체해야 함
                 // In a real app, this would be an API call
                 // For now, we'll use mock data
                 const mockSalary: MonthlySalary = {

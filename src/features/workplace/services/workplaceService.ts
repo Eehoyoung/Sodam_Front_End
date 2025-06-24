@@ -21,6 +21,7 @@ const mockWorkplaces: Workplace[] = [
 
 // Get all workplaces
 export const getWorkplaces = async (): Promise<Workplace[]> => {
+    // TODO: API 연결 필요 - 매장 목록을 가져오는 API 호출로 대체해야 함
     // Simulate API call delay
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -31,6 +32,7 @@ export const getWorkplaces = async (): Promise<Workplace[]> => {
 
 // Get workplace by ID
 export const getWorkplaceById = async (id: string): Promise<Workplace | undefined> => {
+    // TODO: API 연결 필요 - 특정 매장 정보를 가져오는 API 호출로 대체해야 함
     // Simulate API call delay
     return new Promise((resolve) => {
         setTimeout(() => {

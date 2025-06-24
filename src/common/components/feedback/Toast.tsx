@@ -3,6 +3,19 @@ import {Animated, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewS
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
+// Interface for the show method parameters
+interface ToastShowParams {
+    type?: ToastType;
+    text1?: string;
+    text2?: string;
+    duration?: number;
+    position?: 'top' | 'bottom';
+    style?: ViewStyle;
+    textStyle?: TextStyle;
+    showCloseButton?: boolean;
+}
+
+// Interface for the component props
 interface ToastProps {
     visible: boolean;
     message: string;
@@ -15,7 +28,12 @@ interface ToastProps {
     showCloseButton?: boolean;
 }
 
-const Toast: React.FC<ToastProps> = ({
+// Interface for the Toast component with static show method
+interface ToastComponent extends React.FC<ToastProps> {
+    show: (params: ToastShowParams) => void;
+}
+
+const Toast: ToastComponent = ({
                                          visible,
                                          message,
                                          type = 'info',
@@ -27,7 +45,7 @@ const Toast: React.FC<ToastProps> = ({
                                          showCloseButton = true,
                                      }) => {
     const fadeAnim = useRef(new Animated.Value(0)).current;
-    const timeoutRef = useRef<number | null>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [animationValue, setAnimationValue] = useState(0);
 
     // Add listener to track animation value
@@ -193,4 +211,14 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Toast;
+// Add static show method to Toast component
+Toast.show = (params: ToastShowParams) => {
+    // This is a simple implementation that logs the toast message
+    // In a real implementation, this would manage a global toast state
+    console.log(`Toast: ${params.text1} - ${params.text2}`);
+
+    // You would typically use a state management solution or a ref to manage toast visibility
+    // For now, we're just logging the message
+};
+
+export default Toast as ToastComponent;

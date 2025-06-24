@@ -1,7 +1,3 @@
-export type RootStackParamList = {
-    LaborInfoDetail: { laborInfoId: number };
-};
-
 import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -10,6 +6,10 @@ import {Button} from '../../../common/components';
 import {Toast} from '../../../common/components';
 import {Ionicons} from '@expo/vector-icons';
 import {StackNavigationProp} from '@react-navigation/stack';
+
+export type RootStackParamList = {
+    LaborInfoDetail: { infoId: string };
+};
 
 // 노무 정보 상세 타입 정의
 interface LaborInfoDetail {
@@ -30,7 +30,7 @@ type LaborInfoDetailScreenNavigationProp = StackNavigationProp<
 const LaborInfoDetailScreen = () => {
     const navigation = useNavigation<LaborInfoDetailScreenNavigationProp>();
     const route = useRoute();
-    const {laborInfoId} = route.params as { laborInfoId: number };
+    const {infoId} = route.params as { infoId: string };
 
     const [loading, setLoading] = useState(true);
     const [laborInfo, setLaborInfo] = useState<LaborInfoDetail | null>(null);
@@ -43,15 +43,16 @@ const LaborInfoDetailScreen = () => {
     useEffect(() => {
         const fetchLaborInfo = async () => {
             try {
+                // TODO: API 연결 필요 - 노무 정보를 가져오는 API 호출로 대체해야 함
                 // 실제 구현에서는 API 호출로 대체
-                // const response = await fetch(`https://sodam-api.com/api/labor-info/${laborInfoId}`);
+                // const response = await fetch(`https://sodam-api.com/api/labor-info/${infoId}`);
                 // const data = await response.json();
                 // setLaborInfo(data);
 
                 // 임시 데이터 (API 연동 전까지 사용)
                 setTimeout(() => {
                     const mockData: LaborInfoDetail = {
-                        id: laborInfoId,
+                        id: parseInt(infoId),
                         title: '2024년 최저임금 변경에 따른 급여 계산 방법',
                         date: '2024-05-15',
                         content: `# 2024년 최저임금 변경 안내
@@ -93,8 +94,14 @@ const LaborInfoDetailScreen = () => {
             }
         };
 
-        fetchLaborInfo();
-    }, [laborInfoId]);
+        fetchLaborInfo().catch(error => {
+            console.error('Error in fetchLaborInfo:', error);
+            setToastMessage('정보를 불러오는 중 오류가 발생했습니다.');
+            setToastType('error');
+            setShowToast(true);
+            setLoading(false);
+        });
+    }, [infoId]);
 
     // 북마크 토글 함수
     const toggleBookmark = () => {
@@ -103,6 +110,7 @@ const LaborInfoDetailScreen = () => {
         setToastType('success');
         setShowToast(true);
 
+        // TODO: API 연결 필요 - 북마크 상태를 저장하는 API 호출로 대체해야 함
         // 실제 구현에서는 API 호출로 북마크 상태 저장
         // fetch(`https://sodam-api.com/api/bookmarks/${laborInfoId}`, {
         //   method: isBookmarked ? 'DELETE': 'POST',
@@ -221,7 +229,7 @@ const LaborInfoDetailScreen = () => {
                             style={styles.relatedItem}
                             onPress={() => {
                                 // 관련 정보 항목 클릭 시 해당 정보로 이동
-                                navigation.navigate('LaborInfoDetail', {laborInfoId: info.id});
+                                navigation.navigate('LaborInfoDetail', {infoId: info.id.toString()});
                             }}
                         >
                             <Ionicons name="document-text-outline" size={18} color="#3498db"/>

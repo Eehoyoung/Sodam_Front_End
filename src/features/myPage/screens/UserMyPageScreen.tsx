@@ -21,6 +21,7 @@ type UserMyPageScreenNavigationProp = StackNavigationProp<RootStackParamList>;
  */
 const UserMyPageScreen: React.FC = () => {
     const navigation = useNavigation<UserMyPageScreenNavigationProp>();
+    // TODO: API 연결 필요 - 사용자 정보를 가져오는 API 호출로 대체해야 함
     const [user] = useState({
         name: '홍길동',
         email: 'user@example.com',
@@ -40,6 +41,7 @@ const UserMyPageScreen: React.FC = () => {
                 {
                     text: '확인',
                     onPress: () => {
+                        // TODO: API 연결 필요 - 사용자 역할을 사장으로 변경하는 API 호출로 대체해야 함
                         // 실제 구현에서는 API 호출로 역할 변경
                         Alert.alert('성공', '사장 계정으로 전환되었습니다.');
                         navigation.navigate('MasterMyPageScreen');
@@ -62,6 +64,7 @@ const UserMyPageScreen: React.FC = () => {
                 {
                     text: '확인',
                     onPress: () => {
+                        // TODO: API 연결 필요 - 사용자 역할을 사원으로 변경하는 API 호출로 대체해야 함
                         // 실제 구현에서는 API 호출로 역할 변경
                         Alert.alert('성공', '사원 계정으로 전환되었습니다.');
                         navigation.navigate('EmployeeMyPageScreen');

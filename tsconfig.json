@@ -15,7 +15,10 @@
     "target": "esnext",
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": false,
+    "types": [
+      "node"
+    ]
   },
   "exclude": [
     "node_modules",
