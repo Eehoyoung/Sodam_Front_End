@@ -3,6 +3,7 @@ import {RouteProp} from '@react-navigation/native';
 
 // 루트 스택 파라미터 목록
 export type RootStackParamList = {
+    Welcome: undefined;  // 새로운 메인화면 (첫 방문자용)
     Auth: { screen?: keyof AuthStackParamList; params?: any };
     Main: undefined;
     // 기타 루트 레벨 화면...

@@ -1,119 +1,104 @@
-apply plugin: "com.android.application"
-apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "com.facebook.react"
-
-/**
- * This is the configuration block to customize your React Native Android app.
- * By default you don't need to apply any configuration, just uncomment the lines you need.
- */
-react {
-    /* Folders */
-    //   The root of your project, i.e. where "package.json" lives. Default is '../..'
-    // root = file("../../")
-    //   The folder where the react-native NPM package is. Default is ../../node_modules/react-native
-    // reactNativeDir = file("../../node_modules/react-native")
-    //   The folder where the react-native Codegen package is. Default is ../../node_modules/@react-native/codegen
-    // codegenDir = file("../../node_modules/@react-native/codegen")
-    //   The cli.js file which is the React Native CLI entrypoint. Default is ../../node_modules/react-native/cli.js
-    // cliFile = file("../../node_modules/react-native/cli.js")
-
-    /* Variants */
-    //   The list of variants to that are debuggable. For those we're going to
-    //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
-    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
-    // debuggableVariants = ["liteDebug", "prodDebug"]
-
-    /* Bundling */
-    //   A list containing the node command and its flags. Default is just 'node'.
-    // nodeExecutableAndArgs = ["node"]
-    //
-    //   The command to run when bundling. By default is 'bundle'
-    // bundleCommand = "ram-bundle"
-    //
-    //   The path to the CLI configuration file. Default is empty.
-    // bundleConfig = file(../rn-cli.config.js)
-    //
-    //   The name of the generated asset file containing your JS bundle
-    // bundleAssetName = "MyApplication.android.bundle"
-    //
-    //   The entry file for bundle generation. Default is 'index.android.js' or 'index.js'
-    // entryFile = file("../js/MyApplication.android.js")
-    //
-    //   A list of extra flags to pass to the 'bundle' commands.
-    //   See https://github.com/react-native-community/cli/blob/main/docs/commands.md#bundle
-    // extraPackagerArgs = []
-
-    /* Hermes Commands */
-    //   The hermes compiler command to run. By default it is 'hermesc'
-    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
-    //
-    //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
-    // hermesFlags = ["-O", "-output-source-map"]
-
-    /* Autolinking */
-    autolinkLibrariesWithApp()
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "com.facebook.react"
 }
-
-/**
- * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
- */
-def enableProguardInReleaseBuilds = false
-
-/**
- * The preferred build flavor of JavaScriptCore (JSC)
- *
- * For example, to use the international variant, you can use:
- * `def jscFlavor = io.github.react-native-community:jsc-android-intl:2026004.+`
- *
- * The international variant includes ICU i18n library and necessary data
- * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
- * give correct results when using with locales other than en-US. Note that
- * this variant is about 6MiB larger per architecture than default.
- */
-def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
 android {
-    ndkVersion rootProject.ext.ndkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-    compileSdk rootProject.ext.compileSdkVersion
-
     namespace "com.sodam_front_end"
+    compileSdkVersion 35
+    buildToolsVersion "35.0.0"
+    ndkVersion "27.1.12297006"
+
     defaultConfig {
         applicationId "com.sodam_front_end"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 24
+        //noinspection OldTargetApi,EditedTargetSdkVersion
+        targetSdkVersion 35
         versionCode 1
         versionName "1.0"
+        missingDimensionStrategy "react-native-vision-camera", "mlkit"
     }
-    signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
+
+    kotlinOptions {
+        jvmTarget = '17'  // 변경
+    }
+
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            minifyEnabled false
+            shrinkResources false
+            crunchPngs false
+            proguardFiles(
+                    getDefaultProguardFile("proguard-android.txt"),
+                    "proguard-rules.pro"
+            )
         }
+    }
+
+    packagingOptions {
+        // 여러 .so 파일 중 첫 번째만 선택하여 충돌 방지
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libreact_render_component_view.so'
+        pickFirst '**/libreact_render_core.so'
+        pickFirst '**/libreact_render_debug.so'
+        pickFirst '**/libreact_render_graphics.so'
+        pickFirst '**/libfb.so'
+        pickFirst '**/libglslang.so'
+        pickFirst '**/libgtest.so'
+        pickFirst '**/libgtest_main.so'
+        pickFirst '**/libjsi.so'
+        pickFirst '**/liblog.so'
+        pickFirst '**/libreact_codegen_rncore_generated.so'
+        pickFirst '**/libreact_nativemodule_core.so'
+        pickFirst '**/libreactnativejni.so'
+        pickFirst '**/libyoga.so'
+
+        // worklets-core 및 VisionCamera 관련 라이브러리가 빌드 과정에서 제거되지 않도록 방지
+        doNotStrip '**/libworklets.so'
+        doNotStrip '**/libVisionCamera.so'
     }
 }
 
-dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
-    implementation("com.facebook.react:react-android")
+// React Native Vector Icons font configuration - DISABLED
+// Autolinking is disabled for react-native-vector-icons in react-native.config.js
+// Therefore, fonts.gradle cannot be applied as it requires Android plugin configuration
+// project.ext.vectoricons = [
+//     iconFontNames: [ 'AntDesign.ttf', 'Entypo.ttf', 'EvilIcons.ttf', 'Feather.ttf', 'FontAwesome.ttf', 'FontAwesome5_Brands.ttf', 'FontAwesome5_Regular.ttf', 'FontAwesome5_Solid.ttf', 'Foundation.ttf', 'Ionicons.ttf', 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf', 'SimpleLineIcons.ttf', 'Octicons.ttf', 'Zocial.ttf' ]
+// ]
 
-    if (hermesEnabled.toBoolean()) {
-        implementation("com.facebook.react:hermes-android")
+// apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+// Expo modules disabled due to gradle plugin dependency resolution issue
+// apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle")
+// useExpoModules()
+
+// React Native autolinking is handled automatically by settings.gradle
+
+dependencies {
+    implementation "com.facebook.react:react-android"
+
+    // Hermes vs JSC 선택
+    if (project.hasProperty("hermesEnabled") && project.property("hermesEnabled") == "true") {
+        implementation "com.facebook.react:hermes-android"
     } else {
-        implementation jscFlavor
+        implementation "io.github.react-native-community:jsc-android:2026004.+"
     }
+
+    // Manual dependencies for packages with disabled autolinking
+    implementation project(':react-native-reanimated')
+    implementation project(':react-native-async-storage_async-storage')
+    implementation project(':react-native-community_datetimepicker')
+    implementation project(':react-native-geolocation-service')
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-permissions')
+    implementation project(':react-native-safe-area-context')
+    implementation project(':react-native-screens')
+    implementation project(':react-native-vector-icons')
+    implementation project(':react-native-vision-camera')
+    implementation project(':react-native-worklets-core')
 }

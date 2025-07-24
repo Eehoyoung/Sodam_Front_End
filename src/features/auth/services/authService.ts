@@ -1,5 +1,5 @@
 import api from '../../../common/utils/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {memoryStorage} from '../../../common/utils/memoryStorage';
 
 /**
  * 인증 관련 서비스
@@ -39,18 +39,20 @@ export interface AuthResponse {
 // 토큰 저장 함수
 const saveToken = async (token: string): Promise<void> => {
     try {
-        await AsyncStorage.setItem('userToken', token);
+        console.log('[DEBUG_LOG] Using memory storage for token save');
+        await memoryStorage.setItem('userToken', token);
     } catch (error) {
-        console.error('토큰 저장 중 오류가 발생했습니다:', error);
+        console.error('[DEBUG_LOG] 토큰 저장 중 오류가 발생했습니다:', error);
     }
 };
 
 // 토큰 가져오기 함수
 const getToken = async (): Promise<string | null> => {
     try {
-        return await AsyncStorage.getItem('userToken');
+        console.log('[DEBUG_LOG] Using memory storage for token retrieval');
+        return await memoryStorage.getItem('userToken');
     } catch (error) {
-        console.error('토큰을 가져오는 중 오류가 발생했습니다:', error);
+        console.error('[DEBUG_LOG] 토큰을 가져오는 중 오류가 발생했습니다:', error);
         return null;
     }
 };
@@ -58,9 +60,10 @@ const getToken = async (): Promise<string | null> => {
 // 토큰 삭제 함수
 const removeToken = async (): Promise<void> => {
     try {
-        await AsyncStorage.removeItem('userToken');
+        console.log('[DEBUG_LOG] Using memory storage for token removal');
+        await memoryStorage.removeItem('userToken');
     } catch (error) {
-        console.error('토큰 삭제 중 오류가 발생했습니다:', error);
+        console.error('[DEBUG_LOG] 토큰 삭제 중 오류가 발생했습니다:', error);
     }
 };
 

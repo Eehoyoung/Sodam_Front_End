@@ -1,25 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    FlatList,
-    Alert,
     ActivityIndicator,
-    RefreshControl,
+    Alert,
+    FlatList,
+    Modal,
     Platform,
-    Modal
+    RefreshControl,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Geolocation from 'react-native-geolocation-service';
-import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import {RNCamera} from 'react-native-camera';
-import {MainLayout} from '../../../common/components';
-import {Card} from '../../../common/components';
-import {Button} from '../../../common/components';
+import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
+import {Camera, useCameraDevices, useCodeScanner} from 'react-native-vision-camera';
+import {Button, Card, MainLayout} from '../../../common/components';
 import attendanceService from '../services/attendanceService';
 import {AttendanceRecord, AttendanceStatus} from '../types';
 import {format} from 'date-fns';
@@ -48,6 +46,48 @@ const AttendanceScreen = () => {
     const [showQRScanner, setShowQRScanner] = useState(false);
     const [qrCode, setQrCode] = useState<string>('');
     const [checkInMethod, setCheckInMethod] = useState<'standard' | 'location' | 'qr'>('standard');
+
+    // Vision Camera 설정
+    const devices = useCameraDevices();
+    const device = devices.find(d => d.position === 'back');
+
+    // 코드 스캐너 설정
+    const codeScanner = useCodeScanner({
+        codeTypes: ['qr', 'ean-13'],
+        onCodeScanned: (codes) => {
+            if (codes.length > 0) {
+                handleQRCodeScanned(codes[0].value || '');
+            }
+        }
+    });
+
+    // 카메라 권한 확인
+    const checkCameraPermission = async () => {
+        const permission = await Camera.getCameraPermissionStatus();
+
+        if (permission !== 'granted') {
+            const newPermission = await Camera.requestCameraPermission();
+
+            if (newPermission !== 'granted') {
+                Alert.alert(
+                    '카메라 권한 필요',
+                    'QR 코드 스캔을 위해서는 카메라 접근 권한이 필요합니다.',
+                    [{text: '확인'}]
+                );
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    // QR 스캐너 열기
+    const openQRScanner = async () => {
+        const hasPermission = await checkCameraPermission();
+        if (hasPermission) {
+            setShowQRScanner(true);
+        }
+    };
 
     // 출퇴근 기록 조회
     const fetchAttendanceRecords = async () => {
@@ -485,35 +525,42 @@ const AttendanceScreen = () => {
         </View>
     );
 
-    // QR 코드 스캐너 렌더링
+    // QR 스캐너 렌더링
     const renderQRScanner = () => (
         <Modal
             visible={showQRScanner}
             animationType="slide"
-            transparent={false}
             onRequestClose={() => setShowQRScanner(false)}
         >
-            <View style={styles.qrScannerContainer}>
-                <RNCamera
-                    style={styles.camera}
-                    type={RNCamera.Constants.Type.back}
-                    captureAudio={false}
-                    onBarCodeRead={(event) => {
-                        handleQRCodeScanned(event.data);
-                    }}
-                />
-                <View style={styles.qrScannerOverlay}>
-                    <View style={styles.qrScannerHeader}>
-                        <Text style={styles.qrScannerTitle}>QR 코드 스캔</Text>
-                        <TouchableOpacity onPress={() => setShowQRScanner(false)}>
-                            <Icon name="close" size={24} color="#fff"/>
-                        </TouchableOpacity>
+            <View style={styles.cameraContainer}>
+                <View style={styles.cameraHeader}>
+                    <TouchableOpacity
+                        onPress={() => setShowQRScanner(false)}
+                        style={styles.closeButton}
+                    >
+                        <Icon name="close" size={24} color="#fff"/>
+                    </TouchableOpacity>
+                    <Text style={styles.cameraTitle}>QR 코드 스캔</Text>
+                </View>
+
+                {device ? (
+                    <Camera
+                        style={styles.camera}
+                        device={device}
+                        isActive={showQRScanner}
+                        codeScanner={codeScanner}
+                    />
+                ) : (
+                    <View style={styles.loadingCameraContainer}>
+                        <ActivityIndicator size="large" color="#fff"/>
+                        <Text style={styles.loadingCameraText}>카메라를 불러오는 중...</Text>
                     </View>
-                    <View style={styles.qrScannerGuide}>
-                        <Text style={styles.qrScannerGuideText}>
-                            매장에 비치된 QR 코드를 스캔해주세요
-                        </Text>
-                    </View>
+                )}
+
+                <View style={styles.cameraOverlay}>
+                    <Text style={styles.cameraInstructions}>
+                        QR 코드를 화면 중앙에 맞춰주세요
+                    </Text>
                 </View>
             </View>
         </Modal>
@@ -665,7 +712,7 @@ const AttendanceScreen = () => {
                                     {checkInMethod === 'qr' && (
                                         <Button
                                             title="QR 코드로 출근하기"
-                                            onPress={() => setShowQRScanner(true)}
+                                            onPress={openQRScanner}
                                             type="primary"
                                             icon="qr-code-scanner"
                                             fullWidth
@@ -695,7 +742,7 @@ const AttendanceScreen = () => {
                                     {checkInMethod === 'qr' && (
                                         <Button
                                             title="QR 코드로 퇴근하기"
-                                            onPress={() => setShowQRScanner(true)}
+                                            onPress={openQRScanner}
                                             type="secondary"
                                             icon="qr-code-scanner"
                                             fullWidth
@@ -740,72 +787,6 @@ const AttendanceScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    checkInMethodSelector: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 16,
-    },
-    methodOption: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 20,
-        marginHorizontal: 4,
-        backgroundColor: '#f0f0f0',
-    },
-    selectedMethod: {
-        backgroundColor: '#3498db',
-    },
-    methodOptionText: {
-        color: '#555',
-        fontWeight: '500',
-        marginLeft: 4,
-    },
-    selectedMethodText: {
-        color: '#fff',
-    },
-    qrScannerContainer: {
-        flex: 1,
-        flexDirection: 'column',
-    },
-    camera: {
-        flex: 1,
-    },
-    qrScannerOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-    },
-    qrScannerHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 16,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    qrScannerTitle: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    qrScannerGuide: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    qrScannerGuideText: {
-        color: '#fff',
-        fontSize: 16,
-        textAlign: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        padding: 16,
-        borderRadius: 8,
-    },
     container: {
         flex: 1,
         backgroundColor: '#f5f5f5',
@@ -880,6 +861,33 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         textAlign: 'center',
         marginVertical: 8,
+    },
+    checkInMethodSelector: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    methodOption: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+        marginHorizontal: 4,
+        backgroundColor: '#f0f0f0',
+    },
+    selectedMethod: {
+        backgroundColor: '#3498db',
+    },
+    methodOptionText: {
+        color: '#555',
+        fontWeight: '500',
+        marginLeft: 4,
+    },
+    selectedMethodText: {
+        color: '#fff',
     },
     actionButtons: {
         marginTop: 8,
@@ -988,6 +996,59 @@ const styles = StyleSheet.create({
         color: '#7f8c8d',
         marginTop: 8,
         textAlign: 'center',
+    },
+    // QR 스캐너 관련 스타일
+    cameraContainer: {
+        flex: 1,
+        backgroundColor: '#000',
+    },
+    cameraHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: 50,
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        backgroundColor: 'rgba(0,0,0,0.8)',
+    },
+    closeButton: {
+        padding: 10,
+    },
+    cameraTitle: {
+        flex: 1,
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginRight: 44, // closeButton 크기만큼 오프셋
+    },
+    camera: {
+        flex: 1,
+    },
+    cameraOverlay: {
+        position: 'absolute',
+        bottom: 100,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+    },
+    cameraInstructions: {
+        color: '#fff',
+        fontSize: 16,
+        textAlign: 'center',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    loadingCameraContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingCameraText: {
+        color: '#fff',
+        fontSize: 16,
+        marginTop: 16,
     },
 });
 

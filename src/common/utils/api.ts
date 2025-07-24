@@ -1,5 +1,5 @@
 import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {memoryStorage} from './memoryStorage';
 
 /**
  * API 클라이언트 설정
@@ -33,12 +33,13 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
         try {
-            const token = await AsyncStorage.getItem('userToken');
+            console.log('[DEBUG_LOG] Using memory storage for API token retrieval');
+            const token = await memoryStorage.getItem('userToken');
             if (token) {
                 config.headers.set('Authorization', `Bearer ${token}`);
             }
         } catch (error) {
-            console.error('토큰을 가져오는 중 오류가 발생했습니다:', error);
+            console.error('[DEBUG_LOG] 토큰을 가져오는 중 오류가 발생했습니다:', error);
         }
         return config;
     },
@@ -62,8 +63,9 @@ apiClient.interceptors.response.use(
             // 401 Unauthorized: 인증 실패
             if (status === 401) {
                 // 토큰 만료 등의 이유로 로그아웃 처리
-                AsyncStorage.removeItem('userToken')
-                    .catch(err => console.error('토큰 삭제 중 오류가 발생했습니다:', err));
+                console.log('[DEBUG_LOG] Using memory storage for API token removal on 401');
+                memoryStorage.removeItem('userToken')
+                    .catch(err => console.error('[DEBUG_LOG] 토큰 삭제 중 오류가 발생했습니다:', err));
                 // 로그인 페이지로 리다이렉트 등의 처리
             }
 

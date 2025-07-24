@@ -1,0 +1,190 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HybridMainScreen initializes with correct default state 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    testID="header"
+  >
+    <Text>
+      Header
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "position": "absolute",
+        "right": 20,
+        "top": 100,
+        "zIndex": 1000,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "backgroundColor": "#E0E0E0",
+          "borderRadius": 2,
+          "height": 120,
+          "marginBottom": 10,
+          "overflow": "hidden",
+          "width": 4,
+        }
+      }
+    >
+      <Animated.View
+        style={
+          [
+            {
+              "backgroundColor": "#2196F3",
+              "borderRadius": 2,
+              "height": "100%",
+            },
+            {
+              "width": {
+                "addListener": [MockFunction],
+                "removeListener": [MockFunction],
+                "setValue": [MockFunction],
+              },
+            },
+          ]
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+        }
+      }
+    >
+      <Animated.View
+        style={
+          [
+            {
+              "backgroundColor": "#E0E0E0",
+              "borderRadius": 6,
+              "height": 12,
+              "marginVertical": 8,
+              "width": 12,
+            },
+            {
+              "backgroundColor": {
+                "addListener": [MockFunction],
+                "removeListener": [MockFunction],
+                "setValue": [MockFunction],
+              },
+              "transform": [
+                {
+                  "scale": {
+                    "addListener": [MockFunction],
+                    "removeListener": [MockFunction],
+                    "setValue": [MockFunction],
+                  },
+                },
+              ],
+            },
+          ]
+        }
+      />
+      <Animated.View
+        style={
+          [
+            {
+              "backgroundColor": "#E0E0E0",
+              "borderRadius": 6,
+              "height": 12,
+              "marginVertical": 8,
+              "width": 12,
+            },
+            {
+              "backgroundColor": {
+                "addListener": [MockFunction],
+                "removeListener": [MockFunction],
+                "setValue": [MockFunction],
+              },
+              "transform": [
+                {
+                  "scale": {
+                    "addListener": [MockFunction],
+                    "removeListener": [MockFunction],
+                    "setValue": [MockFunction],
+                  },
+                },
+              ],
+            },
+          ]
+        }
+      />
+      <Animated.View
+        style={
+          [
+            {
+              "backgroundColor": "#E0E0E0",
+              "borderRadius": 6,
+              "height": 12,
+              "marginVertical": 8,
+              "width": 12,
+            },
+            {
+              "backgroundColor": {
+                "addListener": [MockFunction],
+                "removeListener": [MockFunction],
+                "setValue": [MockFunction],
+              },
+              "transform": [
+                {
+                  "scale": {
+                    "addListener": [MockFunction],
+                    "removeListener": [MockFunction],
+                    "setValue": [MockFunction],
+                  },
+                },
+              ],
+            },
+          ]
+        }
+      />
+    </View>
+  </View>
+  <ScrollView
+    onScroll={[MockFunction]}
+    scrollEventThrottle={16}
+    showsVerticalScrollIndicator={false}
+    style={
+      {
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      testID="storytelling-section"
+    >
+      <Text>
+        Storytelling Section
+      </Text>
+    </View>
+    <View
+      testID="dashboard-section"
+    >
+      <Text>
+        Feature Dashboard Section
+      </Text>
+    </View>
+    <View
+      testID="conversion-section"
+    >
+      <Text>
+        Conversion Section
+      </Text>
+    </View>
+  </ScrollView>
+</View>
+`;

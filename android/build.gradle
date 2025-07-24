@@ -1,21 +1,70 @@
+// Add buildscript repositories for plugin resolution
 buildscript {
-    ext {
-        buildToolsVersion = "35.0.0"
-        minSdkVersion = 24
-        compileSdkVersion = 35
-        targetSdkVersion = 35
-        ndkVersion = "27.1.12297006"
-        kotlinVersion = "2.1.20"
-    }
     repositories {
         google()
         mavenCentral()
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle")
-        classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+        gradlePluginPortal()
     }
 }
 
-apply plugin: "com.facebook.react.rootproject"
+// 1. 플러그인 선언 (반드시 최상단)
+plugins {
+    id("com.android.application") version "7.2.2" apply false
+    id("org.jetbrains.kotlin.android") version "1.7.22" apply false
+    id("com.facebook.react") version "0.80.1" apply false
+}
+
+// 2. 이제 ext 블록을 선언
+ext {
+    compileSdk = 35
+    buildToolsVersion = "35.0.0"
+    minSdkVersion = 24
+    targetSdkVersion = 35
+}
+
+// 3. allprojects
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://www.jitpack.io" }
+    }
+
+    // Fix for expo-module-gradle-plugin dependency resolution
+    configurations.all {
+        resolutionStrategy {
+            force 'com.facebook.react:react-native-gradle-plugin:0.80.1'
+        }
+    }
+}
+
+// 4. 모든 서브프로젝트에 SDK 설정 강제 적용
+subprojects { subproject ->
+    afterEvaluate {
+        if (subproject.plugins.hasPlugin("com.android.library")
+                || subproject.plugins.hasPlugin("com.android.application")) {
+
+            subproject.android.compileSdkVersion rootProject.ext.compileSdk
+            subproject.android.buildToolsVersion rootProject.ext.buildToolsVersion
+
+            // 라이브러리 모듈에도 min/target SDK를 강제하려면:
+            subproject.android.defaultConfig {
+                minSdkVersion = 24
+                targetSdkVersion = 35
+            }
+
+            // Java 17 강제 적용 (react-native-reanimated 등 모든 서브프로젝트)
+            subproject.android.compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+
+            // Kotlin JVM 타겟도 17로 설정
+            if (subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
+                subproject.android.kotlinOptions {
+                    jvmTarget = '17'
+                }
+            }
+        }
+    }
+}
