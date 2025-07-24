@@ -22,6 +22,11 @@ DerivedData
 *.xcuserstate
 **/.xcode.env.local
 .junie/guidelines.md
+project_planning_Document.md
+docs/report
+Toss_Back.md
+docs
+*.md
 
 # Android/IntelliJ
 #
