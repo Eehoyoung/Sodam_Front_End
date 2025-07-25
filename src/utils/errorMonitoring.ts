@@ -297,7 +297,7 @@ class ErrorMonitoringSystem {
     }
 
     /**
-     * Generate unique error ID
+     * 고유한 에러 ID 생성
      */
     private generateErrorId(type: ErrorType, message: string): string {
         const hash = message.split('').reduce((a, b) => {
