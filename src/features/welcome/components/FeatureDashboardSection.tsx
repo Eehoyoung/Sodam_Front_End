@@ -30,10 +30,13 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
                                                                              isVisible,
                                                                              onFeatureTest
                                                                          }) => {
+    // Native driver animations (transform, opacity)
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const slideAnim1 = useRef(new Animated.Value(50)).current;
     const slideAnim2 = useRef(new Animated.Value(50)).current;
     const slideAnim3 = useRef(new Animated.Value(50)).current;
+
+    // JavaScript driver animations (layout, shadow properties)
     const statsAnim = useRef(new Animated.Value(0)).current;
 
     // Demo state management
@@ -119,16 +122,17 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
                 })
             ];
 
-            // 통계 애니메이션
-            const statsAnimation = Animated.timing(statsAnim, {
+            // 네이티브 드라이버 애니메이션들을 먼저 실행
+            Animated.parallel(featureAnimations).start();
+
+            // JavaScript 드라이버 애니메이션을 별도로 실행
+            Animated.timing(statsAnim, {
                 toValue: 1,
                 duration: 2000,
                 delay: 800,
                 easing: Easing.out(Easing.quad),
                 useNativeDriver: false,
-            });
-
-            Animated.parallel([...featureAnimations, statsAnimation]).start();
+            }).start();
         }
     }, [isVisible]);
 
@@ -151,38 +155,43 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
     };
 
     const FeatureCard: React.FC<{ feature: Feature; index: number }> = ({feature, index}) => {
+        // Native driver animations (transform, opacity)
         const cardScaleAnim = useRef(new Animated.Value(1)).current;
         const buttonScaleAnim = useRef(new Animated.Value(1)).current;
+
+        // JavaScript driver animations (shadow properties)
         const shadowAnim = useRef(new Animated.Value(0.1)).current;
 
         const handleCardPressIn = () => {
-            Animated.parallel([
-                Animated.timing(cardScaleAnim, {
-                    toValue: 0.98,
-                    duration: 150,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(shadowAnim, {
-                    toValue: 0.2,
-                    duration: 150,
-                    useNativeDriver: false,
-                })
-            ]).start();
+            // Native driver animation
+            Animated.timing(cardScaleAnim, {
+                toValue: 0.98,
+                duration: 150,
+                useNativeDriver: true,
+            }).start();
+
+            // JavaScript driver animation (separate to avoid mixing)
+            Animated.timing(shadowAnim, {
+                toValue: 0.2,
+                duration: 150,
+                useNativeDriver: false,
+            }).start();
         };
 
         const handleCardPressOut = () => {
-            Animated.parallel([
-                Animated.timing(cardScaleAnim, {
-                    toValue: 1,
-                    duration: 150,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(shadowAnim, {
-                    toValue: 0.1,
-                    duration: 150,
-                    useNativeDriver: false,
-                })
-            ]).start();
+            // Native driver animation
+            Animated.timing(cardScaleAnim, {
+                toValue: 1,
+                duration: 150,
+                useNativeDriver: true,
+            }).start();
+
+            // JavaScript driver animation (separate to avoid mixing)
+            Animated.timing(shadowAnim, {
+                toValue: 0.1,
+                duration: 150,
+                useNativeDriver: false,
+            }).start();
         };
 
         const handleButtonPressIn = () => {
