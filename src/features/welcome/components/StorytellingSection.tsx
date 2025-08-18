@@ -1,5 +1,15 @@
-import React, {useEffect, useRef} from 'react';
-import {Animated, Dimensions, Easing, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import Animated, {
+    Easing,
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withRepeat,
+    withSequence,
+    withTiming,
+} from 'react-native-reanimated';
 
 const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
@@ -20,11 +30,11 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
                                                                      isVisible,
                                                                      onComplete
                                                                  }) => {
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const slideAnim1 = useRef(new Animated.Value(50)).current;
-    const slideAnim2 = useRef(new Animated.Value(50)).current;
-    const slideAnim3 = useRef(new Animated.Value(50)).current;
-    const arrowBounce = useRef(new Animated.Value(0)).current;
+    const fadeAnim = useSharedValue(0);
+    const slideAnim1 = useSharedValue(50);
+    const slideAnim2 = useSharedValue(50);
+    const slideAnim3 = useSharedValue(50);
+    const arrowBounce = useSharedValue(0);
 
     const problems: Problem[] = [
         {
@@ -52,88 +62,99 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
 
     useEffect(() => {
         if (isVisible) {
-            // 섹션 전체 페이드인
-            Animated.timing(fadeAnim, {
-                toValue: 1,
+            // 섹션 전체 페이드인 (Reanimated 3)
+            fadeAnim.value = withTiming(1, {
                 duration: 500,
                 easing: Easing.out(Easing.cubic),
-                useNativeDriver: true,
-            }).start();
-
-            // 문제 카드들 순차적 애니메이션
-            const animations = [
-                Animated.timing(slideAnim1, {
-                    toValue: 0,
-                    duration: 800,
-                    delay: 300,
-                    easing: Easing.out(Easing.back(1.2)),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(slideAnim2, {
-                    toValue: 0,
-                    duration: 800,
-                    delay: 600,
-                    easing: Easing.out(Easing.back(1.2)),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(slideAnim3, {
-                    toValue: 0,
-                    duration: 800,
-                    delay: 900,
-                    easing: Easing.out(Easing.back(1.2)),
-                    useNativeDriver: true,
-                })
-            ];
-
-            Animated.parallel(animations).start(() => {
-                // 모든 애니메이션 완료 후 화살표 바운스 시작
-                startArrowBounce();
-                if (onComplete) {
-                    setTimeout(onComplete, 1000);
-                }
             });
+
+            // 문제 카드들 순차적 애니메이션 (Reanimated 3)
+            slideAnim1.value = withDelay(300, withTiming(0, {
+                duration: 800,
+                easing: Easing.out(Easing.back(1.2)),
+            }));
+
+            slideAnim2.value = withDelay(600, withTiming(0, {
+                duration: 800,
+                easing: Easing.out(Easing.back(1.2)),
+            }));
+
+            slideAnim3.value = withDelay(900, withTiming(0, {
+                duration: 800,
+                easing: Easing.out(Easing.back(1.2)),
+            }, (finished) => {
+                'worklet';
+                if (finished) {
+                    // 모든 애니메이션 완료 후 화살표 바운스 시작
+                    arrowBounce.value = withRepeat(
+                        withSequence(
+                            withTiming(-10, {
+                                duration: 1000,
+                                easing: Easing.inOut(Easing.sin),
+                            }),
+                            withTiming(0, {
+                                duration: 1000,
+                                easing: Easing.inOut(Easing.sin),
+                            })
+                        ),
+                        -1, // infinite
+                        true // reverse
+                    );
+
+                    if (onComplete) {
+                        runOnJS(() => {
+                            setTimeout(onComplete, 1000);
+                        })();
+                    }
+                }
+            }));
+        } else {
+            // 컴포넌트가 보이지 않을 때 애니메이션 리셋
+            fadeAnim.value = 0;
+            slideAnim1.value = 50;
+            slideAnim2.value = 50;
+            slideAnim3.value = 50;
+            arrowBounce.value = 0;
         }
     }, [isVisible]);
 
-    const startArrowBounce = () => {
-        Animated.loop(
-            Animated.sequence([
-                Animated.timing(arrowBounce, {
-                    toValue: -10,
-                    duration: 1000,
-                    easing: Easing.inOut(Easing.sin),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(arrowBounce, {
-                    toValue: 0,
-                    duration: 1000,
-                    easing: Easing.inOut(Easing.sin),
-                    useNativeDriver: true,
-                })
-            ])
-        ).start();
-    };
+    // Animated styles using Reanimated 3
+    const containerStyle = useAnimatedStyle(() => ({
+        opacity: fadeAnim.value,
+    }));
 
-    const getAnimationStyle = (index: number) => {
-        const anims = [slideAnim1, slideAnim2, slideAnim3];
-        return {
-            transform: [{translateY: anims[index]}],
-            opacity: fadeAnim,
-        };
-    };
+    const problemCard1Style = useAnimatedStyle(() => ({
+        transform: [{translateY: slideAnim1.value}],
+    }));
 
-    const ProblemCard: React.FC<{ problem: Problem; index: number }> = ({problem, index}) => (
-        <Animated.View style={[styles.problemCard, getAnimationStyle(index)]}>
-            <View style={styles.problemHeader}>
-                <Text style={styles.problemEmoji}>{problem.emoji}</Text>
-                <Text style={styles.problemTitle}>{problem.title}</Text>
-            </View>
-            <Text style={styles.problemDescription}>{problem.description}</Text>
-        </Animated.View>
-    );
+    const problemCard2Style = useAnimatedStyle(() => ({
+        transform: [{translateY: slideAnim2.value}],
+    }));
+
+    const problemCard3Style = useAnimatedStyle(() => ({
+        transform: [{translateY: slideAnim3.value}],
+    }));
+
+    const arrowStyle = useAnimatedStyle(() => ({
+        transform: [{translateY: arrowBounce.value}],
+    }));
+
+
+    const ProblemCard: React.FC<{ problem: Problem; index: number }> = ({problem, index}) => {
+        const cardStyles = [problemCard1Style, problemCard2Style, problemCard3Style];
+        return (
+            <Animated.View style={[styles.problemCard, cardStyles[index]]}>
+                <View style={styles.problemHeader}>
+                    <Text style={styles.problemEmoji}>{problem.emoji}</Text>
+                    <Text style={styles.problemTitle}>{problem.title}</Text>
+                </View>
+                <Text style={styles.problemDescription}>{problem.description}</Text>
+            </Animated.View>
+        );
+    };
 
     return (
-        <Animated.View style={[styles.container, {opacity: fadeAnim}]}>
+        <Animated.View style={[styles.container, containerStyle]}>
             <View style={styles.content}>
                 <Text style={styles.sectionTitle}>이런 고민, 혹시 있으신가요?</Text>
 
@@ -149,12 +170,7 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
 
                 <View style={styles.transitionHint}>
                     <Text style={styles.hintText}>이 모든 걱정을...</Text>
-                    <Animated.View
-                        style={[
-                            styles.scrollIndicator,
-                            {transform: [{translateY: arrowBounce}]}
-                        ]}
-                    >
+                    <Animated.View style={[styles.scrollIndicator, arrowStyle]}>
                         <Text style={styles.arrowText}>↓</Text>
                     </Animated.View>
                 </View>

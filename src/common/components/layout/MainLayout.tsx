@@ -1,5 +1,12 @@
-import React, {ReactNode, useRef} from 'react';
-import {Animated, Dimensions, ScrollView, StyleSheet, View} from 'react-native';
+import React, {ReactNode, useMemo, useRef} from 'react';
+import {Dimensions, StyleSheet, View} from 'react-native';
+import Animated, {
+    Extrapolate,
+    interpolate,
+    useAnimatedScrollHandler,
+    useAnimatedStyle,
+    useSharedValue,
+} from 'react-native-reanimated';
 import Header from './Header'; // 같은 디렉토리에 있으므로 경로 수정
 import Footer from './Footer'; // 같은 디렉토리에 있으므로 경로 수정
 import {useResponsiveStyles} from '../../../utils/responsive';
@@ -11,14 +18,27 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({children, title}) => {
     const {responsiveStyles} = useResponsiveStyles();
-    const scrollY = useRef(new Animated.Value(0)).current;
-    const scrollViewRef = useRef<ScrollView>(null);
+    const scrollY = useSharedValue(0);
+    const scrollViewRef = useRef<Animated.ScrollView>(null);
+
+    // Calculate window height outside of worklet to avoid JSI violation
+    const windowHeight = useMemo(() => Dimensions.get('window').height, []);
 
     // 스크롤 위치에 따라 Footer의 투명도 계산
-    const footerOpacity = scrollY.interpolate({
-        inputRange: [0, Dimensions.get('window').height * 0.8, Dimensions.get('window').height],
-        outputRange: [0, 0, 1],
-        extrapolate: 'clamp'
+    const footerAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: interpolate(
+            scrollY.value,
+            [0, windowHeight * 0.8, windowHeight],
+            [0, 0, 1],
+            Extrapolate.CLAMP
+        ),
+    }));
+
+    // 스크롤 이벤트 핸들러
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            scrollY.value = event.contentOffset.y;
+        },
     });
 
     return (
@@ -28,10 +48,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({children, title}) => {
                 ref={scrollViewRef}
                 style={styles.scrollView}
                 contentContainerStyle={[styles.contentContainer, {padding: responsiveStyles.container.padding}]}
-                onScroll={Animated.event(
-                    [{nativeEvent: {contentOffset: {y: scrollY}}}],
-                    {useNativeDriver: true}
-                )}
+                onScroll={scrollHandler}
                 scrollEventThrottle={16}
             >
                 <View style={styles.content}>
@@ -39,7 +56,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({children, title}) => {
                 </View>
                 <View style={styles.footerSpacing}/>
             </Animated.ScrollView>
-            <Animated.View style={[styles.footerContainer, {opacity: footerOpacity}]}>
+            <Animated.View style={[styles.footerContainer, footerAnimatedStyle]}>
                 <Footer/>
             </Animated.View>
         </View>

@@ -108,15 +108,7 @@ jest.mock('react-native-safe-area-context', () => ({
     useSafeAreaInsets: () => ({top: 0, bottom: 0, left: 0, right: 0}),
 }));
 
-// Mock react-native-vector-icons - conditional mocks to avoid requiring the package
-try {
-    jest.mock('react-native-vector-icons/FontAwesome', () => 'FontAwesome');
-    jest.mock('react-native-vector-icons/FontAwesome5', () => 'FontAwesome5');
-    jest.mock('react-native-vector-icons/MaterialIcons', () => 'MaterialIcons');
-    jest.mock('react-native-vector-icons/Ionicons', () => 'Ionicons');
-} catch (e) {
-    // Package not installed, skip mocks
-}
+// react-native-vector-icons removed - migrated to @expo/vector-icons
 
 // Mock @expo/vector-icons
 jest.mock('@expo/vector-icons', () => ({
@@ -162,3 +154,63 @@ jest.mock('react-native-chart-kit', () => ({
     ContributionGraph: 'ContributionGraph',
     StackedBarChart: 'StackedBarChart',
 }));
+
+// Mock react-native-reanimated with official mock to avoid native crashes in Jest
+try {
+    jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'));
+} catch (e) {
+    // if module resolution fails, provide a minimal fallback
+    jest.mock('react-native-reanimated', () => ({
+        Easing: {linear: jest.fn(), ease: jest.fn()},
+        useSharedValue: jest.fn(() => ({value: 0})),
+        useAnimatedStyle: jest.fn(() => ({})),
+        withTiming: jest.fn((v) => v),
+        withSpring: jest.fn((v) => v),
+        withDelay: jest.fn((_, v) => v),
+        runOnJS: (fn) => fn,
+        runOnUI: (fn) => fn,
+        createAnimatedComponent: (c) => c,
+    }));
+}
+
+// Lightweight mock for @testing-library/react-native to avoid adding a dev dependency
+try {
+    jest.mock('@testing-library/react-native', () => {
+        const render = jest.fn(() => ({
+            getByText: jest.fn(),
+            getByTestId: jest.fn(),
+            queryByText: jest.fn(),
+            update: jest.fn(),
+            unmount: jest.fn(),
+        }));
+        const renderHook = jest.fn((callback) => {
+            const result = {current: undefined};
+            try {
+                const r = callback();
+                result.current = (r && 'result' in r) ? r.result : r;
+            } catch (e) {
+                result.current = undefined;
+            }
+            return {
+                result,
+                rerender: jest.fn(),
+                unmount: jest.fn(),
+            };
+        });
+        const fireEvent = {
+            press: jest.fn(),
+            changeText: jest.fn(),
+        };
+        const waitFor = async (cb) => {
+            if (cb) {
+                await cb();
+            }
+        };
+        const act = async (cb) => {
+            return cb ? await cb() : undefined;
+        };
+        return {render, renderHook, fireEvent, waitFor, act};
+    });
+} catch (e) {
+    // ignore
+}

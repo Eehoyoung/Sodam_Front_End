@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     ActivityIndicator,
     Alert,
     FlatList,
+    Linking,
     Modal,
     Platform,
     RefreshControl,
@@ -13,10 +14,10 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {MaterialIcons as Icon} from '@expo/vector-icons';
 import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
-import {Camera, useCameraDevices, useCodeScanner} from 'react-native-vision-camera';
+import NfcManager from 'react-native-nfc-manager';
 import {Button, Card, MainLayout} from '../../../common/components';
 import attendanceService from '../services/attendanceService';
 import {AttendanceRecord, AttendanceStatus} from '../types';
@@ -28,7 +29,7 @@ type AttendanceStackParamList = {
     Attendance: undefined;
     AttendanceDetail: { attendanceId: string };
     CheckIn: undefined;
-    QRScan: undefined;
+    NFCScan: undefined;
 };
 
 type AttendanceScreenNavigationProp = StackNavigationProp<AttendanceStackParamList, 'Attendance'>;
@@ -43,49 +44,66 @@ const AttendanceScreen = () => {
     const [workplaces, setWorkplaces] = useState<{ id: string; name: string }[]>([]);
     const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
     const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-    const [showQRScanner, setShowQRScanner] = useState(false);
-    const [qrCode, setQrCode] = useState<string>('');
-    const [checkInMethod, setCheckInMethod] = useState<'standard' | 'location' | 'qr'>('standard');
+    const [showNFCReader, setShowNFCReader] = useState(false);
+    const [nfcTagId, setNfcTagId] = useState<string>('');
+    const [checkInMethod, setCheckInMethod] = useState<'standard' | 'location' | 'nfc'>('standard');
 
-    // Vision Camera 설정
-    const devices = useCameraDevices();
-    const device = devices.find(d => d.position === 'back');
+    // Refs to track location services and component mount status for proper cleanup
+    const locationWatchId = useRef<number | null>(null);
+    const isMountedRef = useRef(true);
 
-    // 코드 스캐너 설정
-    const codeScanner = useCodeScanner({
-        codeTypes: ['qr', 'ean-13'],
-        onCodeScanned: (codes) => {
-            if (codes.length > 0) {
-                handleQRCodeScanned(codes[0].value || '');
-            }
-        }
-    });
-
-    // 카메라 권한 확인
-    const checkCameraPermission = async () => {
-        const permission = await Camera.getCameraPermissionStatus();
-
-        if (permission !== 'granted') {
-            const newPermission = await Camera.requestCameraPermission();
-
-            if (newPermission !== 'granted') {
+    // NFC 지원 여부 확인
+    const checkNFCSupport = async () => {
+        try {
+            const isSupported = await NfcManager.isSupported();
+            if (!isSupported) {
                 Alert.alert(
-                    '카메라 권한 필요',
-                    'QR 코드 스캔을 위해서는 카메라 접근 권한이 필요합니다.',
+                    'NFC 미지원',
+                    '이 기기는 NFC를 지원하지 않습니다. 다른 출퇴근 방법을 이용해주세요.',
                     [{text: '확인'}]
                 );
                 return false;
             }
-        }
 
-        return true;
+            const isEnabled = await NfcManager.isEnabled();
+            if (!isEnabled) {
+                Alert.alert(
+                    'NFC 비활성화',
+                    'NFC 출퇴근을 위해 NFC를 활성화해주세요.',
+                    [
+                        {text: '취소', style: 'cancel'},
+                        {
+                            text: '설정으로 이동',
+                            onPress: () => {
+                                if (Platform.OS === 'android') {
+                                    Linking.sendIntent('android.settings.NFC_SETTINGS');
+                                } else {
+                                    Linking.openSettings();
+                                }
+                            }
+                        }
+                    ]
+                );
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error('NFC 지원 확인 실패:', error);
+            Alert.alert(
+                'NFC 오류',
+                'NFC 상태를 확인할 수 없습니다.',
+                [{text: '확인'}]
+            );
+            return false;
+        }
     };
 
-    // QR 스캐너 열기
-    const openQRScanner = async () => {
-        const hasPermission = await checkCameraPermission();
-        if (hasPermission) {
-            setShowQRScanner(true);
+    // NFC 리더 열기
+    const openNFCReader = async () => {
+        const isNFCAvailable = await checkNFCSupport();
+        if (isNFCAvailable) {
+            setShowNFCReader(true);
         }
     };
 
@@ -164,14 +182,28 @@ const AttendanceScreen = () => {
 
     // 현재 위치 가져오기
     const getCurrentLocation = () => {
+        if (!isMountedRef.current) {
+            return;
+        }
+
         if (locationPermissionGranted) {
             Geolocation.getCurrentPosition(
                 position => {
+                    // Check if component is still mounted before updating state
+                    if (!isMountedRef.current) {
+                        return;
+                    }
+
                     const {latitude, longitude} = position.coords;
                     setCurrentLocation({latitude, longitude});
                 },
                 error => {
-                    console.error('위치 정보를 가져오는 중 오류가 발생했습니다:', error);
+                    // Check if component is still mounted before updating state
+                    if (!isMountedRef.current) {
+                        return;
+                    }
+
+                    console.error('AttendanceScreen: Location error:', error);
                     Alert.alert('오류', '위치 정보를 가져오는 데 실패했습니다. 다시 시도해주세요.');
                 },
                 {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000}
@@ -179,18 +211,38 @@ const AttendanceScreen = () => {
         }
     };
 
-    // QR 코드 스캔 처리
-    const handleQRCodeScanned = (scannedQRCode: string) => {
-        setQrCode(scannedQRCode);
-        setShowQRScanner(false);
+    // NFC 태그 스캔 처리
+    const handleNFCTagScanned = (scannedNFCTag: string) => {
+        setNfcTagId(scannedNFCTag);
+        setShowNFCReader(false);
 
-        // QR 코드로 출퇴근 처리
+        // NFC 태그로 출퇴근 처리
         if (currentAttendance) {
-            handleCheckOutWithQR(scannedQRCode);
+            handleCheckOutWithNFC(scannedNFCTag);
         } else {
-            handleCheckInWithQR(scannedQRCode);
+            handleCheckInWithNFC(scannedNFCTag);
         }
     };
+
+    // Cleanup effect to properly stop location services when component unmounts
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+
+            // Clear any active location watch
+            if (locationWatchId.current !== null) {
+                Geolocation.clearWatch(locationWatchId.current);
+                locationWatchId.current = null;
+            }
+
+            // Stop location services to prevent Google Play Services channel leaks
+            try {
+                Geolocation.stopObserving();
+            } catch (error) {
+                console.warn('AttendanceScreen: Error stopping location observing:', error);
+            }
+        };
+    }, []);
 
     // 화면 로드 시 데이터 조회 및 위치 권한 요청
     useEffect(() => {
@@ -282,23 +334,23 @@ const AttendanceScreen = () => {
         }
     };
 
-    // QR 코드 기반 출근 처리
-    const handleCheckInWithQR = async (scannedQRCode: string) => {
+    // NFC 태그 기반 출근 처리
+    const handleCheckInWithNFC = async (scannedNFCTag: string) => {
         if (!selectedWorkplaceId) {
             Alert.alert('알림', '근무지를 선택해주세요.');
             return;
         }
 
         try {
-            // QR 코드 기반 인증 먼저 수행
-            const verifyResult = await attendanceService.verifyQrCodeAttendance(
+            // NFC 태그 기반 인증 먼저 수행
+            const verifyResult = await attendanceService.verifyNfcTagAttendance(
                 '1', // 임시 employeeId (실제 구현에서는 로그인한 사용자 ID 사용)
                 selectedWorkplaceId,
-                scannedQRCode
+                scannedNFCTag
             );
 
             if (!verifyResult.success) {
-                Alert.alert('알림', verifyResult.message || 'QR 코드 인증에 실패했습니다. 다시 시도해주세요.');
+                Alert.alert('알림', verifyResult.message || 'NFC 태그 인증에 실패했습니다. 다시 시도해주세요.');
                 return;
             }
 
@@ -308,12 +360,12 @@ const AttendanceScreen = () => {
             };
 
             const response = await attendanceService.checkIn(checkInData);
-            Alert.alert('성공', 'QR 코드 기반 출근 처리되었습니다.');
+            Alert.alert('성공', 'NFC 태그 기반 출근 처리되었습니다.');
             setCurrentAttendance(response);
             fetchAttendanceRecords();
         } catch (error) {
-            console.error('QR 코드 기반 출근 처리 중 오류가 발생했습니다:', error);
-            Alert.alert('오류', 'QR 코드 기반 출근 처리에 실패했습니다. 다시 시도해주세요.');
+            console.error('NFC 태그 기반 출근 처리 중 오류가 발생했습니다:', error);
+            Alert.alert('오류', 'NFC 태그 기반 출근 처리에 실패했습니다. 다시 시도해주세요.');
         }
     };
 
@@ -388,23 +440,23 @@ const AttendanceScreen = () => {
         }
     };
 
-    // QR 코드 기반 퇴근 처리
-    const handleCheckOutWithQR = async (scannedQRCode: string) => {
+    // NFC 태그 기반 퇴근 처리
+    const handleCheckOutWithNFC = async (scannedNFCTag: string) => {
         if (!currentAttendance) {
             Alert.alert('알림', '현재 출근 상태가 아닙니다.');
             return;
         }
 
         try {
-            // QR 코드 기반 인증 먼저 수행
-            const verifyResult = await attendanceService.verifyQrCodeAttendance(
+            // NFC 태그 기반 인증 먼저 수행
+            const verifyResult = await attendanceService.verifyNfcTagAttendance(
                 '1', // 임시 employeeId (실제 구현에서는 로그인한 사용자 ID 사용)
                 selectedWorkplaceId,
-                scannedQRCode
+                scannedNFCTag
             );
 
             if (!verifyResult.success) {
-                Alert.alert('알림', verifyResult.message || 'QR 코드 인증에 실패했습니다. 다시 시도해주세요.');
+                Alert.alert('알림', verifyResult.message || 'NFC 태그 인증에 실패했습니다. 다시 시도해주세요.');
                 return;
             }
 
@@ -414,12 +466,12 @@ const AttendanceScreen = () => {
             };
 
             await attendanceService.checkOut(currentAttendance.id, checkOutData);
-            Alert.alert('성공', 'QR 코드 기반 퇴근 처리되었습니다.');
+            Alert.alert('성공', 'NFC 태그 기반 퇴근 처리되었습니다.');
             setCurrentAttendance(null);
             fetchAttendanceRecords();
         } catch (error) {
-            console.error('QR 코드 기반 퇴근 처리 중 오류가 발생했습니다:', error);
-            Alert.alert('오류', 'QR 코드 기반 퇴근 처리에 실패했습니다. 다시 시도해주세요.');
+            console.error('NFC 태그 기반 퇴근 처리 중 오류가 발생했습니다:', error);
+            Alert.alert('오류', 'NFC 태그 기반 퇴근 처리에 실패했습니다. 다시 시도해주세요.');
         }
     };
 
@@ -525,42 +577,50 @@ const AttendanceScreen = () => {
         </View>
     );
 
-    // QR 스캐너 렌더링
-    const renderQRScanner = () => (
+    // NFC 리더 렌더링
+    const renderNFCReader = () => (
         <Modal
-            visible={showQRScanner}
+            visible={showNFCReader}
             animationType="slide"
-            onRequestClose={() => setShowQRScanner(false)}
+            onRequestClose={() => setShowNFCReader(false)}
         >
-            <View style={styles.cameraContainer}>
-                <View style={styles.cameraHeader}>
+            <View style={styles.nfcContainer}>
+                <View style={styles.nfcHeader}>
                     <TouchableOpacity
-                        onPress={() => setShowQRScanner(false)}
+                        onPress={() => setShowNFCReader(false)}
                         style={styles.closeButton}
                     >
                         <Icon name="close" size={24} color="#fff"/>
                     </TouchableOpacity>
-                    <Text style={styles.cameraTitle}>QR 코드 스캔</Text>
+                    <Text style={styles.nfcTitle}>NFC 태그 읽기</Text>
                 </View>
 
-                {device ? (
-                    <Camera
-                        style={styles.camera}
-                        device={device}
-                        isActive={showQRScanner}
-                        codeScanner={codeScanner}
-                    />
-                ) : (
-                    <View style={styles.loadingCameraContainer}>
-                        <ActivityIndicator size="large" color="#fff"/>
-                        <Text style={styles.loadingCameraText}>카메라를 불러오는 중...</Text>
+                <View style={styles.nfcReaderContainer}>
+                    <View style={styles.nfcIconContainer}>
+                        <Icon name="nfc" size={80} color="#4CAF50"/>
                     </View>
-                )}
 
-                <View style={styles.cameraOverlay}>
-                    <Text style={styles.cameraInstructions}>
-                        QR 코드를 화면 중앙에 맞춰주세요
+                    <Text style={styles.nfcInstructions}>
+                        NFC 태그를 기기 뒷면에 가까이 대주세요
                     </Text>
+
+                    <Text style={styles.nfcSubInstructions}>
+                        태그가 감지되면 자동으로 출퇴근 처리됩니다
+                    </Text>
+
+                    <View style={styles.nfcStatusContainer}>
+                        <ActivityIndicator size="large" color="#4CAF50"/>
+                        <Text style={styles.nfcStatusText}>NFC 태그를 기다리는 중...</Text>
+                    </View>
+                </View>
+
+                <View style={styles.nfcFooter}>
+                    <TouchableOpacity
+                        style={styles.cancelButton}
+                        onPress={() => setShowNFCReader(false)}
+                    >
+                        <Text style={styles.cancelButtonText}>취소</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </Modal>
@@ -569,7 +629,7 @@ const AttendanceScreen = () => {
     return (
         <MainLayout>
             <View style={styles.container}>
-                {renderQRScanner()}
+                {renderNFCReader()}
                 <View style={styles.header}>
                     <Text style={styles.title}>출퇴근 관리</Text>
                 </View>
@@ -671,19 +731,19 @@ const AttendanceScreen = () => {
                             <TouchableOpacity
                                 style={[
                                     styles.methodOption,
-                                    checkInMethod === 'qr' && styles.selectedMethod
+                                    checkInMethod === 'nfc' && styles.selectedMethod
                                 ]}
-                                onPress={() => setCheckInMethod('qr')}
+                                onPress={() => setCheckInMethod('nfc')}
                             >
-                                <Icon name="qr-code-scanner" size={16}
-                                      color={checkInMethod === 'qr' ? '#fff' : '#555'}/>
+                                <Icon name="nfc" size={16}
+                                      color={checkInMethod === 'nfc' ? '#fff' : '#555'}/>
                                 <Text
                                     style={[
                                         styles.methodOptionText,
-                                        checkInMethod === 'qr' && styles.selectedMethodText
+                                        checkInMethod === 'nfc' && styles.selectedMethodText
                                     ]}
                                 >
-                                    QR
+                                    NFC
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -709,12 +769,12 @@ const AttendanceScreen = () => {
                                             fullWidth
                                         />
                                     )}
-                                    {checkInMethod === 'qr' && (
+                                    {checkInMethod === 'nfc' && (
                                         <Button
-                                            title="QR 코드로 출근하기"
-                                            onPress={openQRScanner}
+                                            title="NFC 태그로 출근하기"
+                                            onPress={openNFCReader}
                                             type="primary"
-                                            icon="qr-code-scanner"
+                                            icon="nfc"
                                             fullWidth
                                         />
                                     )}
@@ -739,12 +799,12 @@ const AttendanceScreen = () => {
                                             fullWidth
                                         />
                                     )}
-                                    {checkInMethod === 'qr' && (
+                                    {checkInMethod === 'nfc' && (
                                         <Button
-                                            title="QR 코드로 퇴근하기"
-                                            onPress={openQRScanner}
+                                            title="NFC 태그로 퇴근하기"
+                                            onPress={openNFCReader}
                                             type="secondary"
-                                            icon="qr-code-scanner"
+                                            icon="nfc"
                                             fullWidth
                                         />
                                     )}
@@ -997,23 +1057,23 @@ const styles = StyleSheet.create({
         marginTop: 8,
         textAlign: 'center',
     },
-    // QR 스캐너 관련 스타일
-    cameraContainer: {
+    // NFC 리더 관련 스타일
+    nfcContainer: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: '#f5f5f5',
     },
-    cameraHeader: {
+    nfcHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingTop: 50,
         paddingHorizontal: 20,
         paddingBottom: 20,
-        backgroundColor: 'rgba(0,0,0,0.8)',
+        backgroundColor: '#4CAF50',
     },
     closeButton: {
         padding: 10,
     },
-    cameraTitle: {
+    nfcTitle: {
         flex: 1,
         color: '#fff',
         fontSize: 18,
@@ -1021,34 +1081,67 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginRight: 44, // closeButton 크기만큼 오프셋
     },
-    camera: {
-        flex: 1,
-    },
-    cameraOverlay: {
-        position: 'absolute',
-        bottom: 100,
-        left: 0,
-        right: 0,
-        alignItems: 'center',
-    },
-    cameraInstructions: {
-        color: '#fff',
-        fontSize: 16,
-        textAlign: 'center',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    loadingCameraContainer: {
+    nfcReaderContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        padding: 40,
     },
-    loadingCameraText: {
+    nfcIconContainer: {
+        marginBottom: 30,
+        padding: 20,
+        borderRadius: 50,
+        backgroundColor: '#fff',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    nfcInstructions: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    nfcSubInstructions: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 30,
+        lineHeight: 20,
+    },
+    nfcStatusContainer: {
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    nfcStatusText: {
+        fontSize: 16,
+        color: '#4CAF50',
+        marginTop: 10,
+        fontWeight: '500',
+    },
+    nfcFooter: {
+        padding: 20,
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderTopColor: '#e0e0e0',
+    },
+    cancelButton: {
+        backgroundColor: '#f44336',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    cancelButtonText: {
         color: '#fff',
         fontSize: 16,
-        marginTop: 16,
+        fontWeight: 'bold',
     },
 });
 

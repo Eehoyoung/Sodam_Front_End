@@ -1,7 +1,15 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Animated, Dimensions, Easing, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-
-const {width: screenWidth} = Dimensions.get('window');
+import React, {useEffect, useMemo, useState} from 'react';
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import Animated, {
+    Easing,
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withSpring,
+    withTiming,
+} from 'react-native-reanimated';
+import {useJSISafeDimensions} from '../../../../hooks/useJSISafeDimensions';
 
 interface Store {
     id: string;
@@ -48,12 +56,35 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
     const [managementProgress, setManagementProgress] = useState(0);
 
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const scaleAnim = useRef(new Animated.Value(0.8)).current;
-    const progressAnim = useRef(new Animated.Value(0)).current;
-    const storeAnim1 = useRef(new Animated.Value(0)).current;
-    const storeAnim2 = useRef(new Animated.Value(0)).current;
-    const storeAnim3 = useRef(new Animated.Value(0)).current;
+    const fadeAnim = useSharedValue(0);
+    const scaleAnim = useSharedValue(0.8);
+    const progressAnim = useSharedValue(0);
+    const storeAnim1 = useSharedValue(0);
+    const storeAnim2 = useSharedValue(0);
+    const storeAnim3 = useSharedValue(0);
+
+    // Use JSI-safe dimensions hook
+    let dimensions;
+    try {
+        const hookResult = useJSISafeDimensions();
+        dimensions = hookResult.dimensions;
+    } catch (error) {
+        console.error('StoreManagementDemo: Failed to get dimensions:', error);
+        throw error;
+    }
+
+    // Create dynamic styles that depend on dimensions (moved from StyleSheet.create)
+    const dynamicStyles = useMemo(() => ({
+        demoModal: {
+            backgroundColor: '#FFFFFF',
+            borderRadius: 20,
+            padding: 24,
+            width: dimensions.screenWidth * 0.9,  // ✅ Safe access to dimensions
+            maxWidth: 400,
+            alignItems: 'center',
+            maxHeight: '85%',
+        },
+    }), [dimensions.screenWidth]);
 
     const stores: Store[] = [
         {
@@ -96,70 +127,57 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
 
     useEffect(() => {
         if (isVisible) {
-            // 데모 모달 등장 애니메이션
-            Animated.parallel([
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 300,
-                    easing: Easing.out(Easing.cubic),
-                    useNativeDriver: true,
-                }),
-                Animated.spring(scaleAnim, {
-                    toValue: 1,
-                    tension: 100,
-                    friction: 8,
-                    useNativeDriver: true,
-                })
-            ]).start(() => {
-                // 매장 카드들 순차 애니메이션
-                Animated.stagger(200, [
-                    Animated.timing(storeAnim1, {
-                        toValue: 1,
-                        duration: 600,
-                        easing: Easing.out(Easing.back(1.1)),
-                        useNativeDriver: true,
-                    }),
-                    Animated.timing(storeAnim2, {
-                        toValue: 1,
-                        duration: 600,
-                        easing: Easing.out(Easing.back(1.1)),
-                        useNativeDriver: true,
-                    }),
-                    Animated.timing(storeAnim3, {
-                        toValue: 1,
-                        duration: 600,
-                        easing: Easing.out(Easing.back(1.1)),
-                        useNativeDriver: true,
-                    })
-                ]).start();
+            // 데모 모달 등장 애니메이션 (Reanimated 3)
+            fadeAnim.value = withTiming(1, {
+                duration: 300,
+                easing: Easing.out(Easing.cubic),
             });
+            scaleAnim.value = withSpring(1, {
+                damping: 15,
+                stiffness: 150,
+            });
+
+            // 매장 카드들 순차 애니메이션 (Reanimated 3)
+            storeAnim1.value = withDelay(300, withTiming(1, {
+                duration: 600,
+                easing: Easing.out(Easing.back(1.1)),
+            }));
+
+            storeAnim2.value = withDelay(500, withTiming(1, {
+                duration: 600,
+                easing: Easing.out(Easing.back(1.1)),
+            }));
+
+            storeAnim3.value = withDelay(700, withTiming(1, {
+                duration: 600,
+                easing: Easing.out(Easing.back(1.1)),
+            }));
         }
     }, [isVisible]);
 
     useEffect(() => {
         if (demoStep === 'management') {
-            // 관리 작업 시뮬레이션
-            const managementAnimation = Animated.timing(progressAnim, {
-                toValue: 1,
+            // 관리 작업 시뮬레이션 (Reanimated 3)
+            progressAnim.value = withTiming(1, {
                 duration: 3000,
                 easing: Easing.out(Easing.quad),
-                useNativeDriver: false,
-            });
-
-            managementAnimation.start(({finished}) => {
+            }, (finished) => {
+                'worklet';
                 if (finished) {
-                    setDemoStep('complete');
-                    onDemoComplete({
-                        success: true,
-                        message: '매장 통합관리 체험이 완료되었습니다!',
-                        timestamp: Date.now(),
-                        management: {
+                    runOnJS(() => {
+                        setDemoStep('complete');
+                        onDemoComplete({
                             success: true,
-                            message: '3개 매장 관리 완료',
+                            message: '매장 통합관리 체험이 완료되었습니다!',
                             timestamp: Date.now(),
-                            storesManaged: 3
-                        }
-                    });
+                            management: {
+                                success: true,
+                                message: '3개 매장 관리 완료',
+                                timestamp: Date.now(),
+                                storesManaged: 3
+                            }
+                        });
+                    })();
                 }
             });
 
@@ -177,28 +195,25 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
 
             return () => {
                 clearInterval(progressInterval);
+                // Reanimated 3에서는 자동으로 애니메이션이 정리됨
             };
         }
     }, [demoStep]);
 
     const closeDemo = () => {
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-                toValue: 0.8,
-                duration: 200,
-                useNativeDriver: true,
-            })
-        ]).start(() => {
-            onDemoComplete({
-                success: false,
-                message: '데모가 취소되었습니다.',
-                timestamp: Date.now()
-            });
+        // Reanimated 3 parallel animations
+        fadeAnim.value = withTiming(0, {duration: 200});
+        scaleAnim.value = withTiming(0.8, {duration: 200}, (finished) => {
+            'worklet';
+            if (finished) {
+                runOnJS(() => {
+                    onDemoComplete({
+                        success: false,
+                        message: '데모가 취소되었습니다.',
+                        timestamp: Date.now()
+                    });
+                })();
+            }
         });
     };
 
@@ -209,6 +224,31 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
             maximumFractionDigits: 0,
         }).format(amount);
     };
+
+    // Animated styles using Reanimated 3
+    const containerStyle = useAnimatedStyle(() => ({
+        opacity: fadeAnim.value,
+        transform: [{scale: scaleAnim.value}],
+    }));
+
+    const progressBarStyle = useAnimatedStyle(() => ({
+        width: `${progressAnim.value * 100}%`,
+    }));
+
+    const store1Style = useAnimatedStyle(() => ({
+        opacity: storeAnim1.value,
+        transform: [{scale: storeAnim1.value}],
+    }));
+
+    const store2Style = useAnimatedStyle(() => ({
+        opacity: storeAnim2.value,
+        transform: [{scale: storeAnim2.value}],
+    }));
+
+    const store3Style = useAnimatedStyle(() => ({
+        opacity: storeAnim3.value,
+        transform: [{scale: storeAnim3.value}],
+    }));
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -256,23 +296,14 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
     const startManagement = () => {
         setDemoStep('management');
         setManagementProgress(0);
-        progressAnim.setValue(0);
+        progressAnim.value = 0;
     };
 
     const StoreCard: React.FC<{ store: Store; index: number }> = ({store, index}) => {
-        const anims = [storeAnim1, storeAnim2, storeAnim3];
-        const animStyle = {
-            opacity: anims[index],
-            transform: [{
-                translateY: anims[index].interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [50, 0]
-                })
-            }]
-        };
+        const storeStyles = [store1Style, store2Style, store3Style];
 
         return (
-            <Animated.View style={animStyle}>
+            <Animated.View style={storeStyles[index]}>
                 <TouchableOpacity
                     style={styles.storeCard}
                     onPress={() => handleStoreSelect(store)}
@@ -366,17 +397,7 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
                         <Text style={styles.demoTitle}>통합 관리 실행 중...</Text>
                         <Text style={styles.progressText}>{managementProgress}%</Text>
                         <View style={styles.progressBar}>
-                            <Animated.View
-                                style={[
-                                    styles.progressFill,
-                                    {
-                                        width: progressAnim.interpolate({
-                                            inputRange: [0, 1],
-                                            outputRange: ['0%', '100%']
-                                        })
-                                    }
-                                ]}
-                            />
+                            <Animated.View style={[styles.progressFill, progressBarStyle]}/>
                         </View>
                         <View style={styles.managementSteps}>
                             <Text style={styles.stepText}>📊 매장별 현황 분석 중...</Text>
@@ -412,16 +433,8 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
     if (!isVisible) return null;
 
     return (
-        <Animated.View
-            style={[
-                styles.overlay,
-                {
-                    opacity: fadeAnim,
-                    transform: [{scale: scaleAnim}]
-                }
-            ]}
-        >
-            <View style={styles.demoModal}>
+        <Animated.View style={[styles.overlay, containerStyle]}>
+            <View style={dynamicStyles.demoModal}>
                 <TouchableOpacity style={styles.closeButton} onPress={closeDemo}>
                     <Text style={styles.closeButtonText}>✕</Text>
                 </TouchableOpacity>
@@ -445,14 +458,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         zIndex: 1000,
     },
-    demoModal: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 20,
-        padding: 24,
-        width: screenWidth * 0.9,
-        maxWidth: 400,
-        alignItems: 'center',
-        maxHeight: '85%',
+    demoModalBase: {
+        // Removed dimensions-dependent width - now handled by dynamicStyles
+        // backgroundColor, borderRadius, padding, maxWidth, alignItems, maxHeight moved to dynamicStyles
     },
     closeButton: {
         position: 'absolute',

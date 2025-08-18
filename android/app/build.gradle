@@ -5,19 +5,18 @@ plugins {
 }
 
 android {
-    namespace "com.sodam_front_end"
-    compileSdkVersion 35
-    buildToolsVersion "35.0.0"
+    namespace 'com.sodam_front_end'
+    compileSdkVersion 36
+    buildToolsVersion "36.0.0"
     ndkVersion "27.1.12297006"
 
     defaultConfig {
-        applicationId "com.sodam_front_end"
+        applicationId 'com.sodam_front_end'
         minSdkVersion 24
         //noinspection OldTargetApi,EditedTargetSdkVersion
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode 1
-        versionName "1.0"
-        missingDimensionStrategy "react-native-vision-camera", "mlkit"
+        versionName "0.0.1"
     }
 
     compileOptions {
@@ -26,7 +25,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '17'  // 변경
+        jvmTarget = '17'
     }
 
     buildTypes {
@@ -42,26 +41,8 @@ android {
     }
 
     packagingOptions {
-        // 여러 .so 파일 중 첫 번째만 선택하여 충돌 방지
+        // Keep only necessary pickFirst to avoid masking real conflicts
         pickFirst '**/libc++_shared.so'
-        pickFirst '**/libreact_render_component_view.so'
-        pickFirst '**/libreact_render_core.so'
-        pickFirst '**/libreact_render_debug.so'
-        pickFirst '**/libreact_render_graphics.so'
-        pickFirst '**/libfb.so'
-        pickFirst '**/libglslang.so'
-        pickFirst '**/libgtest.so'
-        pickFirst '**/libgtest_main.so'
-        pickFirst '**/libjsi.so'
-        pickFirst '**/liblog.so'
-        pickFirst '**/libreact_codegen_rncore_generated.so'
-        pickFirst '**/libreact_nativemodule_core.so'
-        pickFirst '**/libreactnativejni.so'
-        pickFirst '**/libyoga.so'
-
-        // worklets-core 및 VisionCamera 관련 라이브러리가 빌드 과정에서 제거되지 않도록 방지
-        doNotStrip '**/libworklets.so'
-        doNotStrip '**/libVisionCamera.so'
     }
 }
 
@@ -89,16 +70,7 @@ dependencies {
         implementation "io.github.react-native-community:jsc-android:2026004.+"
     }
 
-    // Manual dependencies for packages with disabled autolinking
-    implementation project(':react-native-reanimated')
-    implementation project(':react-native-async-storage_async-storage')
-    implementation project(':react-native-community_datetimepicker')
-    implementation project(':react-native-geolocation-service')
-    implementation project(':react-native-gesture-handler')
-    implementation project(':react-native-permissions')
-    implementation project(':react-native-safe-area-context')
-    implementation project(':react-native-screens')
-    implementation project(':react-native-vector-icons')
-    implementation project(':react-native-vision-camera')
-    implementation project(':react-native-worklets-core')
+    // Manual linking (recovery) for critical native modules due to autolinking failure
+    implementation project(":react-native-gesture-handler")
+    implementation project(":react-native-screens")
 }

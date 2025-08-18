@@ -8,3 +8,13 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+-keep class com.swmansion.reanimated.** { *; }
+-keep class com.facebook.react.turbomodule.** { *; }
+
+# CRITICAL: Protect all gesture handler classes
+-keep class com.swmansion.gesturehandler.** { *; }
+-keep class com.swmansion.gesturehandler.react.** { *; }
+-dontwarn com.swmansion.gesturehandler.**
+# Protect TurboModule infrastructure (reinforced)
+-keep class com.facebook.react.turbomodule.** { *; }
+-keep class * extends com.facebook.react.turbomodule.core.interfaces.TurboModule { *; }

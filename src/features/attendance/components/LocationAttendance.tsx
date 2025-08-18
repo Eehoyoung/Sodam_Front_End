@@ -1,17 +1,11 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Alert, Platform, PermissionsAndroid, ViewStyle, TextStyle} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {PermissionsAndroid, Platform, StyleSheet, Text, TextStyle, View, ViewStyle} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import {Button} from '../../../common/components';
-import {Card} from '../../../common/components';
+import {Button, Card, Toast} from '../../../common/components';
 import {colors, spacing} from '../../../common/styles/theme';
 import {useAuth} from '../../../contexts/AuthContext';
 import {useWorkplaces} from '../../workplace/hooks/useWorkplaces';
-import {
-    verifyCheckInByLocation,
-    verifyCheckOutByLocation,
-    isWithinRadius
-} from '../services/locationAttendanceService';
-import {Toast} from '../../../common/components';
+import {isWithinRadius, verifyCheckInByLocation, verifyCheckOutByLocation} from '../services/locationAttendanceService';
 
 interface LocationAttendanceProps {
     storeId: string;
@@ -37,7 +31,31 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
         isWithin: boolean;
     } | null>(null);
 
+    // Ref to track location watch ID for proper cleanup
+    const locationWatchId = useRef<number | null>(null);
+    const isMountedRef = useRef(true);
+
     const workplace = workplaces?.find(wp => wp.id === storeId);
+
+    // Cleanup effect to properly stop location services when component unmounts
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+
+            // Clear any active location watch
+            if (locationWatchId.current !== null) {
+                Geolocation.clearWatch(locationWatchId.current);
+                locationWatchId.current = null;
+            }
+
+            // Stop location services to prevent Google Play Services channel leaks
+            try {
+                Geolocation.stopObserving();
+            } catch (error) {
+                console.warn('LocationAttendance: Error stopping location observing:', error);
+            }
+        };
+    }, []);
 
     // 위치 권한 요청
     const requestLocationPermission = async () => {
@@ -81,10 +99,19 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
 
     // 현재 위치 가져오기
     const getCurrentLocation = () => {
+        if (!isMountedRef.current) {
+            return;
+        }
+
         setLoading(true);
 
         Geolocation.getCurrentPosition(
             position => {
+                // Check if component is still mounted before updating state
+                if (!isMountedRef.current) {
+                    return;
+                }
+
                 setLocation({
                     latitude: position.coords.latitude,
                     longitude: position.coords.longitude
@@ -106,7 +133,12 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
                 setLoading(false);
             },
             error => {
-                console.error(error);
+                // Check if component is still mounted before updating state
+                if (!isMountedRef.current) {
+                    return;
+                }
+
+                console.error('LocationAttendance: Location error:', error);
                 setLoading(false);
                 if (onError) onError('위치 정보를 가져오는데 실패했습니다.');
                 Toast.show({

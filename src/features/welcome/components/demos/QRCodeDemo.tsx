@@ -1,7 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Animated, Dimensions, Easing, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-
-const {width: screenWidth} = Dimensions.get('window');
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Easing,} from 'react-native-reanimated';
+import {useJSISafeDimensions} from '../../../../hooks/useJSISafeDimensions';
+import {CombinedAnimation, ProgressAnimation, PulseAnimation} from '../../../../common/components/animations';
 
 interface DemoResult {
     success: boolean;
@@ -18,81 +19,35 @@ const QRCodeDemo: React.FC<QRCodeDemoProps> = ({onDemoComplete, isVisible}) => {
     const [demoStep, setDemoStep] = useState<'idle' | 'scanning' | 'success' | 'complete'>('idle');
     const [scanProgress, setScanProgress] = useState(0);
 
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const scaleAnim = useRef(new Animated.Value(0.8)).current;
-    const progressAnim = useRef(new Animated.Value(0)).current;
-    const pulseAnim = useRef(new Animated.Value(1)).current;
+    // Use JSI-safe dimensions hook
+    let dimensions;
+    try {
+        const hookResult = useJSISafeDimensions();
+        dimensions = hookResult.dimensions;
+    } catch (error) {
+        console.error('QRCodeDemo: Failed to get dimensions:', error);
+        throw error;
+    }
 
-    useEffect(() => {
-        if (isVisible) {
-            // 데모 모달 등장 애니메이션
-            Animated.parallel([
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 300,
-                    easing: Easing.out(Easing.cubic),
-                    useNativeDriver: true,
-                }),
-                Animated.spring(scaleAnim, {
-                    toValue: 1,
-                    tension: 100,
-                    friction: 8,
-                    useNativeDriver: true,
-                })
-            ]).start();
-        }
-    }, [isVisible]);
+    // Animation logic is now handled by standardized animation components
 
     useEffect(() => {
         if (demoStep === 'scanning') {
-            // QR 스캔 시뮬레이션
-            const scanAnimation = Animated.timing(progressAnim, {
-                toValue: 1,
-                duration: 2000,
-                easing: Easing.out(Easing.quad),
-                useNativeDriver: false,
-            });
-
-            // 펄스 애니메이션
-            const pulseAnimation = Animated.loop(
-                Animated.sequence([
-                    Animated.timing(pulseAnim, {
-                        toValue: 1.1,
-                        duration: 500,
-                        easing: Easing.inOut(Easing.sin),
-                        useNativeDriver: true,
-                    }),
-                    Animated.timing(pulseAnim, {
-                        toValue: 1,
-                        duration: 500,
-                        easing: Easing.inOut(Easing.sin),
-                        useNativeDriver: true,
-                    })
-                ])
-            );
-
-            pulseAnimation.start();
-            scanAnimation.start(({finished}) => {
-                if (finished) {
-                    pulseAnimation.stop();
-                    setDemoStep('success');
-                    setTimeout(() => {
-                        setDemoStep('complete');
-                        onDemoComplete({
-                            success: true,
-                            message: 'QR 출퇴근 체험이 완료되었습니다!',
-                            timestamp: Date.now()
-                        });
-                    }, 1500);
-                }
-            });
-
             // 진행률 업데이트
             const progressInterval = setInterval(() => {
                 setScanProgress(prev => {
                     const newProgress = prev + 5;
                     if (newProgress >= 100) {
                         clearInterval(progressInterval);
+                        setDemoStep('success');
+                        setTimeout(() => {
+                            setDemoStep('complete');
+                            onDemoComplete({
+                                success: true,
+                                message: 'QR 출퇴근 체험이 완료되었습니다!',
+                                timestamp: Date.now()
+                            });
+                        }, 1500);
                         return 100;
                     }
                     return newProgress;
@@ -101,40 +56,31 @@ const QRCodeDemo: React.FC<QRCodeDemoProps> = ({onDemoComplete, isVisible}) => {
 
             return () => {
                 clearInterval(progressInterval);
-                pulseAnimation.stop();
             };
         }
-    }, [demoStep]);
+    }, [demoStep, onDemoComplete]);
 
     const startDemo = () => {
         setDemoStep('scanning');
         setScanProgress(0);
-        progressAnim.setValue(0);
     };
 
     const closeDemo = () => {
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-                toValue: 0.8,
-                duration: 200,
-                useNativeDriver: true,
-            })
-        ]).start(() => {
-            onDemoComplete({
-                success: false,
-                message: '데모가 취소되었습니다.',
-                timestamp: Date.now()
-            });
+        onDemoComplete({
+            success: false,
+            message: '데모가 취소되었습니다.',
+            timestamp: Date.now()
         });
     };
 
+    // Animation styles are now handled by standardized animation components
+
     const renderQRScanner = () => (
-        <Animated.View style={[styles.qrScanner, {transform: [{scale: pulseAnim}]}]}>
+        <PulseAnimation
+            isActive={demoStep === 'scanning'}
+            style={styles.qrScanner}
+            config={{minScale: 1, maxScale: 1.1, duration: 500}}
+        >
             <View style={styles.qrFrame}>
                 <View style={styles.qrCorner}/>
                 <View style={[styles.qrCorner, styles.qrCornerTopRight]}/>
@@ -142,19 +88,7 @@ const QRCodeDemo: React.FC<QRCodeDemoProps> = ({onDemoComplete, isVisible}) => {
                 <View style={[styles.qrCorner, styles.qrCornerBottomRight]}/>
 
                 {demoStep === 'scanning' && (
-                    <Animated.View
-                        style={[
-                            styles.scanLine,
-                            {
-                                transform: [{
-                                    translateY: progressAnim.interpolate({
-                                        inputRange: [0, 1],
-                                        outputRange: [-100, 100]
-                                    })
-                                }]
-                            }
-                        ]}
-                    />
+                    <View style={styles.scanLine}/>
                 )}
 
                 {demoStep === 'success' && (
@@ -163,7 +97,7 @@ const QRCodeDemo: React.FC<QRCodeDemoProps> = ({onDemoComplete, isVisible}) => {
                     </View>
                 )}
             </View>
-        </Animated.View>
+        </PulseAnimation>
     );
 
     const renderDemoContent = () => {
@@ -188,17 +122,13 @@ const QRCodeDemo: React.FC<QRCodeDemoProps> = ({onDemoComplete, isVisible}) => {
                         <Text style={styles.demoTitle}>QR 코드 스캔 중...</Text>
                         <Text style={styles.progressText}>{scanProgress}%</Text>
                         <View style={styles.progressBar}>
-                            <Animated.View
-                                style={[
-                                    styles.progressFill,
-                                    {
-                                        width: progressAnim.interpolate({
-                                            inputRange: [0, 1],
-                                            outputRange: ['0%', '100%']
-                                        })
-                                    }
-                                ]}
-                            />
+                            <ProgressAnimation
+                                progress={scanProgress / 100}
+                                config={{duration: 100, easing: Easing.linear}}
+                                style={styles.progressFill}
+                            >
+                                <View/>
+                            </ProgressAnimation>
                         </View>
                         <Text style={styles.scanningText}>
                             📍 위치 확인 중...{'\n'}
@@ -244,14 +174,11 @@ const QRCodeDemo: React.FC<QRCodeDemoProps> = ({onDemoComplete, isVisible}) => {
     if (!isVisible) return null;
 
     return (
-        <Animated.View
-            style={[
-                styles.overlay,
-                {
-                    opacity: fadeAnim,
-                    transform: [{scale: scaleAnim}]
-                }
-            ]}
+        <CombinedAnimation
+            isVisible={isVisible}
+            fadeConfig={{duration: 300, easing: Easing.out(Easing.cubic)}}
+            scaleConfig={{damping: 15, stiffness: 150}}
+            style={styles.overlay}
         >
             <View style={styles.demoModal}>
                 <TouchableOpacity style={styles.closeButton} onPress={closeDemo}>
@@ -261,7 +188,7 @@ const QRCodeDemo: React.FC<QRCodeDemoProps> = ({onDemoComplete, isVisible}) => {
                 {renderQRScanner()}
                 {renderDemoContent()}
             </View>
-        </Animated.View>
+        </CombinedAnimation>
     );
 };
 
@@ -281,7 +208,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: 20,
         padding: 24,
-        width: screenWidth * 0.9,
+        width: '90%',
         maxWidth: 400,
         alignItems: 'center',
     },

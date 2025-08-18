@@ -1,8 +1,11 @@
 /**
  * Entry point for Sodam App
  * @format
+ * real
  */
 
+// NOTE: Do not import or require 'react-native-gesture-handler' here.
+// RNGH will be required lazily inside App.tsx AFTER native module validation completes.
 import {AppRegistry, LogBox} from 'react-native';
 import {name as appName} from './app.json';
 
@@ -10,27 +13,60 @@ import {name as appName} from './app.json';
 if (__DEV__) {
     LogBox.ignoreLogs([
         'ENOENT: no such file or directory',
-        'DevTools',
+        /DevTools.*/,
         'Launching DevTools',
         'debugger-frontend',
         'ko.json',
         'Require cycle:',
         'Remote debugger',
         'Setting a timer',
-
+        'Simulated error coming from DevTools', // DevTools 시뮬레이션 오류
+        'Error: Simulated error coming from DevTools',
+        'Warning: Error: Simulated error coming from DevTools',
+        'An error was thrown when attempting to render log messages via LogBox', // LogBox 렌더링 오류
+        /VM\d+:\d+.*DevTools.*/, // VM 스크립트의 DevTools 관련 메시지
+        /VM\d+:\d+.*Error.*LogBox.*/, // VM 스크립트의 LogBox 렌더링 오류
+        /Simulated error.*/, // 시뮬레이션 오류 관련 모든 메시지
+        /An error was thrown.*LogBox.*/, // LogBox 렌더링 오류 관련 모든 메시지
     ]);
+
+    // 특정 네이티브 모듈 미연결 에러 무시 (react-native-screens, RNGestureHandler)
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+        try {
+            const flat = args.map(a => (a instanceof Error ? (a.message || String(a)) : (typeof a === 'string' ? a : JSON.stringify(a)))).join(' ');
+            if (!flat) return originalConsoleError(...args);
+            if (flat.includes("Screen native module hasn't been linked")) {
+                // Drop this error to keep Logcat clean during staged recovery
+                return;
+            }
+            if (flat.includes("'RNGestureHandlerModule' could not be found") || flat.includes('RNGestureHandlerModule')) {
+                // Drop RNGestureHandler missing native module errors during staged recovery
+                return;
+            }
+        } catch {
+        }
+        originalConsoleError(...args);
+    };
 }
 
-console.log('[DEBUG_LOG] === INDEX.JS START ===');
-console.log('[DEBUG_LOG] App name:', appName);
+console.log('[DEBUG_LOG] About to require AppComponent from ./App.tsx');
+
+// JSC 전환 확인 코드
+if (__DEV__) {
+    console.log('🚀 JavaScript Engine:', global.HermesInternal ? 'Hermes' : 'JSC');
+    console.log('🏗️ New Architecture:', global.RN$Bridgeless ? 'Enabled' : 'Disabled');
+    console.log('🎨 Reanimated:', global._REANIMATED_VERSION_JS || 'Loading...');
+}
 
 // AppComponent 임포트 (점진적 로딩을 위한 에러 핸들링 포함)
 let AppComponent;
 try {
     AppComponent = require('./App.tsx').default;
-    console.log('[DEBUG_LOG] ✅ AppComponent loaded successfully');
+    console.log('[DEBUG_LOG] AppComponent loaded successfully');
 } catch (error) {
-    console.error('[DEBUG_LOG] ❌ Failed to load AppComponent:', error);
+    console.error('[DEBUG_LOG] Failed to load AppComponent:', error);
+    console.error('Failed to load AppComponent:', error);
 
     // 폴백 컴포넌트
     const React = require('react');
@@ -50,13 +86,12 @@ try {
     );
 }
 
-// 컴포넌트 등록
+console.log('[DEBUG_LOG] About to register component');
 try {
     AppRegistry.registerComponent(appName, () => AppComponent);
-    console.log('[DEBUG_LOG] ✅ SUCCESS: Component registered successfully!');
-    console.log('[DEBUG_LOG] ✅ App name:', appName);
+    console.log('[DEBUG_LOG] Component registered successfully');
 } catch (error) {
-    console.error('[DEBUG_LOG] ❌ FAILED: Registration error:', error);
+    console.error('[DEBUG_LOG] Component registration failed:', error);
 }
 
 console.log('[DEBUG_LOG] === INDEX.JS END ===');

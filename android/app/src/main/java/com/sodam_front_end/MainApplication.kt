@@ -1,61 +1,100 @@
-package com.sodam_front_end
+﻿package com.sodam_front_end
 
-// Manual imports for packages with disabled autolinking
 import android.app.Application
-import android.content.res.Configuration
-import com.agontuk.RNFusedLocation.RNFusedLocationPackage
+import android.util.Log
 import com.facebook.react.*
-import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
-import com.mrousavy.camera.react.CameraPackage
-import com.oblador.vectoricons.VectorIconsPackage
-import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage
-import com.swmansion.gesturehandler.RNGestureHandlerPackage
-import com.swmansion.reanimated.ReanimatedPackage
-import com.swmansion.rnscreens.RNScreensPackage
-import com.th3rdwave.safeareacontext.SafeAreaContextPackage
-import com.worklets.WorkletsPackage
-import com.zoontek.rnpermissions.RNPermissionsPackage
+import com.facebook.react.soloader.OpenSourceMergedSoMapping
+import com.facebook.soloader.SoLoader
 
 class MainApplication : Application(), ReactApplication {
 
-  override val reactNativeHost: ReactNativeHost =
-      object : DefaultReactNativeHost(this) {
-        override fun getPackages(): List<ReactPackage> =
-            PackageList(this).packages.apply {
-                // Manually add packages with disabled autolinking
-                add(SafeAreaContextPackage())
-                add(ReanimatedPackage())
-                add(AsyncStoragePackage())
-                add(RNDateTimePickerPackage())
-                add(RNFusedLocationPackage())
-                add(RNGestureHandlerPackage())
-                add(RNPermissionsPackage())
-                add(RNScreensPackage())
-                add(VectorIconsPackage())
-                add(CameraPackage())
-                add(WorkletsPackage())
+    private fun tryAddGestureHandler(packages: MutableList<ReactPackage>, archLabel: String) {
+        val already = packages.any { it.javaClass.simpleName == "RNGestureHandlerPackage" }
+        if (already) return
+        try {
+            val clazz = Class.forName("com.swmansion.gesturehandler.RNGestureHandlerPackage")
+            val instance = clazz.getDeclaredConstructor().newInstance()
+            if (instance is ReactPackage) {
+                packages.add(instance)
+                Log.d("RECOVERY", "Force-added RNGestureHandlerPackage ($archLabel)")
             }
+        } catch (t: Throwable) {
+            Log.w("RECOVERY", "Gesture handler package not available to add ($archLabel): ${t.message}")
+        }
+    }
 
-        override fun getJSMainModuleName(): String = "index"
+    private fun tryAddScreensPackage(packages: MutableList<ReactPackage>, archLabel: String) {
+        val already = packages.any { it.javaClass.simpleName == "RNScreensPackage" }
+        if (already) return
+        try {
+            val clazz = Class.forName("com.swmansion.rnscreens.RNScreensPackage")
+            val instance = clazz.getDeclaredConstructor().newInstance()
+            if (instance is ReactPackage) {
+                packages.add(instance)
+                Log.d("RECOVERY", "Force-added RNScreensPackage ($archLabel)")
+            }
+        } catch (t: Throwable) {
+            Log.w("RECOVERY", "Screens package not available to add ($archLabel): ${t.message}")
+        }
+    }
 
-        override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
+    private val mReactNativeHost: ReactNativeHost? by lazy {
+        if (!BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+            object : DefaultReactNativeHost(this) {
+                override fun getPackages(): List<ReactPackage> {
+                    val packages = PackageList(this).packages.toMutableList()
+                    tryAddGestureHandler(packages, "old arch")
+                    tryAddScreensPackage(packages, "old arch")
+                    return packages
+                }
 
-        override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
-        override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED
-      }
+                override fun getJSMainModuleName(): String = "index"
 
-  override val reactHost: ReactHost
-    get() = getDefaultReactHost(applicationContext, reactNativeHost)
+                override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
 
-  override fun onCreate() {
-    super.onCreate()
-    loadReactNative(this)
-  }
+                override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
+            }
+        } else {
+            null
+        }
+    }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
+    override val reactNativeHost: ReactNativeHost
+        get() = mReactNativeHost ?: throw IllegalStateException(
+            "ReactNativeHost should not be used with New Architecture enabled. Use ReactHost instead."
+        )
+
+    override val reactHost: ReactHost
+        get() = getDefaultReactHost(
+            applicationContext,
+            if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+                object : DefaultReactNativeHost(this) {
+                    override fun getPackages(): List<ReactPackage> {
+                        val packages = PackageList(this).packages.toMutableList()
+                        tryAddGestureHandler(packages, "new arch")
+                        tryAddScreensPackage(packages, "new arch")
+                        return packages
+                    }
+
+                    override fun getJSMainModuleName(): String = "index"
+
+                    override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
+
+                    override val isNewArchEnabled: Boolean = true
+                }
+            } else {
+                mReactNativeHost!!
+            }
+        )
+
+    override fun onCreate() {
+        super.onCreate()
+        SoLoader.init(this, OpenSourceMergedSoMapping)
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+            load()
+        }
     }
 }

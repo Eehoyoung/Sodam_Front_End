@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import {
-    Animated,
     Dimensions,
     Modal as RNModal,
     StyleSheet,
@@ -11,6 +10,7 @@ import {
     View,
     ViewStyle,
 } from 'react-native';
+import Animated, {useAnimatedStyle, useSharedValue, withTiming,} from 'react-native-reanimated';
 
 // 모달 컴포넌트의 Props 타입 정의
 interface ModalProps {
@@ -53,15 +53,16 @@ const Modal: React.FC<ModalProps> = ({
                                          height,
                                      }) => {
     // 애니메이션 값
-    const fadeAnim = React.useRef(new Animated.Value(0)).current;
+    const fadeAnim = useSharedValue(0);
+
+    // 애니메이션 스타일
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: fadeAnim.value,
+    }));
 
     // 모달 표시 상태가 변경될 때 애니메이션 실행
     useEffect(() => {
-        Animated.timing(fadeAnim, {
-            toValue: visible ? 1 : 0,
-            duration: 200,
-            useNativeDriver: true,
-        }).start();
+        fadeAnim.value = withTiming(visible ? 1 : 0, {duration: 200});
     }, [visible, fadeAnim]);
 
     // 배경 터치 핸들러
@@ -80,7 +81,7 @@ const Modal: React.FC<ModalProps> = ({
         <RNModal
             transparent
             visible={visible}
-            animationType={animationType}
+            animationType="none" // Use 'none' to avoid conflicts with custom Reanimated animation
             onRequestClose={onClose}
         >
             <TouchableWithoutFeedback onPress={handleBackdropPress}>
@@ -95,10 +96,10 @@ const Modal: React.FC<ModalProps> = ({
                             style={[
                                 styles.modalContainer,
                                 {
-                                    opacity: fadeAnim,
                                     width: typeof width === 'string' && !width.endsWith('%') && width !== 'auto' ? undefined : width,
                                     height: typeof height === 'string' && !height.endsWith('%') && height !== 'auto' ? undefined : height,
                                 },
+                                animatedStyle,
                                 style,
                             ]}
                         >

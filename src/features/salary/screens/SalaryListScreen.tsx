@@ -1,28 +1,26 @@
 import React, {useEffect, useState} from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    FlatList,
-    TouchableOpacity,
     ActivityIndicator,
-    RefreshControl,
     Alert,
+    FlatList,
     Modal,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
     TextInput,
-    ScrollView
+    TouchableOpacity,
+    View
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {MaterialIcons as Icon} from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {MainLayout} from '../../../common/components';
-import {Card, Button} from '../../../common/components';
+import {Button, Card, MainLayout} from '../../../common/components';
 
 import salaryService from '../services/salaryService';
-import {SalaryRecord, SalaryStatus, SalaryFilter} from '../types';
+import {SalaryFilter, SalaryRecord, SalaryStatus} from '../types';
 import {format} from 'date-fns';
-import {ko} from 'date-fns/locale';
 
 // 네비게이션 타입 정의
 type SalaryStackParamList = {

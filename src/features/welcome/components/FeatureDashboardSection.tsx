@@ -1,6 +1,14 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Animated, Dimensions, Easing, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import QRCodeDemo from './demos/QRCodeDemo';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import Animated, {
+    Easing,
+    interpolate,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withTiming,
+} from 'react-native-reanimated';
+import NFCDemo from './demos/NFCDemo';
 import SalaryCalculatorDemo from './demos/SalaryCalculatorDemo';
 import StoreManagementDemo from './demos/StoreManagementDemo';
 
@@ -30,27 +38,27 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
                                                                              isVisible,
                                                                              onFeatureTest
                                                                          }) => {
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const slideAnim1 = useRef(new Animated.Value(50)).current;
-    const slideAnim2 = useRef(new Animated.Value(50)).current;
-    const slideAnim3 = useRef(new Animated.Value(50)).current;
-    const statsAnim = useRef(new Animated.Value(0)).current;
+    const fadeAnim = useSharedValue(0);
+    const slideAnim1 = useSharedValue(50);
+    const slideAnim2 = useSharedValue(50);
+    const slideAnim3 = useSharedValue(50);
+    const statsAnim = useSharedValue(0);
 
     // Demo state management
     const [activeDemo, setActiveDemo] = useState<string | null>(null);
 
     const features: Feature[] = [
         {
-            id: 'qr-attendance',
-            icon: '📱⚡',
-            title: 'QR 출퇴근',
+            id: 'nfc-attendance',
+            icon: '📱📡',
+            title: 'NFC 출퇴근',
             benefits: [
                 '1초만에 출퇴근 완료',
                 'GPS 위치 자동 확인',
                 '실시간 알림 발송'
             ],
             demoAction: '체험해보기',
-            color: '#2196F3'
+            color: '#4CAF50'
         },
         {
             id: 'auto-salary',
@@ -86,49 +94,33 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
 
     useEffect(() => {
         if (isVisible) {
-            // 섹션 전체 페이드인
-            Animated.timing(fadeAnim, {
-                toValue: 1,
+            // 섹션 전체 페이드인 (Reanimated 3)
+            fadeAnim.value = withTiming(1, {
                 duration: 500,
                 easing: Easing.out(Easing.cubic),
-                useNativeDriver: true,
-            }).start();
-
-            // 기능 카드들 순차적 애니메이션
-            const featureAnimations = [
-                Animated.timing(slideAnim1, {
-                    toValue: 0,
-                    duration: 600,
-                    delay: 200,
-                    easing: Easing.out(Easing.back(1.2)),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(slideAnim2, {
-                    toValue: 0,
-                    duration: 600,
-                    delay: 400,
-                    easing: Easing.out(Easing.back(1.2)),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(slideAnim3, {
-                    toValue: 0,
-                    duration: 600,
-                    delay: 600,
-                    easing: Easing.out(Easing.back(1.2)),
-                    useNativeDriver: true,
-                })
-            ];
-
-            // 통계 애니메이션
-            const statsAnimation = Animated.timing(statsAnim, {
-                toValue: 1,
-                duration: 2000,
-                delay: 800,
-                easing: Easing.out(Easing.quad),
-                useNativeDriver: false,
             });
 
-            Animated.parallel([...featureAnimations, statsAnimation]).start();
+            // 기능 카드들 순차적 애니메이션 (Reanimated 3)
+            slideAnim1.value = withDelay(200, withTiming(0, {
+                duration: 600,
+                easing: Easing.out(Easing.back(1.2)),
+            }));
+
+            slideAnim2.value = withDelay(400, withTiming(0, {
+                duration: 600,
+                easing: Easing.out(Easing.back(1.2)),
+            }));
+
+            slideAnim3.value = withDelay(600, withTiming(0, {
+                duration: 600,
+                easing: Easing.out(Easing.back(1.2)),
+            }));
+
+            // 통계 애니메이션 (Reanimated 3)
+            statsAnim.value = withDelay(800, withTiming(1, {
+                duration: 2000,
+                easing: Easing.out(Easing.quad),
+            }));
         }
     }, [isVisible]);
 
@@ -147,64 +139,44 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
 
     const handleDemoComplete = (result: any) => {
         setActiveDemo(null);
-        console.log('[DEBUG_LOG] Demo completed:', result);
     };
 
     const FeatureCard: React.FC<{ feature: Feature; index: number }> = ({feature, index}) => {
-        const cardScaleAnim = useRef(new Animated.Value(1)).current;
-        const buttonScaleAnim = useRef(new Animated.Value(1)).current;
-        const shadowAnim = useRef(new Animated.Value(0.1)).current;
+        const cardScaleAnim = useSharedValue(1);
+        const buttonScaleAnim = useSharedValue(1);
+        const shadowAnim = useSharedValue(0.1);
 
         const handleCardPressIn = () => {
-            Animated.parallel([
-                Animated.timing(cardScaleAnim, {
-                    toValue: 0.98,
-                    duration: 150,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(shadowAnim, {
-                    toValue: 0.2,
-                    duration: 150,
-                    useNativeDriver: false,
-                })
-            ]).start();
+            cardScaleAnim.value = withTiming(0.98, {duration: 150});
+            shadowAnim.value = withTiming(0.2, {duration: 150});
         };
 
         const handleCardPressOut = () => {
-            Animated.parallel([
-                Animated.timing(cardScaleAnim, {
-                    toValue: 1,
-                    duration: 150,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(shadowAnim, {
-                    toValue: 0.1,
-                    duration: 150,
-                    useNativeDriver: false,
-                })
-            ]).start();
+            cardScaleAnim.value = withTiming(1, {duration: 150});
+            shadowAnim.value = withTiming(0.1, {duration: 150});
         };
 
         const handleButtonPressIn = () => {
-            Animated.timing(buttonScaleAnim, {
-                toValue: 0.95,
-                duration: 100,
-                useNativeDriver: true,
-            }).start();
+            buttonScaleAnim.value = withTiming(0.95, {duration: 100});
         };
 
         const handleButtonPressOut = () => {
-            Animated.timing(buttonScaleAnim, {
-                toValue: 1,
-                duration: 100,
-                useNativeDriver: true,
-            }).start();
+            buttonScaleAnim.value = withTiming(1, {duration: 100});
         };
 
-        const animatedShadowOpacity = shadowAnim.interpolate({
-            inputRange: [0.1, 0.2],
-            outputRange: [0.1, 0.2],
-        });
+        // Animated styles for FeatureCard
+        const cardAnimatedStyle = useAnimatedStyle(() => ({
+            transform: [{scale: cardScaleAnim.value}],
+            shadowOpacity: interpolate(
+                shadowAnim.value,
+                [0.1, 0.2],
+                [0.1, 0.2]
+            ),
+        }));
+
+        const buttonAnimatedStyle = useAnimatedStyle(() => ({
+            transform: [{scale: buttonScaleAnim.value}],
+        }));
 
         return (
             <TouchableOpacity
@@ -217,10 +189,7 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
                 <Animated.View style={[
                     styles.featureCard,
                     getFeatureAnimationStyle(index),
-                    {
-                        transform: [{scale: cardScaleAnim}],
-                        shadowOpacity: animatedShadowOpacity,
-                    }
+                    cardAnimatedStyle,
                 ]}>
                     <View style={styles.featureHeader}>
                         <Text style={styles.featureIcon}>{feature.icon}</Text>
@@ -243,7 +212,7 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
                         onPressOut={handleButtonPressOut}
                         activeOpacity={1}
                     >
-                        <Animated.View style={{transform: [{scale: buttonScaleAnim}]}}>
+                        <Animated.View style={buttonAnimatedStyle}>
                             <Text style={styles.demoButtonText}>{feature.demoAction} →</Text>
                         </Animated.View>
                     </TouchableOpacity>
@@ -254,23 +223,31 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
 
     const StatCard: React.FC<{ stat: Stat; index: number }> = ({stat, index}) => {
         const [displayValue, setDisplayValue] = useState('0');
-        const scaleAnim = useRef(new Animated.Value(0.8)).current;
+        const scaleAnim = useSharedValue(0.8);
 
-        const animatedValue = statsAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, 1],
+        const animatedValue = interpolate(
+            statsAnim.value,
+            [0, 1],
+            [0, 1]
+        );
+
+        const animatedStyle = useAnimatedStyle(() => {
+            return {
+                opacity: animatedValue,
+                transform: [{scale: scaleAnim.value}]
+            };
         });
 
         useEffect(() => {
             if (isVisible) {
-                // Scale animation for card entrance
-                Animated.timing(scaleAnim, {
-                    toValue: 1,
-                    duration: 600,
-                    delay: 800 + (index * 200),
-                    easing: Easing.out(Easing.back(1.2)),
-                    useNativeDriver: true,
-                }).start();
+                // Scale animation for card entrance using Reanimated v3
+                scaleAnim.value = withDelay(
+                    800 + (index * 200),
+                    withTiming(1, {
+                        duration: 600,
+                        easing: Easing.out(Easing.back(1.2)),
+                    })
+                );
 
                 // Counter animation for numeric values
                 const timeout = setTimeout(() => {
@@ -316,13 +293,7 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
         };
 
         return (
-            <Animated.View style={[
-                styles.statCard,
-                {
-                    opacity: animatedValue,
-                    transform: [{scale: scaleAnim}]
-                }
-            ]}>
+            <Animated.View style={[styles.statCard, animatedStyle]}>
                 <Text style={styles.statIcon}>{stat.icon}</Text>
                 <Animated.Text style={styles.statValue}>
                     {displayValue}
@@ -360,8 +331,8 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
             </View>
 
             {/* Interactive Demos */}
-            <QRCodeDemo
-                isVisible={activeDemo === 'qr-attendance'}
+            <NFCDemo
+                isVisible={activeDemo === 'nfc-attendance'}
                 onDemoComplete={handleDemoComplete}
             />
             <SalaryCalculatorDemo

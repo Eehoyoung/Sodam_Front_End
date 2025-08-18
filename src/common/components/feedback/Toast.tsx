@@ -1,5 +1,6 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Animated, Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle,} from 'react-native';
+import React, {useCallback, useEffect, useRef} from 'react';
+import {Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle,} from 'react-native';
+import Animated, {interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming,} from 'react-native-reanimated';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -13,6 +14,7 @@ interface ToastShowParams {
     style?: ViewStyle;
     textStyle?: TextStyle;
     showCloseButton?: boolean;
+    visibilityTime?: number; // alias commonly used in other toast libs
 }
 
 // Interface for the component props
@@ -44,20 +46,22 @@ const Toast: ToastComponent = ({
                                          textStyle,
                                          showCloseButton = true,
                                      }) => {
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const [animationValue, setAnimationValue] = useState(0);
+    const fadeAnim = useSharedValue(0);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Add listener to track animation value
-    useEffect(() => {
-        const id = fadeAnim.addListener(state => {
-            setAnimationValue(state.value);
-        });
-
-        return () => {
-            fadeAnim.removeListener(id);
-        };
-    }, [fadeAnim]);
+    // Animated style using Reanimated 3
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: fadeAnim.value,
+        transform: [
+            {
+                translateY: interpolate(
+                    fadeAnim.value,
+                    [0, 1],
+                    [position === 'top' ? -20 : 20, 0]
+                ),
+            },
+        ],
+    }));
 
     const handleClose = useCallback(() => {
         if (timeoutRef.current) {
@@ -66,13 +70,10 @@ const Toast: ToastComponent = ({
         }
 
         // 페이드 아웃 애니메이션 실행 후 onClose 콜백 호출
-        Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-        }).start(() => {
-            if (onClose) {
-                onClose();
+        fadeAnim.value = withTiming(0, {duration: 300}, (finished) => {
+            'worklet';
+            if (finished && onClose) {
+                runOnJS(onClose)();
             }
         });
     }, [fadeAnim, onClose]);
@@ -80,11 +81,7 @@ const Toast: ToastComponent = ({
     useEffect(() => {
         if (visible) {
             // 토스트가 보이면 페이드 인 애니메이션 실행
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+            fadeAnim.value = withTiming(1, {duration: 300});
 
             // 지정된 시간 후에 토스트 닫기
             if (duration > 0) {
@@ -94,11 +91,7 @@ const Toast: ToastComponent = ({
             }
         } else {
             // 토스트가 사라지면 페이드 아웃 애니메이션 실행
-            Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+            fadeAnim.value = withTiming(0, {duration: 300});
         }
 
         // 컴포넌트 언마운트 시 타이머 정리
@@ -125,7 +118,7 @@ const Toast: ToastComponent = ({
     };
 
     // 토스트가 보이지 않으면 렌더링하지 않음
-    if (!visible && animationValue === 0) {
+    if (!visible && fadeAnim.value === 0) {
         return null;
     }
 
@@ -136,16 +129,8 @@ const Toast: ToastComponent = ({
                 position === 'top' ? styles.topPosition : styles.bottomPosition,
                 {
                     backgroundColor: getBackgroundColor(),
-                    opacity: fadeAnim,
-                    transform: [
-                        {
-                            translateY: fadeAnim.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [position === 'top' ? -20 : 20, 0],
-                            }),
-                        },
-                    ],
                 },
+                animatedStyle,
                 style,
             ]}
             accessibilityRole="alert"
@@ -213,9 +198,12 @@ const styles = StyleSheet.create({
 
 // Add static show method to Toast component
 Toast.show = (params: ToastShowParams) => {
+    // Map visibilityTime to duration if provided for compatibility
+    const duration = typeof params.visibilityTime === 'number' ? params.visibilityTime : params.duration;
+
     // This is a simple implementation that logs the toast message
     // In a real implementation, this would manage a global toast state
-    console.log(`Toast: ${params.text1} - ${params.text2}`);
+    console.log(`Toast: ${params.text1} - ${params.text2}; duration=${duration}`);
 
     // You would typically use a state management solution or a ref to manage toast visibility
     // For now, we're just logging the message

@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Animated, Dimensions, Platform, ScrollView, StyleSheet, View} from 'react-native';
+import React, {useMemo, useState} from 'react';
+import {Dimensions, Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {RootNavigationProp} from '../../../navigation/types';
 
@@ -9,8 +9,6 @@ import FeatureDashboardSection from '../components/FeatureDashboardSection';
 import ConversionSection from '../components/ConversionSection';
 import Header from '../components/Header';
 
-const {height: screenHeight} = Dimensions.get('window');
-
 interface SectionVisibility {
     problems: boolean;
     solutions: boolean;
@@ -19,6 +17,19 @@ interface SectionVisibility {
 
 const HybridMainScreen: React.FC = () => {
     const navigation = useNavigation<RootNavigationProp>();
+
+    // Cache screen height outside worklet to avoid JSI violation
+    let screenHeight;
+    try {
+        screenHeight = useMemo(() => {
+            const dimensions = Dimensions.get('window');
+            return dimensions.height;
+        }, []);
+    } catch (error) {
+        console.error('HybridMainScreen: Failed to get screen dimensions:', error);
+        throw error;
+    }
+
     const [currentSection, setCurrentSection] = useState(0);
     const [isVisible, setIsVisible] = useState<SectionVisibility>({
         problems: true, // 첫 섹션은 즉시 표시
@@ -26,53 +37,41 @@ const HybridMainScreen: React.FC = () => {
         cta: false
     });
 
-    const scrollY = new Animated.Value(0);
-    const progressAnim = new Animated.Value(0);
+    // Disabled for MVP stability - basic scroll handling
+    const handleScroll = (event: any) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const sectionHeight = screenHeight * 0.8;
 
-    const handleScroll = Animated.event(
-        [{nativeEvent: {contentOffset: {y: scrollY}}}],
-        {
-            useNativeDriver: false,
-            listener: (event: any) => {
-                const offsetY = event.nativeEvent.contentOffset.y;
-                const sectionHeight = screenHeight * 0.8;
-                const totalScrollHeight = sectionHeight * 3; // 3 sections total
-
-                // Calculate progress (0 to 1)
-                const progress = Math.min(Math.max(offsetY / totalScrollHeight, 0), 1);
-
-                // Animate progress indicator
-                Animated.timing(progressAnim, {
-                    toValue: progress,
-                    duration: 100,
-                    useNativeDriver: false,
-                }).start();
-
-                // 섹션별 가시성 업데이트
-                if (offsetY > sectionHeight * 0.3 && !isVisible.solutions) {
-                    setIsVisible(prev => ({...prev, solutions: true}));
+        // 섹션별 가시성 업데이트 (simplified without animations)
+        if (offsetY > sectionHeight * 0.3) {
+            setIsVisible(prev => {
+                if (!prev.solutions) {
                     setCurrentSection(1);
+                    return {...prev, solutions: true};
                 }
-                if (offsetY > sectionHeight * 1.2 && !isVisible.cta) {
-                    setIsVisible(prev => ({...prev, cta: true}));
-                    setCurrentSection(2);
-                }
-            }
+                return prev;
+            });
         }
-    );
+        if (offsetY > sectionHeight * 1.2) {
+            setIsVisible(prev => {
+                if (!prev.cta) {
+                    setCurrentSection(2);
+                    return {...prev, cta: true};
+                }
+                return prev;
+            });
+        }
+    };
 
     const handleFeatureTest = (featureId: string) => {
-        console.log(`[DEBUG_LOG] Feature test requested: ${featureId}`);
         // TODO: 기능별 데모 구현
     };
 
     const handleAppDownload = () => {
-        console.log('[DEBUG_LOG] App download initiated');
         // TODO: 앱 스토어 링크 연결
     };
 
     const handleWebTrial = () => {
-        console.log('[DEBUG_LOG] Web trial started');
         navigation.navigate('Auth', {screen: 'Signup'});
     };
 
@@ -84,6 +83,19 @@ const HybridMainScreen: React.FC = () => {
         navigation.navigate('Auth', {screen: 'Signup'});
     };
 
+    // Progress bar style (disabled animations for MVP)
+    const progressBarStyle = {
+        width: `${(currentSection + 1) * 33}%`,
+    };
+
+    // Progress dots styles (simplified for MVP)
+    const getProgressDotStyle = (index: number) => {
+        return {
+            backgroundColor: index <= currentSection ? '#2196F3' : '#E0E0E0',
+            transform: [{scale: index === currentSection ? 1.2 : 1}],
+        };
+    };
+
     return (
         <View style={styles.container}>
             <Header onLogin={handleLogin} onSignup={handleSignup}/>
@@ -91,39 +103,15 @@ const HybridMainScreen: React.FC = () => {
             {/* Scroll Progress Indicator */}
             <View style={styles.progressContainer}>
                 <View style={styles.progressTrack}>
-                    <Animated.View
-                        style={[
-                            styles.progressBar,
-                            {
-                                width: progressAnim.interpolate({
-                                    inputRange: [0, 1],
-                                    outputRange: ['0%', '100%'],
-                                })
-                            }
-                        ]}
+                    <View
+                        style={[styles.progressBar]}
                     />
                 </View>
                 <View style={styles.progressDots}>
                     {[0, 1, 2].map((index) => (
-                        <Animated.View
+                        <View
                             key={index}
-                            style={[
-                                styles.progressDot,
-                                {
-                                    backgroundColor: progressAnim.interpolate({
-                                        inputRange: [index / 3, (index + 1) / 3],
-                                        outputRange: ['#E0E0E0', '#2196F3'],
-                                        extrapolate: 'clamp',
-                                    }),
-                                    transform: [{
-                                        scale: progressAnim.interpolate({
-                                            inputRange: [index / 3, (index + 1) / 3],
-                                            outputRange: [1, 1.2],
-                                            extrapolate: 'clamp',
-                                        })
-                                    }]
-                                }
-                            ]}
+                            style={[styles.progressDot, getProgressDotStyle(index)]}
                         />
                     ))}
                 </View>

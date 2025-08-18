@@ -5,16 +5,15 @@
 
 import api from '../../../common/utils/api';
 import {
-    AttendanceRecord,
-    AttendanceStatus,
-    AttendanceStatistics,
     AttendanceFilter,
+    AttendanceRecord,
+    AttendanceStatistics,
+    AttendanceStatus,
     CheckInRequest,
     CheckOutRequest,
     UpdateAttendanceRequest
 } from '../types';
-import {verifyCheckInByLocation, verifyCheckOutByLocation, LocationVerifyResponse} from './locationAttendanceService';
-import {verifyCheckInByQR, verifyCheckOutByQR, QRVerifyResponse} from './qrAttendanceService';
+import {NFCVerifyResponse, verifyCheckInByNFC, verifyCheckOutByNFC} from './nfcAttendanceService';
 
 // 출퇴근 관리 서비스 객체
 const attendanceService = {
@@ -280,6 +279,31 @@ const attendanceService = {
             console.error('매장별 QR 코드 생성 중 오류가 발생했습니다:', error);
             throw error;
         }
+    },
+
+    /**
+     * NFC 태그 기반 출퇴근 인증 (래퍼)
+     * @param employeeId 직원 ID (number 또는 string 허용)
+     * @param workplaceId 근무지 ID (number 또는 string 허용)
+     * @param nfcTagId NFC 태그 문자열
+     * @param isCheckOut 퇴근 여부 (기본 false = 출근)
+     */
+    verifyNfcTagAttendance: async (
+        employeeId: string | number,
+        workplaceId: string | number,
+        nfcTagId: string,
+        isCheckOut: boolean = false
+    ): Promise<NFCVerifyResponse> => {
+        const employeeIdNum = typeof employeeId === 'string' ? Number(employeeId) : employeeId;
+        const storeIdNum = typeof workplaceId === 'string' ? Number(workplaceId) : workplaceId;
+        if (!Number.isFinite(employeeIdNum) || !Number.isFinite(storeIdNum)) {
+            return {success: false, message: '유효하지 않은 ID입니다.'};
+        }
+
+        if (isCheckOut) {
+            return await verifyCheckOutByNFC({employeeId: employeeIdNum, storeId: storeIdNum, nfcTagId});
+        }
+        return await verifyCheckInByNFC({employeeId: employeeIdNum, storeId: storeIdNum, nfcTagId});
     },
 };
 

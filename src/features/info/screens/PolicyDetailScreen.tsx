@@ -6,7 +6,7 @@ import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {Button, MainLayout, Toast} from '../../../common/components';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {Ionicons} from '@expo/vector-icons';
 import {StackNavigationProp} from '@react-navigation/stack';
 
 

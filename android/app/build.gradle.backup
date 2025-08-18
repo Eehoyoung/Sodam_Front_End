@@ -20,6 +20,14 @@ android {
         missingDimensionStrategy "react-native-vision-camera", "mlkit"
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'  // 변경
+    }
 
     buildTypes {
         release {
@@ -32,6 +40,7 @@ android {
             )
         }
     }
+
     packagingOptions {
         // 여러 .so 파일 중 첫 번째만 선택하여 충돌 방지
         pickFirst '**/libc++_shared.so'
@@ -56,6 +65,20 @@ android {
     }
 }
 
+// React Native Vector Icons font configuration - DISABLED
+// Autolinking is disabled for react-native-vector-icons in react-native.config.js
+// Therefore, fonts.gradle cannot be applied as it requires Android plugin configuration
+// project.ext.vectoricons = [
+//     iconFontNames: [ 'AntDesign.ttf', 'Entypo.ttf', 'EvilIcons.ttf', 'Feather.ttf', 'FontAwesome.ttf', 'FontAwesome5_Brands.ttf', 'FontAwesome5_Regular.ttf', 'FontAwesome5_Solid.ttf', 'Foundation.ttf', 'Ionicons.ttf', 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf', 'SimpleLineIcons.ttf', 'Octicons.ttf', 'Zocial.ttf' ]
+// ]
+
+// apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+// Expo modules disabled due to gradle plugin dependency resolution issue
+// apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle")
+// useExpoModules()
+
+// React Native autolinking is handled automatically by settings.gradle
+
 dependencies {
     implementation "com.facebook.react:react-android"
 
@@ -66,6 +89,16 @@ dependencies {
         implementation "io.github.react-native-community:jsc-android:2026004.+"
     }
 
-    // All packages are now handled by autolinking
-    // Manual implementations removed to prevent conflicts
+    // Manual dependencies for packages with disabled autolinking
+    implementation project(':react-native-reanimated')
+    implementation project(':react-native-async-storage_async-storage')
+    implementation project(':react-native-community_datetimepicker')
+    implementation project(':react-native-geolocation-service')
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-permissions')
+    implementation project(':react-native-safe-area-context')
+    implementation project(':react-native-screens')
+    implementation project(':react-native-vector-icons')
+    implementation project(':react-native-vision-camera')
+    implementation project(':react-native-worklets-core')
 }

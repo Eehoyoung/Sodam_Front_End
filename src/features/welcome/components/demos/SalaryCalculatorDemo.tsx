@@ -1,7 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Animated, Dimensions, Easing, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
-
-const {width: screenWidth} = Dimensions.get('window');
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Easing,} from 'react-native-reanimated';
+import {useJSISafeDimensions} from '../../../../hooks/useJSISafeDimensions';
+import {CombinedAnimation, NumberCountAnimation, ProgressAnimation} from '../../../../common/components/animations';
 
 interface SalaryCalculation {
     hours: number;
@@ -34,51 +35,27 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
     const [calculation, setCalculation] = useState<SalaryCalculation | null>(null);
     const [calculationProgress, setCalculationProgress] = useState(0);
 
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const scaleAnim = useRef(new Animated.Value(0.8)).current;
-    const progressAnim = useRef(new Animated.Value(0)).current;
-    const numberAnim = useRef(new Animated.Value(0)).current;
+    // Use JSI-safe dimensions hook
+    let dimensions;
+    try {
+        const hookResult = useJSISafeDimensions();
+        dimensions = hookResult.dimensions;
+    } catch (error) {
+        console.error('SalaryCalculatorDemo: Failed to get dimensions:', error);
+        throw error;
+    }
 
-    useEffect(() => {
-        if (isVisible) {
-            // 데모 모달 등장 애니메이션
-            Animated.parallel([
-                Animated.timing(fadeAnim, {
-                    toValue: 1,
-                    duration: 300,
-                    easing: Easing.out(Easing.cubic),
-                    useNativeDriver: true,
-                }),
-                Animated.spring(scaleAnim, {
-                    toValue: 1,
-                    tension: 100,
-                    friction: 8,
-                    useNativeDriver: true,
-                })
-            ]).start();
-        }
-    }, [isVisible]);
+    // Animation logic is now handled by standardized animation components
 
     useEffect(() => {
         if (demoStep === 'calculating') {
-            // 계산 시뮬레이션
-            const calculationAnimation = Animated.timing(progressAnim, {
-                toValue: 1,
-                duration: 2500,
-                easing: Easing.out(Easing.quad),
-                useNativeDriver: false,
-            });
-
-            calculationAnimation.start(({finished}) => {
-                if (finished) {
-                    setDemoStep('result');
-                    // 숫자 카운트업 애니메이션
-                    Animated.timing(numberAnim, {
-                        toValue: 1,
-                        duration: 1500,
-                        easing: Easing.out(Easing.cubic),
-                        useNativeDriver: false,
-                    }).start(() => {
+            // 진행률 업데이트
+            const progressInterval = setInterval(() => {
+                setCalculationProgress(prev => {
+                    const newProgress = prev + 4;
+                    if (newProgress >= 100) {
+                        clearInterval(progressInterval);
+                        setDemoStep('result');
                         setTimeout(() => {
                             setDemoStep('complete');
                             onDemoComplete({
@@ -87,17 +64,7 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
                                 timestamp: Date.now(),
                                 calculation: calculation!
                             });
-                        }, 2000);
-                    });
-                }
-            });
-
-            // 진행률 업데이트
-            const progressInterval = setInterval(() => {
-                setCalculationProgress(prev => {
-                    const newProgress = prev + 4;
-                    if (newProgress >= 100) {
-                        clearInterval(progressInterval);
+                        }, 3500); // Allow time for number count animation
                         return 100;
                     }
                     return newProgress;
@@ -108,7 +75,7 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
                 clearInterval(progressInterval);
             };
         }
-    }, [demoStep]);
+    }, [demoStep, calculation, onDemoComplete]);
 
     const calculateSalary = () => {
         const hoursNum = parseFloat(hours) || 0;
@@ -135,28 +102,13 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
         setCalculation(calculationResult);
         setDemoStep('calculating');
         setCalculationProgress(0);
-        progressAnim.setValue(0);
-        numberAnim.setValue(0);
     };
 
     const closeDemo = () => {
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-                toValue: 0.8,
-                duration: 200,
-                useNativeDriver: true,
-            })
-        ]).start(() => {
-            onDemoComplete({
-                success: false,
-                message: '데모가 취소되었습니다.',
-                timestamp: Date.now()
-            });
+        onDemoComplete({
+            success: false,
+            message: '데모가 취소되었습니다.',
+            timestamp: Date.now()
         });
     };
 
@@ -168,19 +120,16 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
         }).format(amount);
     };
 
-    const AnimatedNumber: React.FC<{ value: number; prefix?: string }> = ({value, prefix = ''}) => {
-        const animatedValue = numberAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, value],
-        });
+    // Animation styles are now handled by standardized animation components
 
+    const AnimatedNumber: React.FC<{ value: number; prefix?: string }> = ({value, prefix = ''}) => {
         return (
-            <Animated.Text style={styles.calculationValue}>
-                {prefix}
-                <Animated.Text>
-                    {formatCurrency(value)}
-                </Animated.Text>
-            </Animated.Text>
+            <NumberCountAnimation
+                targetValue={value}
+                startValue={0}
+                config={{duration: 1500, easing: Easing.out(Easing.cubic)}}
+                formatter={(val) => `${prefix}${formatCurrency(val)}`}
+            />
         );
     };
 
@@ -192,17 +141,13 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
 
             {demoStep === 'calculating' && (
                 <View style={styles.calculatingIndicator}>
-                    <Animated.View
-                        style={[
-                            styles.calculatingBar,
-                            {
-                                width: progressAnim.interpolate({
-                                    inputRange: [0, 1],
-                                    outputRange: ['0%', '100%']
-                                })
-                            }
-                        ]}
-                    />
+                    <ProgressAnimation
+                        progress={calculationProgress / 100}
+                        config={{duration: 100, easing: Easing.linear}}
+                        style={styles.calculatingBar}
+                    >
+                        <View/>
+                    </ProgressAnimation>
                 </View>
             )}
 
@@ -337,14 +282,11 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
     if (!isVisible) return null;
 
     return (
-        <Animated.View
-            style={[
-                styles.overlay,
-                {
-                    opacity: fadeAnim,
-                    transform: [{scale: scaleAnim}]
-                }
-            ]}
+        <CombinedAnimation
+            isVisible={isVisible}
+            fadeConfig={{duration: 300, easing: Easing.out(Easing.cubic)}}
+            scaleConfig={{damping: 15, stiffness: 150}}
+            style={styles.overlay}
         >
             <View style={styles.demoModal}>
                 <TouchableOpacity style={styles.closeButton} onPress={closeDemo}>
@@ -354,7 +296,7 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
                 {renderCalculator()}
                 {renderDemoContent()}
             </View>
-        </Animated.View>
+        </CombinedAnimation>
     );
 };
 
@@ -374,10 +316,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderRadius: 20,
         padding: 24,
-        width: screenWidth * 0.9,
+        width: '90%',
         maxWidth: 400,
         alignItems: 'center',
-        maxHeight: '80%',
     },
     closeButton: {
         position: 'absolute',

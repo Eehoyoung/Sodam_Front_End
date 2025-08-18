@@ -1,5 +1,14 @@
-import React, {useEffect, useRef} from 'react';
-import {Animated, Dimensions, Easing, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {Dimensions, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import Animated, {
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withRepeat,
+    withSequence,
+    withTiming,
+} from 'react-native-reanimated';
 
 const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
@@ -22,11 +31,11 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                                                                  onDownload,
                                                                  onWebTrial
                                                              }) => {
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const ctaSlideAnim = useRef(new Animated.Value(50)).current;
-    const testimonialAnim1 = useRef(new Animated.Value(50)).current;
-    const testimonialAnim2 = useRef(new Animated.Value(50)).current;
-    const pulseAnim = useRef(new Animated.Value(1)).current;
+    const fadeAnim = useSharedValue(0);
+    const ctaSlideAnim = useSharedValue(50);
+    const testimonialAnim1 = useSharedValue(50);
+    const testimonialAnim2 = useSharedValue(50);
+    const pulseAnim = useSharedValue(1);
 
     const testimonials: Testimonial[] = [
         {
@@ -47,74 +56,78 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
 
     useEffect(() => {
         if (isVisible) {
-            // 섹션 전체 페이드인
-            Animated.timing(fadeAnim, {
-                toValue: 1,
+            // 섹션 전체 페이드인 (Reanimated 3)
+            fadeAnim.value = withTiming(1, {
                 duration: 500,
                 easing: Easing.out(Easing.cubic),
-                useNativeDriver: true,
-            }).start();
-
-            // CTA 섹션 애니메이션
-            Animated.timing(ctaSlideAnim, {
-                toValue: 0,
-                duration: 600,
-                delay: 200,
-                easing: Easing.out(Easing.back(1.1)),
-                useNativeDriver: true,
-            }).start();
-
-            // 후기 카드들 순차적 애니메이션
-            const testimonialAnimations = [
-                Animated.timing(testimonialAnim1, {
-                    toValue: 0,
-                    duration: 800,
-                    delay: 600,
-                    easing: Easing.out(Easing.cubic),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(testimonialAnim2, {
-                    toValue: 0,
-                    duration: 800,
-                    delay: 900,
-                    easing: Easing.out(Easing.cubic),
-                    useNativeDriver: true,
-                })
-            ];
-
-            Animated.parallel(testimonialAnimations).start(() => {
-                // 후기 애니메이션 완료 후 CTA 버튼 펄스 시작
-                startPulseAnimation();
             });
+
+            // CTA 섹션 애니메이션 (Reanimated 3)
+            ctaSlideAnim.value = withDelay(200, withTiming(0, {
+                duration: 600,
+                easing: Easing.out(Easing.back(1.1)),
+            }));
+
+            // 후기 카드들 순차적 애니메이션 (Reanimated 3)
+            testimonialAnim1.value = withDelay(600, withTiming(0, {
+                duration: 800,
+                easing: Easing.out(Easing.cubic),
+            }));
+
+            testimonialAnim2.value = withDelay(900, withTiming(0, {
+                duration: 800,
+                easing: Easing.out(Easing.cubic),
+            }, (finished) => {
+                'worklet';
+                if (finished) {
+                    // 후기 애니메이션 완료 후 CTA 버튼 펄스 시작
+                    pulseAnim.value = withRepeat(
+                        withSequence(
+                            withTiming(1.05, {
+                                duration: 1000,
+                                easing: Easing.inOut(Easing.sin),
+                            }),
+                            withTiming(1, {
+                                duration: 1000,
+                                easing: Easing.inOut(Easing.sin),
+                            })
+                        ),
+                        -1, // infinite
+                        true // reverse
+                    );
+                }
+            }));
+        } else {
+            // 컴포넌트가 보이지 않을 때 애니메이션 리셋
+            fadeAnim.value = 0;
+            ctaSlideAnim.value = 50;
+            testimonialAnim1.value = 50;
+            testimonialAnim2.value = 50;
+            pulseAnim.value = 1;
         }
     }, [isVisible]);
 
-    const startPulseAnimation = () => {
-        Animated.loop(
-            Animated.sequence([
-                Animated.timing(pulseAnim, {
-                    toValue: 1.05,
-                    duration: 1000,
-                    easing: Easing.inOut(Easing.sin),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(pulseAnim, {
-                    toValue: 1,
-                    duration: 1000,
-                    easing: Easing.inOut(Easing.sin),
-                    useNativeDriver: true,
-                })
-            ])
-        ).start();
-    };
+    // Animated styles using Reanimated 3
+    const containerStyle = useAnimatedStyle(() => ({
+        opacity: fadeAnim.value,
+    }));
 
-    const getTestimonialAnimationStyle = (index: number) => {
-        const anims = [testimonialAnim1, testimonialAnim2];
-        return {
-            transform: [{translateY: anims[index]}],
-            opacity: fadeAnim,
-        };
-    };
+    const ctaStyle = useAnimatedStyle(() => ({
+        transform: [{translateY: ctaSlideAnim.value}],
+    }));
+
+    const testimonial1Style = useAnimatedStyle(() => ({
+        transform: [{translateY: testimonialAnim1.value}],
+    }));
+
+    const testimonial2Style = useAnimatedStyle(() => ({
+        transform: [{translateY: testimonialAnim2.value}],
+    }));
+
+    const pulseStyle = useAnimatedStyle(() => ({
+        transform: [{scale: pulseAnim.value}],
+    }));
+
 
     const renderStars = (rating: number) => {
         return Array.from({length: 5}, (_, index) => (
@@ -127,31 +140,29 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     const TestimonialCard: React.FC<{ testimonial: Testimonial; index: number }> = ({
                                                                                         testimonial,
                                                                                         index
-                                                                                    }) => (
-        <Animated.View style={[styles.testimonialCard, getTestimonialAnimationStyle(index)]}>
-            <View style={styles.testimonialHeader}>
-                <View style={styles.starsContainer}>
-                    {renderStars(testimonial.rating)}
+                                                                                    }) => {
+        const testimonialStyles = [testimonial1Style, testimonial2Style];
+        return (
+            <Animated.View style={[styles.testimonialCard, testimonialStyles[index]]}>
+                <View style={styles.testimonialHeader}>
+                    <View style={styles.starsContainer}>
+                        {renderStars(testimonial.rating)}
+                    </View>
                 </View>
-            </View>
-            <Text style={styles.testimonialText}>"{testimonial.text}"</Text>
-            <View style={styles.testimonialFooter}>
-                <Text style={styles.testimonialAuthor}>- {testimonial.author}</Text>
-                <Text style={styles.testimonialRole}>{testimonial.role}</Text>
-            </View>
-        </Animated.View>
-    );
+                <Text style={styles.testimonialText}>"{testimonial.text}"</Text>
+                <View style={styles.testimonialFooter}>
+                    <Text style={styles.testimonialAuthor}>- {testimonial.author}</Text>
+                    <Text style={styles.testimonialRole}>{testimonial.role}</Text>
+                </View>
+            </Animated.View>
+        );
+    };
 
     return (
-        <Animated.View style={[styles.container, {opacity: fadeAnim}]}>
+        <Animated.View style={[styles.container, containerStyle]}>
             <View style={styles.content}>
                 {/* CTA 섹션 */}
-                <Animated.View
-                    style={[
-                        styles.ctaContainer,
-                        {transform: [{translateY: ctaSlideAnim}]}
-                    ]}
-                >
+                <Animated.View style={[styles.ctaContainer, ctaStyle]}>
                     <Text style={styles.ctaTitle}>🚀 지금 바로 시작하기</Text>
 
                     <View style={styles.benefits}>
@@ -161,7 +172,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                     </View>
 
                     <View style={styles.actionButtons}>
-                        <Animated.View style={{transform: [{scale: pulseAnim}]}}>
+                        <Animated.View style={pulseStyle}>
                             <TouchableOpacity
                                 style={styles.primaryButton}
                                 onPress={onDownload}

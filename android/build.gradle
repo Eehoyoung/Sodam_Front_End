@@ -9,17 +9,20 @@ buildscript {
 
 // 1. 플러그인 선언 (반드시 최상단)
 plugins {
-    id("com.android.application") version "7.2.2" apply false
-    id("org.jetbrains.kotlin.android") version "1.7.22" apply false
-    id("com.facebook.react") version "0.80.1" apply false
+    id("com.android.application") version "8.11.0" apply false
+    id("org.jetbrains.kotlin.android") version "2.2.0" apply false
+    id("com.facebook.react") version "0.81.0" apply false
 }
 
 // 2. 이제 ext 블록을 선언
 ext {
-    compileSdk = 35
-    buildToolsVersion = "35.0.0"
+    compileSdk = 36
+    buildToolsVersion = "36.0.0"
     minSdkVersion = 24
-    targetSdkVersion = 35
+    targetSdkVersion = 36
+    // Ensure Hermes engine is enabled for app module
+    hermesEnabled = "true"
+    kotlinVersion = "1.6.21"
 }
 
 // 3. allprojects
@@ -31,9 +34,9 @@ allprojects {
     }
 
     // Fix for expo-module-gradle-plugin dependency resolution
-    configurations.all {
+    configurations.configureEach {
         resolutionStrategy {
-            force 'com.facebook.react:react-native-gradle-plugin:0.80.1'
+            force 'com.facebook.react:react-native-gradle-plugin:0.81.0'
         }
     }
 }
@@ -49,8 +52,8 @@ subprojects { subproject ->
 
             // 라이브러리 모듈에도 min/target SDK를 강제하려면:
             subproject.android.defaultConfig {
-                minSdkVersion = 24
-                targetSdkVersion = 35
+                minSdkVersion 24
+                targetSdkVersion 36
             }
 
             // Java 17 강제 적용 (react-native-reanimated 등 모든 서브프로젝트)

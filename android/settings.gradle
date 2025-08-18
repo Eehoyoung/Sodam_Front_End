@@ -4,64 +4,34 @@ pluginManagement {
         google()
         mavenCentral()
     }
-    // 이 한 줄이 생명입니다. 로컬에 설치된 @react-native/gradle-plugin을 include 시켜 줍니다.
     includeBuild("../node_modules/@react-native/gradle-plugin")
+}
 
-    // Explicitly resolve React Native gradle plugin version
-    resolutionStrategy {
-        eachPlugin {
-            if (requested.id.id == "com.facebook.react") {
-                useVersion("0.80.1")
-            }
+plugins {
+    id("com.facebook.react.settings")
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+    repositories {
+        google()
+        mavenCentral()
+    }
+    versionCatalogs {
+        libs {
+            from(files("../node_modules/react-native/gradle/libs.versions.toml"))
         }
     }
 }
 
-// 이 플러그인은 settings 단계에서만 사용됩니다.
-plugins {
-    id("com.facebook.react.settings") version "0.80.1"
-}
-extensions.configure(com.facebook.react.ReactSettingsExtension) {
-    it.autolinkLibrariesFromCommand()
-}
+rootProject.name = 'Sodam_Front_End'
+include ':app'
 
-rootProject.name = "Sodam_Front_End"
-include(":app")
-
-// Manual project includes for packages with disabled autolinking
-include ':react-native-reanimated'
-project(':react-native-reanimated').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-reanimated/android')
-
-include ':react-native-async-storage_async-storage'
-project(':react-native-async-storage_async-storage').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-async-storage/async-storage/android')
-
-include ':react-native-community_datetimepicker'
-project(':react-native-community_datetimepicker').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/datetimepicker/android')
-
-include ':react-native-geolocation-service'
-project(':react-native-geolocation-service').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-geolocation-service/android')
-
+// Explicit manual linking for critical native modules (recovery)
 include ':react-native-gesture-handler'
 project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-gesture-handler/android')
-
-include ':react-native-permissions'
-project(':react-native-permissions').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-permissions/android')
-
-include ':react-native-safe-area-context'
-project(':react-native-safe-area-context').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-safe-area-context/android')
 
 include ':react-native-screens'
 project(':react-native-screens').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-screens/android')
 
-include ':react-native-vector-icons'
-project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
-
-include ':react-native-vision-camera'
-project(':react-native-vision-camera').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vision-camera/android')
-
-include ':react-native-worklets-core'
-project(':react-native-worklets-core').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-worklets-core/android')
-
-// Expo modules disabled due to gradle plugin dependency resolution issue
-// apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle")
-// useExpoModules()
+// ReactAndroid project inclusion is managed by com.facebook.react.settings plugin and the RN Gradle plugin.

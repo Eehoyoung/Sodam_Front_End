@@ -1,78 +1,61 @@
-import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import authService, {User} from '../features/auth/services/authService';
-import {memoryStorage} from '../common/utils/memoryStorage';
+import React, {createContext, ReactNode, useContext, useEffect} from 'react';
+import {User} from '../features/auth/services/authService';
+import {useAuthState, useKakaoLogin, useLogin, useLogout} from '../features/auth/hooks/useAuthQueries';
+import {unifiedStorage} from '../common/utils/unifiedStorage';
 import {safeLogger} from '../utils/safeLogger';
 
-// 조건부 import를 통한 안전한 AsyncStorage 접근
-const getAsyncStorage = async () => {
-    try {
-        // 모듈 로딩 오류를 방지하기 위한 동적 AsyncStorage import
-        const AsyncStorageModule = await import('@react-native-async-storage/async-storage');
-        const AsyncStorage = AsyncStorageModule.default;
-
-        // AsyncStorage 모듈이 존재하고 필요한 메서드를 가지고 있는지 확인
-        if (!AsyncStorage || typeof AsyncStorage.getItem !== 'function') {
-            console.log('[DEBUG_LOG] AsyncStorage module not available, using memory storage');
-            return memoryStorage;
-        }
-
-        // 타임아웃을 통한 AsyncStorage 기능 테스트
-        const testPromise = AsyncStorage.getItem('__test__');
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('AsyncStorage timeout')), 1000)
-        );
-
-        await Promise.race([testPromise, timeoutPromise]);
-        console.log('[DEBUG_LOG] AsyncStorage is available and functional');
-        return AsyncStorage;
-    } catch (error: any) {
-        console.log('[DEBUG_LOG] AsyncStorage not available, falling back to memory storage:', error?.message || 'Unknown error');
-        return memoryStorage;
-    }
-};
-
-// 인증 컨텍스트 타입 정의
+/**
+ * 인증 컨텍스트 타입 정의
+ * TanStack Query와 통합된 인증 상태 관리
+ */
 interface AuthContextType {
     isAuthenticated: boolean;
     user: User | null;
     loading: boolean;
-    isFirstLaunch: boolean;
     login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     kakaoLogin: (code: string) => Promise<void>;
-    setFirstLaunchComplete: () => Promise<void>;
 }
 
-// 기본값 생성
+/**
+ * 기본 인증 컨텍스트 값
+ */
 const defaultAuthContext: AuthContextType = {
     isAuthenticated: false,
     user: null,
     loading: true,
-    isFirstLaunch: true,
     login: async () => {
+        throw new Error('AuthProvider not found');
     },
     logout: async () => {
+        throw new Error('AuthProvider not found');
     },
     kakaoLogin: async () => {
-    },
-    setFirstLaunchComplete: async () => {
+        throw new Error('AuthProvider not found');
     },
 };
 
-// 컨텍스트 생성
+/**
+ * 인증 컨텍스트 생성
+ */
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
-// 컨텍스트 훅 - 안전장치 추가
-export const useAuth = () => {
+/**
+ * 인증 컨텍스트 훅
+ * 안전장치가 포함된 useAuth 훅
+ */
+export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
 
     if (context === undefined) {
-        console.error('[DEBUG_LOG] AuthContext not found - using default values');
+        console.error('[useAuth] AuthContext not found - using default values');
+        safeLogger.error('AuthContext not found', new Error('AuthProvider not mounted'));
+
+        // 기본값 반환으로 앱 크래시 방지
         return {
             isAuthenticated: false,
             user: null,
-            loading: false,  // loading을 false로 설정하여 무한 로딩 방지
-            isFirstLaunch: true,
+            loading: false,
             login: async () => {
                 throw new Error('AuthProvider not found');
             },
@@ -82,216 +65,236 @@ export const useAuth = () => {
             kakaoLogin: async () => {
                 throw new Error('AuthProvider not found');
             },
-            setFirstLaunchComplete: async () => {
-                throw new Error('AuthProvider not found');
-            },
         };
     }
 
     return context;
 };
 
-// 프로바이더 컴포넌트
+/**
+ * AuthProvider Props 인터페이스
+ */
 interface AuthProviderProps {
     children: ReactNode;
 }
 
+/**
+ * 인증 프로바이더 컴포넌트
+ * TanStack Query 훅을 사용하여 인증 상태를 관리하고 Context로 제공
+ */
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [isFirstLaunch, setIsFirstLaunch] = useState(true);
+    // TanStack Query 훅을 사용하여 인증 상태 관리
+    const {
+        isAuthenticated,
+        user,
+        isLoading: authLoading,
+        error: authError,
+        refetch: refetchAuth
+    } = useAuthState();
 
-    // 앱 시작 시 인증 상태 및 첫 실행 확인
+    // TanStack Query 뮤테이션 훅들
+    const loginMutation = useLogin();
+    const logoutMutation = useLogout();
+    const kakaoLoginMutation = useKakaoLogin();
+
+    /**
+     * 통합 스토리지 초기화
+     */
     useEffect(() => {
-        let isMounted = true;
-        const abortController = new AbortController();
-
-        const checkAuth = async () => {
+        const initializeStorage = async () => {
             try {
-                if (!isMounted) return;
+                await unifiedStorage.initialize();
+                console.log('[AuthProvider] 통합 스토리지 초기화 완료');
 
-                const storage = await getAsyncStorage();
-
-                if (!isMounted) return;
-
-                // 첫 실행 여부 확인
-                const hasLaunched = await storage.getItem('hasLaunched');
-                if (isMounted) {
-                    setIsFirstLaunch(!hasLaunched);
-
-                }
-
-                if (!isMounted) return;
-
-                const token = await storage.getItem('userToken');
-                if (token && isMounted) {
-                    // 토큰이 있으면 사용자 정보 가져오기 (AbortController 사용)
-                    try {
-                        console.log('[DEBUG_LOG] Token found, fetching user data...');
-
-                        // API 호출에 AbortController 적용
-                        const userData = await authService.getCurrentUser();
-
-                        if (isMounted && !abortController.signal.aborted) {
-                            setUser(userData);
-                            setIsAuthenticated(true);
-                            console.log('[DEBUG_LOG] User authenticated successfully');
-                        }
-                    } catch (error) {
-                        if (!abortController.signal.aborted && isMounted) {
-                            safeLogger.error('[DEBUG_LOG] User data fetch failed:', error);
-                            // 사용자 정보를 가져오는 데 실패하면 토큰 삭제
-                            try {
-                                await storage.removeItem('userToken');
-                            } catch (removeError) {
-                                safeLogger.asyncStorageError('[DEBUG_LOG] Failed to remove token:', removeError);
-                            }
-                            setIsAuthenticated(false);
-                            setUser(null);
-                        }
-                    }
-                } else if (isMounted) {
-                    console.log('[DEBUG_LOG] No token found, user not authenticated');
-                    setIsAuthenticated(false);
-                    setUser(null);
-                }
+                // 스토리지 초기화 후 인증 상태 재확인
+                refetchAuth();
             } catch (error) {
-                if (!abortController.signal.aborted && isMounted) {
-                    safeLogger.asyncStorageError('[DEBUG_LOG] Auth check failed:', error);
-                    // Storage 오류 시 graceful fallback
-                    setIsAuthenticated(false);
-                    setUser(null);
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                    console.log('[DEBUG_LOG] Auth check completed');
-                }
+                console.error('[AuthProvider] 통합 스토리지 초기화 실패:', error);
+                safeLogger.error('Storage initialization failed', error);
             }
         };
 
-        // 지연 실행으로 네이티브 모듈 초기화 대기
-        const timeoutId: NodeJS.Timeout = setTimeout(() => {
-            if (isMounted && !abortController.signal.aborted) {
-                checkAuth();
-            }
-        }, 500); // 전체 인증 체크에 대한 최대 타임아웃 (3초) - WSOD 해결을 위해 단축
-        const maxTimeoutId: NodeJS.Timeout = setTimeout(() => {
-            if (isMounted) {
-                console.log('[DEBUG_LOG] FORCE: Auth check timeout - setting loading false');
-                setLoading(false);
-            }
-        }, 3000);
-        return () => {
-            isMounted = false;
-            abortController.abort();
-            clearTimeout(timeoutId);
-            clearTimeout(maxTimeoutId);
-        };
-    }, []);
+        initializeStorage();
+    }, [refetchAuth]);
 
-    // 로그인 함수
-    const login = async (email: string, password: string) => {
-        const isMounted = true;
+    /**
+     * 로그인 함수
+     * TanStack Query 뮤테이션을 사용하여 로그인 처리
+     */
+    const login = async (email: string, password: string): Promise<void> => {
         try {
-            if (isMounted) setLoading(true);
-            console.log('[DEBUG_LOG] Starting login process');
-            const response = await authService.login({email, password});
-            if (isMounted) {
-                setUser(response.user);
-                setIsAuthenticated(true);
-                console.log('[DEBUG_LOG] Login successful');
-            }
+            console.log('[AuthProvider] 로그인 시도:', email);
+            await loginMutation.mutateAsync({email, password});
+            console.log('[AuthProvider] 로그인 성공');
         } catch (error) {
-            safeLogger.error('[DEBUG_LOG] Login failed:', error);
+            console.error('[AuthProvider] 로그인 실패:', error);
+            safeLogger.error('Login failed', error);
             throw error;
-        } finally {
-            if (isMounted) setLoading(false);
         }
     };
 
-    // 로그아웃 함수
-    const logout = async () => {
-        const isMounted = true;
+    /**
+     * 로그아웃 함수
+     * TanStack Query 뮤테이션을 사용하여 로그아웃 처리
+     */
+    const logout = async (): Promise<void> => {
         try {
-            if (isMounted) setLoading(true);
-            console.log('[DEBUG_LOG] Starting logout process');
-            await authService.logout();
-            if (isMounted) {
-                setIsAuthenticated(false);
-                setUser(null);
-                console.log('[DEBUG_LOG] Logout successful');
-            }
+            console.log('[AuthProvider] 로그아웃 시도');
+            await logoutMutation.mutateAsync();
+            console.log('[AuthProvider] 로그아웃 성공');
         } catch (error) {
-            safeLogger.error('[DEBUG_LOG] Logout failed:', error);
-            // 로그아웃이 실패하더라도 로컬 상태를 정리
-            if (isMounted) {
-                setIsAuthenticated(false);
-                setUser(null);
-            }
-        } finally {
-            if (isMounted) setLoading(false);
-        }
-    };
-
-    // 카카오 로그인 함수
-    const kakaoLogin = async (code: string) => {
-        const isMounted = true;
-        try {
-            if (isMounted) setLoading(true);
-            console.log('[DEBUG_LOG] Starting Kakao login process');
-            // 카카오 로그인 처리
-            const response = await authService.kakaoLogin(code);
-
-            if (response.token && isMounted) {
-                // 사용자 정보 가져오기
-                const userData = await authService.getCurrentUser();
-                if (isMounted) {
-                    setUser(userData);
-                    setIsAuthenticated(true);
-                    console.log('[DEBUG_LOG] Kakao login successful');
-                }
-            } else if (!isMounted) {
-                return; // 컴포넌트가 언마운트되었으므로 에러를 발생시키지 않음
-            } else {
-                throw new Error('카카오 로그인 실패');
-            }
-        } catch (error) {
-            safeLogger.error('[DEBUG_LOG] Kakao login failed:', error);
+            console.error('[AuthProvider] 로그아웃 실패:', error);
+            safeLogger.error('Logout failed', error);
             throw error;
-        } finally {
-            if (isMounted) setLoading(false);
         }
     };
 
-    // 첫 실행 완료 처리 함수
-    const setFirstLaunchComplete = async () => {
+    /**
+     * 카카오 로그인 함수
+     * TanStack Query 뮤테이션을 사용하여 카카오 로그인 처리
+     */
+    const kakaoLogin = async (code: string): Promise<void> => {
         try {
-            console.log('[DEBUG_LOG] Setting first launch complete');
-            const storage = await getAsyncStorage();
-            await storage.setItem('hasLaunched', 'true');
-            setIsFirstLaunch(false);
-            console.log('[DEBUG_LOG] First launch completed successfully');
+            console.log('[AuthProvider] 카카오 로그인 시도');
+            await kakaoLoginMutation.mutateAsync(code);
+            console.log('[AuthProvider] 카카오 로그인 성공');
         } catch (error) {
-            safeLogger.asyncStorageError('[DEBUG_LOG] Failed to set first launch complete:', error);
+            console.error('[AuthProvider] 카카오 로그인 실패:', error);
+            safeLogger.error('Kakao login failed', error);
+            throw error;
         }
     };
 
-    // 컨텍스트 값
-    const value = {
+    /**
+     * 인증 에러 처리
+     */
+    useEffect(() => {
+        if (authError) {
+            console.error('[AuthProvider] 인증 오류:', authError);
+            safeLogger.error('Authentication error', authError);
+        }
+    }, [authError]);
+
+    /**
+     * 뮤테이션 에러 처리
+     */
+    useEffect(() => {
+        if (loginMutation.error) {
+            console.error('[AuthProvider] 로그인 뮤테이션 오류:', loginMutation.error);
+        }
+        if (logoutMutation.error) {
+            console.error('[AuthProvider] 로그아웃 뮤테이션 오류:', logoutMutation.error);
+        }
+        if (kakaoLoginMutation.error) {
+            console.error('[AuthProvider] 카카오 로그인 뮤테이션 오류:', kakaoLoginMutation.error);
+        }
+    }, [loginMutation.error, logoutMutation.error, kakaoLoginMutation.error]);
+
+    /**
+     * 로딩 상태 계산
+     * 인증 상태 로딩 또는 뮤테이션 진행 중일 때 true
+     */
+    const loading = authLoading ||
+        loginMutation.isPending ||
+        logoutMutation.isPending ||
+        kakaoLoginMutation.isPending;
+
+    /**
+     * 컨텍스트 값 생성
+     */
+    const contextValue: AuthContextType = {
         isAuthenticated,
         user,
         loading,
-        isFirstLaunch,
         login,
         logout,
         kakaoLogin,
-        setFirstLaunchComplete,
     };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    /**
+     * 디버깅을 위한 상태 로깅
+     */
+    useEffect(() => {
+        if (__DEV__) {
+            console.log('[AuthProvider] 상태 변경:', {
+                isAuthenticated,
+                user: user ? {id: user.id, name: user.name, role: user.role} : null,
+                loading,
+            });
+        }
+    }, [isAuthenticated, user, loading]);
+
+    return (
+        <AuthContext.Provider value={contextValue}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
-export {AuthProvider as default};
+/**
+ * 인증 상태 확인 유틸리티 훅
+ * 특정 역할이나 권한을 확인할 때 사용
+ */
+export const useAuthCheck = () => {
+    const {isAuthenticated, user, loading} = useAuth();
 
+    return {
+        isAuthenticated,
+        user,
+        loading,
+
+        // 역할 확인 헬퍼
+        isEmployee: user?.role === 'EMPLOYEE',
+        isManager: user?.role === 'MANAGER',
+        isMaster: user?.role === 'MASTER',
+        isUser: user?.role === 'USER',
+
+        // 권한 확인 헬퍼
+        hasManagerAccess: user?.role === 'MANAGER' || user?.role === 'MASTER',
+        hasMasterAccess: user?.role === 'MASTER',
+
+        // 사용자 정보 헬퍼
+        userId: user?.id,
+        userName: user?.name,
+        userEmail: user?.email,
+        userPhone: user?.phone,
+    };
+};
+
+/**
+ * 인증 필요 컴포넌트 래퍼
+ * 인증되지 않은 사용자에게는 로그인 화면을 보여줌
+ */
+interface RequireAuthProps {
+    children: ReactNode;
+    fallback?: ReactNode;
+    roles?: Array<'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER'>;
+}
+
+export const RequireAuth: React.FC<RequireAuthProps> = ({
+                                                            children,
+                                                            fallback = null,
+                                                            roles = []
+                                                        }) => {
+    const {isAuthenticated, user, loading} = useAuth();
+
+    // 로딩 중일 때는 로딩 표시
+    if (loading) {
+        return <>{fallback}</>;
+    }
+
+    // 인증되지 않은 경우
+    if (!isAuthenticated || !user) {
+        return <>{fallback}</>;
+    }
+
+    // 특정 역할이 필요한 경우 역할 확인
+    if (roles.length > 0 && !roles.includes(user.role)) {
+        console.warn('[RequireAuth] 권한 부족:', {userRole: user.role, requiredRoles: roles});
+        return <>{fallback}</>;
+    }
+
+    return <>{children}</>;
+};
+
+export default AuthContext;

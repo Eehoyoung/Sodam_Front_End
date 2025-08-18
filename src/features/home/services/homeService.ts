@@ -1,10 +1,10 @@
 import axios from 'axios';
-import {Event, LaborInfo, Policy, TaxInfo, Tip, Testimonial, Service} from '../types';
+import {Event, LaborInfo, Policy, Service, TaxInfo, Testimonial, Tip} from '../types';
 
 /**
  * 홈 화면에 필요한 데이터를 가져오는 서비스
  */
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_URL = (typeof globalThis !== 'undefined' && (globalThis as any).process?.env?.REACT_APP_API_URL) || 'http://localhost:8080';
 
 /**
  * 이벤트 슬라이더에 표시할 이벤트 목록을 가져옵니다.

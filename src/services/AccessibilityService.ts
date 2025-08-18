@@ -574,8 +574,8 @@ class AccessibilityService {
      */
     private async loadUserPreferences(): Promise<void> {
         try {
-            const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-            const preferencesJson = await AsyncStorage.getItem('accessibility_preferences');
+            const {unifiedStorage} = await import('../common/utils/unifiedStorage');
+            const preferencesJson = await unifiedStorage.getItem('accessibility_preferences');
 
             if (preferencesJson) {
                 const preferences = JSON.parse(preferencesJson);
@@ -592,8 +592,8 @@ class AccessibilityService {
      */
     private async saveUserPreferences(): Promise<void> {
         try {
-            const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-            await AsyncStorage.setItem('accessibility_preferences', JSON.stringify(this.config));
+            const {unifiedStorage} = await import('../common/utils/unifiedStorage');
+            await unifiedStorage.setItem('accessibility_preferences', JSON.stringify(this.config));
         } catch (error) {
             console.warn('Failed to save accessibility preferences:', error);
         }
