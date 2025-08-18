@@ -5,23 +5,20 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, InteractionManager, StyleSheet, Text, View} from 'react-native';
-// GestureHandlerRootView will be required dynamically after validation to avoid early TurboModule access
+import {InteractionManager, StyleSheet} from 'react-native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import ErrorBoundary from './src/components/ErrorBoundary';
 import {colors} from './src/theme/colors';
 import {typography} from './src/theme/typography';
 import ThemeProvider from './src/common/providers/ThemeProvider';
-// MinimalNavigator will be required dynamically after validation to avoid early RNGH import
-// import MinimalNavigator from './src/navigation/MinimalNavigator';
-// AppNavigator will be required dynamically after validation to avoid early RNGH import
-// import AppNavigator from './src/navigation/AppNavigator';
+import MinimalNavigator from './src/navigation/MinimalNavigator';
+import AppNavigator from './src/navigation/AppNavigator';
 import {ENABLE_SCREENS_NATIVE, ENABLE_STACK_NAV, stageAtLeast} from './src/navigation/config';
 import AuthMockProvider from './src/contexts/AuthMockProvider';
 import {AuthProvider} from './src/contexts/AuthContext';
 import {QueryClientProvider} from '@tanstack/react-query';
 import {queryClient} from './src/common/utils/queryClient';
-import {CriticalModuleValidator} from './src/utils/NativeModuleValidator';
 
 const App: React.FC = () => {
     useEffect(() => {
@@ -54,82 +51,20 @@ const App: React.FC = () => {
         };
     }, []);
 
-    // Critical native module validation gating
-    const [validation, setValidation] = useState<{
-        isValid: boolean;
-        isLoading: boolean;
-        error?: string;
-    }>({isValid: false, isLoading: true});
-
-  useEffect(() => {
-      let mounted = true;
-      const validate = async () => {
-          try {
-              const ok = await CriticalModuleValidator.performCriticalValidation();
-              if (!mounted) return;
-              if (!ok) {
-                  const res = CriticalModuleValidator.validateGestureHandler();
-                  setValidation({isValid: false, isLoading: false, error: res.error});
-              } else {
-                  setValidation({isValid: true, isLoading: false});
-              }
-          } catch (e: any) {
-              if (!mounted) return;
-              setValidation({isValid: false, isLoading: false, error: e?.message ?? String(e)});
-          }
-      };
-      validate();
-      return () => {
-          mounted = false;
-      };
-  }, []);
-
-    // Navigator tree will be composed lazily after validation to avoid early RNGH access
-
-    if (validation.isLoading) {
-        return (
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                <ActivityIndicator size="large" color={colors.primary}/>
-                <Text style={{marginTop: 12, color: colors.textSecondary}}>
-                    Validating native modules...
-                </Text>
-            </View>
-        );
-    }
-
-    if (!validation.isValid) {
-        return (
-            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16}}>
-                <Text style={{fontSize: typography.sizes.md, color: colors.textPrimary, textAlign: 'center'}}>
-                    Critical native modules failed validation.
-                </Text>
-                {validation.error ? (
-                    <Text style={{marginTop: 8, color: colors.textSecondary, textAlign: 'center'}}>
-                        {validation.error}
-                    </Text>
-                ) : null}
-            </View>
-        );
-    }
-
-    // Compose navigation and providers lazily after validation passes
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const {GestureHandlerRootView} = require('react-native-gesture-handler');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const AppNavigator = ENABLE_STACK_NAV ? require('./src/navigation/AppNavigator').default : null;
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const MinimalNavigator = require('./src/navigation/MinimalNavigator').default;
     const NavigatorTree = (
         ENABLE_STACK_NAV ? <AppNavigator appReady={appReady}/> : <MinimalNavigator/>
     );
+
     const WrappedByLocalBoundary = stageAtLeast(16) ? (
         <ErrorBoundary>{NavigatorTree}</ErrorBoundary>
     ) : (
         NavigatorTree
     );
+
     const WithRealAuth = (
         <AuthProvider>{WrappedByLocalBoundary}</AuthProvider>
     );
+
     const WithAuthMock = stageAtLeast(17) ? (
         <AuthMockProvider>{WithRealAuth}</AuthMockProvider>
     ) : (

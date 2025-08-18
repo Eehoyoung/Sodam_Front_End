@@ -70,7 +70,5 @@ dependencies {
         implementation "io.github.react-native-community:jsc-android:2026004.+"
     }
 
-    // Manual linking (recovery) for critical native modules due to autolinking failure
-    implementation project(":react-native-gesture-handler")
-    implementation project(":react-native-screens")
+    // React Native 라이브러리들은 autolinking으로 자동 처리됨
 }

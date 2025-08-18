@@ -19,7 +19,6 @@
     "android:jsc": "npm run gradle-clean && npm run metro-reset && npm run android",
     "clean:all": "npm run gradle-clean && rmdir /s /q node_modules && npm install",
     "diag:native": "powershell -ExecutionPolicy Bypass -File .\\scripts\\verify-native-modules.ps1 -Device auto -Out logs\\verify-native-modules.log",
-    "validate-modules": "npm run diag:native",
     "perf:capture": "powershell -ExecutionPolicy Bypass -File .\\scripts\\collect-performance.ps1 -DurationSec 30 -IntervalMs 1000 -Out logs\\perf-collect.log",
     "run:iter": "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-iter-suite.ps1 -Device auto -TimeoutSec 15"
   },
