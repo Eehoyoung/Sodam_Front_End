@@ -27,7 +27,6 @@ try {
 
   $depsToCheck = @(
     'react-native-reanimated',
-    'react-native-gesture-handler',
     'react-native-screens',
     '@react-native-async-storage/async-storage'
   )

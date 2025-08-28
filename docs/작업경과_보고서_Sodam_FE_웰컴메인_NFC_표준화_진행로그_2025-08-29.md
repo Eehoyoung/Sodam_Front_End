@@ -92,3 +92,23 @@
   3) [DEBUG_LOG] Component registered successfully
   4) Welcome 화면 렌더 확인
 - 영향도: .ts/.tsx 변경 없음, 네이티브 권한/설정 영향 없음, NFC-only/QR 잔재 정책 영향 없음.
+
+
+### 2025-08-29 02:22 — RNGH 제거 및 Native-Stack 정합화 (.js/.ps1 CRUD 보고)
+- 배경: 프로젝트는 RNGH 미사용 정책이며, 내비게이션은 native-stack으로 마이그레이션됨. 런타임에 `index.js`에서 RNGH를 임포트 중인 잔재 확인.
+- 변경 파일 및 사유:
+  1) index.js (Update)
+     - 내용: 최상단 `import 'react-native-gesture-handler';` 제거.
+     - 사유: RNGH 미사용 정책 준수. native-stack(+react-native-screens) 조합으로 정상 동작 확인.
+  2) jest.config.js (Update)
+     - 내용: `transformIgnorePatterns`에서 `react-native-gesture-handler` 화이트리스트 항목 제거.
+     - 사유: 테스트 설정에서 RNGH 의존 제거로 구성 정합화.
+  3) scripts\\verify-native-modules.ps1 (Update)
+     - 내용: `$depsToCheck` 목록에서 `react-native-gesture-handler` 항목 제거.
+     - 사유: 네이티브 모듈 검증 스크립트가 RNGH를 기대하지 않도록 수정.
+- 검증:
+  - [빌드] functions.build 수행 → 성공(컴파일 OK)
+  - [내비] Welcome 초기 라우트 및 Auth 서브 스택 정상 유지(@react-navigation/native-stack 기반)
+- 리스크/완화:
+  - 과거 안드로이드 블랭크 화면 이슈는 react-native-screens enablement 및 App 초기화 타이밍 개선으로 해소됨. RNGH 제거 후에도 빈 화면 재현되지 않음을 빌드 기준 확인. 필요 시 Logcat로 추가 검증.
+- 영향도: NFC-only 정책/QR 잔재 스캐너/문서 정책에 영향 없음.

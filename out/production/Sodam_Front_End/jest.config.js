@@ -30,7 +30,7 @@ module.exports = {
         '^\\./src/contexts/AuthContext$': '<rootDir>/src/tests/mocks/AuthContext.mock.ts'
     },
     transformIgnorePatterns: [
-        'node_modules/(?!(react-native|@react-native|@expo/vector-icons|react-native-chart-kit|react-native-reanimated|react-native-gesture-handler)/)'
+        'node_modules/(?!(react-native|@react-native|@expo/vector-icons|react-native-chart-kit|react-native-reanimated)/)'
     ],
     testEnvironment: 'node',
     verbose: true
