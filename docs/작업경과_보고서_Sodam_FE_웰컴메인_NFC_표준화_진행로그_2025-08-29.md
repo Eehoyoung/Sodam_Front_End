@@ -47,3 +47,9 @@
  Date | Version | Changes | Author |
 ------|---------|---------|--------|
  2025-08-29 | 1.0 | 초기 생성: 브랜치/네비/스캐너 검증 로그 추가 | Junie |
+
+
+### 2025-08-29 01:15
+- [빌드] functions.build 수행 결과: Build completed successfully (컴파일 성공)
+- [테스트] run_test 도구를 통해 JS/Jest 테스트 실행은 환경 제약으로 식별되지 않음. 로컬 개발 환경에서는 `npm test`로 실행 권장.
+- [상태] 수용 기준 충족: Welcome 초기 라우트 고정, Minimal 비노출, QR 잔재 0건, 빌드 성공.
