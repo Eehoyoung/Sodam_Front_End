@@ -1,19 +1,18 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {View, Text, StyleSheet, Alert, Platform, Linking, TouchableOpacity} from 'react-native';
-import NfcManager, {NfcTech, Ndef, NfcEvents} from 'react-native-nfc-manager';
-import {Button} from '../../../common/components';
-import {Card} from '../../../common/components';
+import React, {useEffect, useRef, useState} from 'react';
+import {Alert, Linking, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import NfcManager, {Ndef, NfcTech} from 'react-native-nfc-manager';
+import {Button, Card, Toast} from '../../../common/components';
 import {colors, spacing} from '../../../common/styles/theme';
-const c = colors as any;
 import {useAuth} from '../../../contexts/AuthContext';
 import {
-    verifyCheckInByNFC,
-    verifyCheckOutByNFC,
+    isNFCTagValid,
     parseNFCTagData,
-    isNFCTagValid
+    verifyCheckInByNFC,
+    verifyCheckOutByNFC
 } from '../services/nfcAttendanceService';
-import {Toast} from '../../../common/components';
 import {Icon} from '../../../common/components/Icon';
+
+const c = colors as any;
 
 interface NFCAttendanceProps {
     onSuccess?: (isCheckIn: boolean) => void;
@@ -21,9 +20,9 @@ interface NFCAttendanceProps {
 }
 
 const NFCAttendance: React.FC<NFCAttendanceProps> = ({
-                                                       onSuccess,
-                                                       onError
-                                                   }) => {
+                                                         onSuccess,
+                                                         onError
+                                                     }) => {
     const {user} = useAuth();
     const [isNFCSupported, setIsNFCSupported] = useState(false);
     const [isNFCEnabled, setIsNFCEnabled] = useState(false);
@@ -302,7 +301,7 @@ const NFCAttendance: React.FC<NFCAttendanceProps> = ({
         return (
             <Card style={styles.container}>
                 <View style={styles.unsupportedContainer}>
-                    <Icon name="nfc-off" size={64} color={c.text?.secondary || '#666'} />
+                    <Icon name="nfc-off" size={64} color={c.text?.secondary || '#666'}/>
                     <Text style={styles.unsupportedTitle}>NFC 미지원</Text>
                     <Text style={styles.unsupportedMessage}>
                         이 기기는 NFC를 지원하지 않습니다.{'\n'}
@@ -335,7 +334,7 @@ const NFCAttendance: React.FC<NFCAttendanceProps> = ({
                 {isActive ? (
                     <View style={styles.activeReader}>
                         <View style={styles.nfcIcon}>
-                            <Icon name="nfc" size={48} color={c.primary?.main || '#1976D2'} />
+                            <Icon name="nfc" size={48} color={c.primary?.main || '#1976D2'}/>
                         </View>
                         <Text style={styles.instructionText}>
                             NFC 태그를 기기에 가까이 대주세요
@@ -352,7 +351,7 @@ const NFCAttendance: React.FC<NFCAttendanceProps> = ({
                 ) : (
                     <View style={styles.inactiveReader}>
                         <View style={styles.nfcIcon}>
-                            <Icon name="nfc" size={48} color={c.text?.secondary || '#666'} />
+                            <Icon name="nfc" size={48} color={c.text?.secondary || '#666'}/>
                         </View>
                         <Text style={styles.instructionText}>
                             NFC 태그 읽기 준비 완료
@@ -386,7 +385,7 @@ const NFCAttendance: React.FC<NFCAttendanceProps> = ({
 
             {!isNFCEnabled && (
                 <View style={styles.warningContainer}>
-                    <Icon name="warning" size={20} color={c.warning?.main || '#FFC107'} />
+                    <Icon name="warning" size={20} color={c.warning?.main || '#FFC107'}/>
                     <Text style={styles.warningText}>
                         NFC가 비활성화되어 있습니다. 설정에서 NFC를 활성화해주세요.
                     </Text>

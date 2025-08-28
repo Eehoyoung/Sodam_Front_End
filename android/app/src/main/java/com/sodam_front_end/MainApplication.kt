@@ -15,7 +15,7 @@ class MainApplication : Application(), ReactApplication {
         if (!BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
             object : DefaultReactNativeHost(this) {
                 override fun getPackages(): List<ReactPackage> =
-                    PackageList(this).packages
+                    PackageList(this).packages + listOf(SafeAreaReactPackage())
 
                 override fun getJSMainModuleName(): String = "index"
 
@@ -39,7 +39,7 @@ class MainApplication : Application(), ReactApplication {
             if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
                 object : DefaultReactNativeHost(this) {
                     override fun getPackages(): List<ReactPackage> =
-                        PackageList(this).packages
+                        PackageList(this).packages + listOf(SafeAreaReactPackage())
 
                     override fun getJSMainModuleName(): String = "index"
 
@@ -57,6 +57,28 @@ class MainApplication : Application(), ReactApplication {
         SoLoader.init(this, OpenSourceMergedSoMapping)
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
             load()
+        }
+
+        // Initialize Reanimated 3.x with improved error handling
+        try {
+            val reanimatedClass = Class.forName("com.swmansion.reanimated.Reanimated")
+            val initializeMethod = reanimatedClass.getDeclaredMethod("initialize", Application::class.java)
+            initializeMethod.invoke(null, this)
+            android.util.Log.d("MainApplication", "Reanimated initialized successfully")
+        } catch (noSuchMethodException: NoSuchMethodException) {
+            // Try alternative initialization without Application parameter
+            try {
+                val reanimatedClass = Class.forName("com.swmansion.reanimated.Reanimated")
+                val initializeMethod = reanimatedClass.getDeclaredMethod("initialize")
+                initializeMethod.invoke(null)
+                android.util.Log.d("MainApplication", "Reanimated initialized successfully (fallback method)")
+            } catch (e: Exception) {
+                android.util.Log.w("MainApplication", "Reanimated initialization failed (fallback): ${e.message}")
+                e.printStackTrace()
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("MainApplication", "Reanimated initialization failed: ${e.message}")
+            e.printStackTrace()
         }
     }
 }

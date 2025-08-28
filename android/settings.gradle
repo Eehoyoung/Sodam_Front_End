@@ -1,8 +1,8 @@
 pluginManagement {
     repositories {
+        mavenCentral()
         gradlePluginPortal()
         google()
-        mavenCentral()
     }
     includeBuild("../node_modules/@react-native/gradle-plugin")
 }
@@ -10,6 +10,12 @@ pluginManagement {
 plugins {
     id("com.facebook.react.settings")
 }
+
+// Ensure autolinking.json is generated from RN CLI output (includes project.android.packageName)
+extensions.configure(com.facebook.react.ReactSettingsExtension) { ext ->
+    ext.autolinkLibrariesFromCommand()
+}
+
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
@@ -26,5 +32,7 @@ dependencyResolutionManagement {
 
 rootProject.name = 'Sodam_Front_End'
 include ':app'
+
+// Reanimated is now handled by autolinking - manual include removed to prevent conflicts
 
 // ReactAndroid project inclusion is managed by com.facebook.react.settings plugin and the RN Gradle plugin.

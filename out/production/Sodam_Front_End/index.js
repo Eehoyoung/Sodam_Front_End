@@ -1,10 +1,7 @@
-/**
+﻿/**
  * Entry point for Sodam App
  * @format
- * real
  */
-
-import 'react-native-gesture-handler';
 import {AppRegistry, LogBox} from 'react-native';
 import {name as appName} from './app.json';
 
@@ -39,11 +36,8 @@ if (__DEV__) {
                 // Drop this error to keep Logcat clean during staged recovery
                 return;
             }
-            if (flat.includes("'RNGestureHandlerModule' could not be found") || flat.includes('RNGestureHandlerModule')) {
-                // Drop RNGestureHandler missing native module errors during staged recovery
-                return;
-            }
-        } catch {}
+        } catch {
+        }
         originalConsoleError(...args);
     };
 }

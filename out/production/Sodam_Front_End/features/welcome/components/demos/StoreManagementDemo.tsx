@@ -1,15 +1,33 @@
-import React, {useEffect, useRef, useState, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withTiming,
-    withSpring,
-    withDelay,
-    runOnJS,
-    Easing,
-} from 'react-native-reanimated';
-import { useJSISafeDimensions } from '../../../../hooks/useJSISafeDimensions';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let Easing: any;
+let runOnJS: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withDelay: any;
+let withSpring: any;
+let withTiming: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    Easing = reanimated.Easing;
+    runOnJS = reanimated.runOnJS;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withDelay = reanimated.withDelay;
+    withSpring = reanimated.withSpring;
+    withTiming = reanimated.withTiming;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] StoreManagementDemo: Reanimated import failed, using fallback', error);
+}
+import {useJSISafeDimensions} from '../../../../hooks/useJSISafeDimensions';
 
 interface Store {
     id: string;
@@ -202,8 +220,8 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
 
     const closeDemo = () => {
         // Reanimated 3 parallel animations
-        fadeAnim.value = withTiming(0, { duration: 200 });
-        scaleAnim.value = withTiming(0.8, { duration: 200 }, (finished) => {
+        fadeAnim.value = withTiming(0, {duration: 200});
+        scaleAnim.value = withTiming(0.8, {duration: 200}, (finished) => {
             'worklet';
             if (finished) {
                 runOnJS(() => {
@@ -228,7 +246,7 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
     // Animated styles using Reanimated 3
     const containerStyle = useAnimatedStyle(() => ({
         opacity: fadeAnim.value,
-        transform: [{ scale: scaleAnim.value }],
+        transform: [{scale: scaleAnim.value}],
     }));
 
     const progressBarStyle = useAnimatedStyle(() => ({
@@ -237,17 +255,17 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
 
     const store1Style = useAnimatedStyle(() => ({
         opacity: storeAnim1.value,
-        transform: [{ scale: storeAnim1.value }],
+        transform: [{scale: storeAnim1.value}],
     }));
 
     const store2Style = useAnimatedStyle(() => ({
         opacity: storeAnim2.value,
-        transform: [{ scale: storeAnim2.value }],
+        transform: [{scale: storeAnim2.value}],
     }));
 
     const store3Style = useAnimatedStyle(() => ({
         opacity: storeAnim3.value,
-        transform: [{ scale: storeAnim3.value }],
+        transform: [{scale: storeAnim3.value}],
     }));
 
     const getStatusColor = (status: string) => {
@@ -397,7 +415,7 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
                         <Text style={styles.demoTitle}>통합 관리 실행 중...</Text>
                         <Text style={styles.progressText}>{managementProgress}%</Text>
                         <View style={styles.progressBar}>
-                            <Animated.View style={[styles.progressFill, progressBarStyle]} />
+                            <Animated.View style={[styles.progressFill, progressBarStyle]}/>
                         </View>
                         <View style={styles.managementSteps}>
                             <Text style={styles.stepText}>📊 매장별 현황 분석 중...</Text>

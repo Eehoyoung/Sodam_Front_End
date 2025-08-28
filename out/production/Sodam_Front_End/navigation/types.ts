@@ -1,4 +1,4 @@
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RouteProp} from '@react-navigation/native';
 
 // 루트 스택 파라미터 목록
@@ -27,12 +27,12 @@ export type HomeStackParamList = {
 };
 
 // 네비게이션 프롭 타입 정의
-export type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
-export type SignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Signup'>;
-export type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
-export type WorkplaceListScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'WorkplaceList'>;
-export type WorkplaceDetailScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'WorkplaceDetail'>;
-export type RootNavigationProp = StackNavigationProp<RootStackParamList>;
+export type LoginScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
+export type SignupScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Signup'>;
+export type HomeScreenNavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
+export type WorkplaceListScreenNavigationProp = NativeStackNavigationProp<HomeStackParamList, 'WorkplaceList'>;
+export type WorkplaceDetailScreenNavigationProp = NativeStackNavigationProp<HomeStackParamList, 'WorkplaceDetail'>;
+export type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 // 라우트 프롭 타입 정의 (필요한 경우)
 export type WorkplaceDetailRouteProp = RouteProp<HomeStackParamList, 'WorkplaceDetail'>;

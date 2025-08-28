@@ -1,6 +1,6 @@
 import React, {createContext, ReactNode, useContext, useEffect} from 'react';
 import {User} from '../features/auth/services/authService';
-import {useAuthState, useLogin, useLogout, useKakaoLogin} from '../features/auth/hooks/useAuthQueries';
+import {useAuthState, useKakaoLogin, useLogin, useLogout} from '../features/auth/hooks/useAuthQueries';
 import {unifiedStorage} from '../common/utils/unifiedStorage';
 import {safeLogger} from '../utils/safeLogger';
 
@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const login = async (email: string, password: string): Promise<void> => {
         try {
             console.log('[AuthProvider] 로그인 시도:', email);
-            await loginMutation.mutateAsync({ email, password });
+            await loginMutation.mutateAsync({email, password});
             console.log('[AuthProvider] 로그인 성공');
         } catch (error) {
             console.error('[AuthProvider] 로그인 실패:', error);
@@ -195,9 +195,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
      * 인증 상태 로딩 또는 뮤테이션 진행 중일 때 true
      */
     const loading = authLoading ||
-                   loginMutation.isPending ||
-                   logoutMutation.isPending ||
-                   kakaoLoginMutation.isPending;
+        loginMutation.isPending ||
+        logoutMutation.isPending ||
+        kakaoLoginMutation.isPending;
 
     /**
      * 컨텍스트 값 생성
@@ -218,7 +218,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         if (__DEV__) {
             console.log('[AuthProvider] 상태 변경:', {
                 isAuthenticated,
-                user: user ? { id: user.id, name: user.name, role: user.role } : null,
+                user: user ? {id: user.id, name: user.name, role: user.role} : null,
                 loading,
             });
         }
@@ -236,7 +236,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
  * 특정 역할이나 권한을 확인할 때 사용
  */
 export const useAuthCheck = () => {
-    const { isAuthenticated, user, loading } = useAuth();
+    const {isAuthenticated, user, loading} = useAuth();
 
     return {
         isAuthenticated,
@@ -272,11 +272,11 @@ interface RequireAuthProps {
 }
 
 export const RequireAuth: React.FC<RequireAuthProps> = ({
-    children,
-    fallback = null,
-    roles = []
-}) => {
-    const { isAuthenticated, user, loading } = useAuth();
+                                                            children,
+                                                            fallback = null,
+                                                            roles = []
+                                                        }) => {
+    const {isAuthenticated, user, loading} = useAuth();
 
     // 로딩 중일 때는 로딩 표시
     if (loading) {
@@ -290,7 +290,7 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({
 
     // 특정 역할이 필요한 경우 역할 확인
     if (roles.length > 0 && !roles.includes(user.role)) {
-        console.warn('[RequireAuth] 권한 부족:', { userRole: user.role, requiredRoles: roles });
+        console.warn('[RequireAuth] 권한 부족:', {userRole: user.role, requiredRoles: roles});
         return <>{fallback}</>;
     }
 

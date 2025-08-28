@@ -5,8 +5,8 @@ import {CompositeNavigationProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 
 // AppNavigator.tsx 또는 타입 정의 파일에서 정의한 RootStackParamList 타입을 import 합니다.
-import {RootStackParamList} from '../../../navigation/AppNavigator';
-import {HomeStackParamList} from '../../../navigation/HomeNavigator';
+import {RootStackParamList} from '../../../navigation/types';
+import {HomeStackParamList} from '../../../navigation/types';
 import {useResponsiveStyles} from "../../../utils/responsive";
 import {useAuth} from '../../../contexts/AuthContext';
 

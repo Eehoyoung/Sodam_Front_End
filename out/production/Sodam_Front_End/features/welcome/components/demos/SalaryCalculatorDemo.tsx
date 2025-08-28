@@ -1,20 +1,20 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withTiming,
-    withSpring,
-    runOnJS,
-    interpolate,
-    Easing,
-} from 'react-native-reanimated';
-import { useJSISafeDimensions } from '../../../../hooks/useJSISafeDimensions';
-import {
-    CombinedAnimation,
-    ProgressAnimation,
-    NumberCountAnimation
-} from '../../../../common/components/animations';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Easing: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Easing = reanimated.Easing;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] SalaryCalculatorDemo: Reanimated import failed, using fallback', error);
+}
+import {useJSISafeDimensions} from '../../../../hooks/useJSISafeDimensions';
+import {CombinedAnimation, NumberCountAnimation, ProgressAnimation} from '../../../../common/components/animations';
 
 interface SalaryCalculation {
     hours: number;
@@ -139,7 +139,7 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
             <NumberCountAnimation
                 targetValue={value}
                 startValue={0}
-                config={{ duration: 1500, easing: Easing.out(Easing.cubic) }}
+                config={{duration: 1500, easing: Easing.out(Easing.cubic)}}
                 formatter={(val) => `${prefix}${formatCurrency(val)}`}
             />
         );
@@ -155,10 +155,10 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
                 <View style={styles.calculatingIndicator}>
                     <ProgressAnimation
                         progress={calculationProgress / 100}
-                        config={{ duration: 100, easing: Easing.linear }}
+                        config={{duration: 100, easing: Easing.linear}}
                         style={styles.calculatingBar}
                     >
-                        <View />
+                        <View/>
                     </ProgressAnimation>
                 </View>
             )}
@@ -296,8 +296,8 @@ const SalaryCalculatorDemo: React.FC<SalaryCalculatorDemoProps> = ({
     return (
         <CombinedAnimation
             isVisible={isVisible}
-            fadeConfig={{ duration: 300, easing: Easing.out(Easing.cubic) }}
-            scaleConfig={{ damping: 15, stiffness: 150 }}
+            fadeConfig={{duration: 300, easing: Easing.out(Easing.cubic)}}
+            scaleConfig={{damping: 15, stiffness: 150}}
             style={styles.overlay}
         >
             <View style={styles.demoModal}>

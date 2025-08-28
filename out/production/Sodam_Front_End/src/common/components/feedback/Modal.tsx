@@ -10,11 +10,25 @@ import {
     View,
     ViewStyle,
 } from 'react-native';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withTiming,
-} from 'react-native-reanimated';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withTiming: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withTiming = reanimated.withTiming;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] Modal: Reanimated import failed, using fallback', error);
+}
 
 // 모달 컴포넌트의 Props 타입 정의
 interface ModalProps {
@@ -56,18 +70,22 @@ const Modal: React.FC<ModalProps> = ({
                                          width = `80%`,
                                          height,
                                      }) => {
-    // 애니메이션 값
-    const fadeAnim = useSharedValue(0);
+    const shouldUseAnimations = ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE);
 
-    // 애니메이션 스타일
-    const animatedStyle = useAnimatedStyle(() => ({
+    // Only use animated values when animations are enabled
+    const fadeAnim = shouldUseAnimations && useSharedValue ? useSharedValue(0) : null;
+
+    // Conditionally create animated styles only when animations are enabled
+    const animatedStyle = shouldUseAnimations && useAnimatedStyle && fadeAnim ? useAnimatedStyle(() => ({
         opacity: fadeAnim.value,
-    }));
+    })) : null;
 
     // 모달 표시 상태가 변경될 때 애니메이션 실행
     useEffect(() => {
-        fadeAnim.value = withTiming(visible ? 1 : 0, { duration: 200 });
-    }, [visible, fadeAnim]);
+        if (shouldUseAnimations && fadeAnim && withTiming) {
+            fadeAnim.value = withTiming(visible ? 1 : 0, {duration: 200});
+        }
+    }, [visible, fadeAnim, shouldUseAnimations]);
 
     // 배경 터치 핸들러
     const handleBackdropPress = () => {

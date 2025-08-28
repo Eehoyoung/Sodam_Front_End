@@ -6,17 +6,37 @@
 
 import React, {useEffect} from 'react';
 import {ViewStyle} from 'react-native';
-import Animated, {
-    Easing,
-    interpolate,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withSequence,
-    withSpring,
-    withTiming,
-} from 'react-native-reanimated';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let Easing: any;
+let interpolate: any;
+let runOnJS: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withRepeat: any;
+let withSequence: any;
+let withSpring: any;
+let withTiming: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    Easing = reanimated.Easing;
+    interpolate = reanimated.interpolate;
+    runOnJS = reanimated.runOnJS;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withRepeat = reanimated.withRepeat;
+    withSequence = reanimated.withSequence;
+    withSpring = reanimated.withSpring;
+    withTiming = reanimated.withTiming;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] JSISafeAnimations: Reanimated import failed, using fallback', error);
+}
 import {useJSISafeDimensions} from '../../../hooks/useJSISafeDimensions';
 
 // Common animation configuration types
@@ -88,40 +108,64 @@ export const FadeAnimation: React.FC<FadeAnimationProps> = ({
                                                                 style,
                                                                 onAnimationComplete,
                                                             }) => {
-    const fadeAnim = useSharedValue(isVisible ? 1 : 0);
+    const shouldUseAnimations = ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE);
+
+    // Only use animated values when animations are enabled
+    const fadeAnim = shouldUseAnimations && useSharedValue ? useSharedValue(isVisible ? 1 : 0) : null;
 
     const {
         duration = 300,
-        easing = Easing.out(Easing.cubic),
+        easing = shouldUseAnimations && Easing ? Easing.out(Easing.cubic) : null,
         delay = 0,
     } = config;
 
     useEffect(() => {
-        const targetValue = isVisible ? 1 : 0;
-
-        fadeAnim.value = withTiming(
-            targetValue,
-            {
-                duration,
-                easing,
-            },
-            (finished) => {
-                'worklet';
-                if (finished && onAnimationComplete) {
-                    runOnJS(onAnimationComplete)();
-                }
+        if (!shouldUseAnimations) {
+            // No animations - trigger completion callback immediately
+            if (onAnimationComplete) {
+                setTimeout(onAnimationComplete, 0);
             }
-        );
-    }, [isVisible, duration, easing, onAnimationComplete]);
+            return;
+        }
 
-    const animatedStyle = useAnimatedStyle(() => ({
+        if (fadeAnim && withTiming) {
+            const targetValue = isVisible ? 1 : 0;
+
+            fadeAnim.value = withTiming(
+                targetValue,
+                {
+                    duration,
+                    easing,
+                },
+                (finished) => {
+                    'worklet';
+                    if (finished && onAnimationComplete && runOnJS) {
+                        runOnJS(onAnimationComplete)();
+                    }
+                }
+            );
+        }
+    }, [isVisible, duration, easing, onAnimationComplete, shouldUseAnimations]);
+
+    // Conditionally create animated styles only when animations are enabled
+    const animatedStyle = shouldUseAnimations && useAnimatedStyle && fadeAnim ? useAnimatedStyle(() => ({
         opacity: fadeAnim.value,
-    }));
+    })) : null;
 
+    if (!shouldUseAnimations) {
+        // Fallback to regular View when animations are disabled
+        return (
+            <View style={[{opacity: isVisible ? 1 : 0}, style]}>
+                {children}
+            </View>
+        );
+    }
+
+    const AnimatedComponent = Animated || View;
     return (
-        <Animated.View style={[animatedStyle, style]}>
+        <AnimatedComponent style={[animatedStyle, style]}>
             {children}
-        </Animated.View>
+        </AnimatedComponent>
     );
 };
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -14,10 +14,10 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import { MaterialIcons as Icon } from '@expo/vector-icons';
+import {MaterialIcons as Icon} from '@expo/vector-icons';
 import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
-import NfcManager, {NfcTech} from 'react-native-nfc-manager';
+import NfcManager from 'react-native-nfc-manager';
 import {Button, Card, MainLayout} from '../../../common/components';
 import attendanceService from '../services/attendanceService';
 import {AttendanceRecord, AttendanceStatus} from '../types';

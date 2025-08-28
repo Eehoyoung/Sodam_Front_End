@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Dimensions, Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {RootNavigationProp} from '../../../navigation/types';
@@ -92,7 +92,7 @@ const HybridMainScreen: React.FC = () => {
     const getProgressDotStyle = (index: number) => {
         return {
             backgroundColor: index <= currentSection ? '#2196F3' : '#E0E0E0',
-            transform: [{ scale: index === currentSection ? 1.2 : 1 }],
+            transform: [{scale: index === currentSection ? 1.2 : 1}],
         };
     };
 

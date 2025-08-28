@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../features/home/screens/HomeScreen';
 import SubscribeScreen from '../features/subscription/screens/SubscribeScreen';
 import QnAScreen from '../features/qna/screens/QnAScreen';
@@ -27,7 +27,7 @@ export type HomeStackParamList = {
     UserMyPageScreen: undefined;
 };
 
-const Stack = createStackNavigator<HomeStackParamList>();
+const Stack = createNativeStackNavigator<HomeStackParamList>();
 
 /**
  * 메인 앱 화면들을 위한 네비게이터

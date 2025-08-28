@@ -238,48 +238,7 @@ const attendanceService = {
         }
     },
 
-    /**
-     * QR 코드 기반 출퇴근 인증
-     * @param employeeId 직원 ID
-     * @param workplaceId 근무지 ID
-     * @param qrCode QR 코드 문자열
-     * @returns 인증 결과 (성공 여부)
-     */
-    verifyQrCodeAttendance: async (
-        employeeId: string,
-        workplaceId: string,
-        qrCode: string
-    ): Promise<{ success: boolean; message?: string }> => {
-        try {
-            const response = await api.post<{ success: boolean; message?: string }>(
-                '/attendance/qr-verify',
-                {
-                    employeeId,
-                    workplaceId,
-                    qrCode
-                }
-            );
-            return response.data;
-        } catch (error) {
-            console.error('QR 코드 기반 출퇴근 인증 중 오류가 발생했습니다:', error);
-            throw error;
-        }
-    },
 
-    /**
-     * 매장별 QR 코드 생성
-     * @param workplaceId 근무지 ID
-     * @returns QR 코드 이미지 URL 또는 인코딩된 문자열
-     */
-    getWorkplaceQrCode: async (workplaceId: string): Promise<{ qrCode: string }> => {
-        try {
-            const response = await api.get<{ qrCode: string }>(`/stores/${workplaceId}/qr-code`);
-            return response.data;
-        } catch (error) {
-            console.error('매장별 QR 코드 생성 중 오류가 발생했습니다:', error);
-            throw error;
-        }
-    },
 
     /**
      * NFC 태그 기반 출퇴근 인증 (래퍼)

@@ -1,12 +1,28 @@
 import React, {useCallback, useEffect, useRef} from 'react';
-import {Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle,} from 'react-native';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withTiming,
-    runOnJS,
-    interpolate,
-} from 'react-native-reanimated';
+import {Platform, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle, View} from 'react-native';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let interpolate: any;
+let runOnJS: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withTiming: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    interpolate = reanimated.interpolate;
+    runOnJS = reanimated.runOnJS;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withTiming = reanimated.withTiming;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] Toast: Reanimated import failed, using fallback', error);
+}
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -52,11 +68,14 @@ const Toast: ToastComponent = ({
                                          textStyle,
                                          showCloseButton = true,
                                      }) => {
-    const fadeAnim = useSharedValue(0);
+    const shouldUseAnimations = ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE);
+
+    // Only use animated values when animations are enabled
+    const fadeAnim = shouldUseAnimations && useSharedValue ? useSharedValue(0) : null;
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Animated style using Reanimated 3
-    const animatedStyle = useAnimatedStyle(() => ({
+    // Conditionally create animated styles only when animations are enabled
+    const animatedStyle = shouldUseAnimations && useAnimatedStyle && fadeAnim && interpolate ? useAnimatedStyle(() => ({
         opacity: fadeAnim.value,
         transform: [
             {
@@ -67,7 +86,7 @@ const Toast: ToastComponent = ({
                 ),
             },
         ],
-    }));
+    })) : null;
 
     const handleClose = useCallback(() => {
         if (timeoutRef.current) {
@@ -75,19 +94,28 @@ const Toast: ToastComponent = ({
             timeoutRef.current = null;
         }
 
-        // 페이드 아웃 애니메이션 실행 후 onClose 콜백 호출
-        fadeAnim.value = withTiming(0, { duration: 300 }, (finished) => {
-            'worklet';
-            if (finished && onClose) {
-                runOnJS(onClose)();
+        if (shouldUseAnimations && fadeAnim && withTiming && runOnJS) {
+            // 페이드 아웃 애니메이션 실행 후 onClose 콜백 호출
+            fadeAnim.value = withTiming(0, {duration: 300}, (finished) => {
+                'worklet';
+                if (finished && onClose) {
+                    runOnJS(onClose)();
+                }
+            });
+        } else {
+            // 애니메이션 없이 바로 onClose 호출
+            if (onClose) {
+                onClose();
             }
-        });
-    }, [fadeAnim, onClose]);
+        }
+    }, [fadeAnim, onClose, shouldUseAnimations]);
 
     useEffect(() => {
         if (visible) {
-            // 토스트가 보이면 페이드 인 애니메이션 실행
-            fadeAnim.value = withTiming(1, { duration: 300 });
+            // 토스트가 보이면 애니메이션 실행 (조건부)
+            if (shouldUseAnimations && fadeAnim && withTiming) {
+                fadeAnim.value = withTiming(1, {duration: 300});
+            }
 
             // 지정된 시간 후에 토스트 닫기
             if (duration > 0) {
@@ -96,8 +124,10 @@ const Toast: ToastComponent = ({
                 }, duration);
             }
         } else {
-            // 토스트가 사라지면 페이드 아웃 애니메이션 실행
-            fadeAnim.value = withTiming(0, { duration: 300 });
+            // 토스트가 사라지면 애니메이션 실행 (조건부)
+            if (shouldUseAnimations && fadeAnim && withTiming) {
+                fadeAnim.value = withTiming(0, {duration: 300});
+            }
         }
 
         // 컴포넌트 언마운트 시 타이머 정리
@@ -106,7 +136,7 @@ const Toast: ToastComponent = ({
                 clearTimeout(timeoutRef.current);
             }
         };
-    }, [visible, duration, fadeAnim, handleClose]);
+    }, [visible, duration, fadeAnim, handleClose, shouldUseAnimations]);
 
     // 토스트 타입에 따른 배경색 설정
     const getBackgroundColor = () => {
@@ -123,20 +153,24 @@ const Toast: ToastComponent = ({
         }
     };
 
-    // 토스트가 보이지 않으면 렌더링하지 않음
-    if (!visible && fadeAnim.value === 0) {
+    // 토스트가 보이지 않으면 렌더링하지 않음 (조건부 체크)
+    if (!visible && (!shouldUseAnimations || (fadeAnim && fadeAnim.value === 0))) {
         return null;
     }
 
+    // Define components conditionally
+    const ContainerComponent = shouldUseAnimations && Animated ? Animated.View : View;
+
     return (
-        <Animated.View
+        <ContainerComponent
             style={[
                 styles.container,
                 position === 'top' ? styles.topPosition : styles.bottomPosition,
                 {
                     backgroundColor: getBackgroundColor(),
+                    opacity: shouldUseAnimations ? undefined : (visible ? 1 : 0),
                 },
-                animatedStyle,
+                shouldUseAnimations ? animatedStyle : null,
                 style,
             ]}
             accessibilityRole="alert"
@@ -152,7 +186,7 @@ const Toast: ToastComponent = ({
                     <Text style={styles.closeButtonText}>✕</Text>
                 </TouchableOpacity>
             )}
-        </Animated.View>
+        </ContainerComponent>
     );
 };
 

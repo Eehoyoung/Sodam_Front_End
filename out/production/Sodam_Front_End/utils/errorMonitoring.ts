@@ -258,6 +258,15 @@ class ErrorMonitoringSystem {
     private startPerformanceMonitoring() {
         if (!this.isEnabled) return;
 
+        // In Jest/test environment, skip starting intervals to avoid open handles
+        try {
+            const g: any = typeof globalThis !== 'undefined' ? (globalThis as any) : {};
+            const isJest = !!g.jest || (typeof process !== 'undefined' && (process as any)?.env?.JEST_WORKER_ID);
+            if (isJest) return;
+        } catch {
+            // ignore env detection errors
+        }
+
         // 메모리 사용량 모니터링 (React Native용 타입 단언 포함)
         setInterval(() => {
             const performance = global.performance as any;

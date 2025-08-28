@@ -1,0 +1,1 @@
+﻿HasError=True; Patterns=[ReactNativeJS.*(TypeError|ReferenceError|Invariant Violation|Error:) => 3; RNGestureHandlerModule'.*could not be found|RNGestureHandlerModule => 1]

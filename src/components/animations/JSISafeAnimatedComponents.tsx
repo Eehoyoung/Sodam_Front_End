@@ -5,19 +5,40 @@
  */
 
 import React, {ReactNode} from 'react';
-import {ViewStyle} from 'react-native';
-import Animated, {
-    Easing,
-    Extrapolate,
-    interpolate,
-    runOnJS,
-    useAnimatedScrollHandler,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withSpring,
-    withTiming,
-} from 'react-native-reanimated';
+import {ViewStyle, View} from 'react-native';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let Easing: any;
+let Extrapolate: any;
+let interpolate: any;
+let runOnJS: any;
+let useAnimatedScrollHandler: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withDelay: any;
+let withSpring: any;
+let withTiming: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    Easing = reanimated.Easing;
+    Extrapolate = reanimated.Extrapolate;
+    interpolate = reanimated.interpolate;
+    runOnJS = reanimated.runOnJS;
+    useAnimatedScrollHandler = reanimated.useAnimatedScrollHandler;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withDelay = reanimated.withDelay;
+    withSpring = reanimated.withSpring;
+    withTiming = reanimated.withTiming;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] JSISafeAnimatedComponents: Reanimated import failed, using fallback', error);
+}
 import {useAnimationDimensions, useJSISafeDimensions} from '../../hooks/useJSISafeDimensions';
 
 // =============================================================================
@@ -91,34 +112,58 @@ export const JSISafeFadeAnimation: React.FC<FadeAnimationProps> = ({
                                                                        style,
                                                                        onAnimationComplete,
                                                                    }) => {
-    const opacity = useSharedValue(isVisible ? 1 : 0);
+    const shouldUseAnimations = ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE);
+
+    // Only use animated values when animations are enabled
+    const opacity = shouldUseAnimations && useSharedValue ? useSharedValue(isVisible ? 1 : 0) : null;
 
     React.useEffect(() => {
-        const {duration = 300, easing = Easing.out(Easing.cubic), delay = 0} = config;
+        if (!shouldUseAnimations) {
+            // No animations - trigger completion callback immediately
+            if (onAnimationComplete) {
+                setTimeout(onAnimationComplete, 0);
+            }
+            return;
+        }
 
-        opacity.value = withDelay(
-            delay,
-            withTiming(
-                isVisible ? 1 : 0,
-                {duration, easing},
-                (finished) => {
-                    'worklet';
-                    if (finished && onAnimationComplete) {
-                        runOnJS(onAnimationComplete)();
+        if (opacity && withDelay && withTiming && Easing && runOnJS) {
+            const {duration = 300, easing = Easing.out(Easing.cubic), delay = 0} = config;
+
+            opacity.value = withDelay(
+                delay,
+                withTiming(
+                    isVisible ? 1 : 0,
+                    {duration, easing},
+                    (finished) => {
+                        'worklet';
+                        if (finished && onAnimationComplete) {
+                            runOnJS(onAnimationComplete)();
+                        }
                     }
-                }
-            )
-        );
-    }, [isVisible, config, onAnimationComplete]);
+                )
+            );
+        }
+    }, [isVisible, opacity, config, onAnimationComplete, shouldUseAnimations]);
 
-    const animatedStyle = useAnimatedStyle(() => ({
+    // Conditionally create animated styles only when animations are enabled
+    const animatedStyle = shouldUseAnimations && useAnimatedStyle && opacity ? useAnimatedStyle(() => ({
         opacity: opacity.value,
-    }));
+    })) : null;
 
+    if (!shouldUseAnimations) {
+        // Fallback to regular View when animations are disabled
+        return (
+            <View style={[{opacity: isVisible ? 1 : 0}, style]}>
+                {children}
+            </View>
+        );
+    }
+
+    const AnimatedComponent = Animated || View;
     return (
-        <Animated.View style={[animatedStyle, style]}>
+        <AnimatedComponent style={[animatedStyle, style]}>
             {children}
-        </Animated.View>
+        </AnimatedComponent>
     );
 };
 
