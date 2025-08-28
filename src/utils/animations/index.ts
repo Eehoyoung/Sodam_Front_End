@@ -142,8 +142,70 @@ export {
     useLifecycleAnimation,
 } from './animationHooks';
 
-// Re-export commonly used Reanimated functions for convenience
-export {
+// Conditionally re-export Reanimated functions based on feature flags
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../src/navigation/config';
+
+// Placeholder exports when animations are disabled
+const createPlaceholderExports = () => ({
+    useSharedValue: () => ({ value: 0 }),
+    useAnimatedStyle: () => ({}),
+    useAnimatedScrollHandler: () => ({}),
+    useAnimatedGestureHandler: () => ({}),
+    useAnimatedReaction: () => {},
+    useAnimatedProps: () => ({}),
+    withTiming: (value: any) => value,
+    withSpring: (value: any) => value,
+    withSequence: (...values: any[]) => values[values.length - 1],
+    withRepeat: (value: any) => value,
+    withDelay: (delay: number, value: any) => value,
+    withDecay: (value: any) => value,
+    interpolate: (value: number, input: number[], output: any[]) => output[0],
+    Extrapolate: { CLAMP: 'clamp', EXTEND: 'extend', IDENTITY: 'identity' },
+    Easing: {
+        linear: (t: number) => t,
+        ease: (t: number) => t,
+        out: (easing: any) => easing,
+    },
+    runOnJS: (fn: any) => fn,
+    runOnUI: (fn: any) => fn,
+    reanimatedCancelAnimation: () => {},
+});
+
+// Conditionally export real or placeholder functions
+let reanimatedExports: any;
+
+try {
+    if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+        const reanimated = require('react-native-reanimated');
+        reanimatedExports = {
+            useSharedValue: reanimated.useSharedValue,
+            useAnimatedStyle: reanimated.useAnimatedStyle,
+            useAnimatedScrollHandler: reanimated.useAnimatedScrollHandler,
+            useAnimatedGestureHandler: reanimated.useAnimatedGestureHandler,
+            useAnimatedReaction: reanimated.useAnimatedReaction,
+            useAnimatedProps: reanimated.useAnimatedProps,
+            withTiming: reanimated.withTiming,
+            withSpring: reanimated.withSpring,
+            withSequence: reanimated.withSequence,
+            withRepeat: reanimated.withRepeat,
+            withDelay: reanimated.withDelay,
+            withDecay: reanimated.withDecay,
+            interpolate: reanimated.interpolate,
+            Extrapolate: reanimated.Extrapolate,
+            Easing: reanimated.Easing,
+            runOnJS: reanimated.runOnJS,
+            runOnUI: reanimated.runOnUI,
+            reanimatedCancelAnimation: reanimated.cancelAnimation,
+        };
+    } else {
+        reanimatedExports = createPlaceholderExports();
+    }
+} catch (error) {
+    console.warn('[RECOVERY] animations/index: Reanimated import failed, using placeholders', error);
+    reanimatedExports = createPlaceholderExports();
+}
+
+export const {
     useSharedValue,
     useAnimatedStyle,
     useAnimatedScrollHandler,
@@ -161,8 +223,8 @@ export {
     Easing,
     runOnJS,
     runOnUI,
-    cancelAnimation as reanimatedCancelAnimation,
-} from 'react-native-reanimated';
+    reanimatedCancelAnimation,
+} = reanimatedExports;
 
 // Utility functions for easy access
 export const AnimationUtils = {

@@ -4,21 +4,21 @@
  */
 
 export {
-  FadeAnimation,
-  ScaleAnimation,
-  ProgressAnimation,
-  PulseAnimation,
-  NumberCountAnimation,
-  CombinedAnimation,
-  type AnimationConfig,
-  type SpringConfig,
-  type FadeAnimationProps,
-  type ScaleAnimationProps,
-  type ProgressAnimationProps,
-  type PulseAnimationProps,
-  type NumberCountAnimationProps,
-  type CombinedAnimationProps,
+    FadeAnimation,
+    ScaleAnimation,
+    ProgressAnimation,
+    PulseAnimation,
+    NumberCountAnimation,
+    CombinedAnimation,
+    type AnimationConfig,
+    type SpringConfig,
+    type FadeAnimationProps,
+    type ScaleAnimationProps,
+    type ProgressAnimationProps,
+    type PulseAnimationProps,
+    type NumberCountAnimationProps,
+    type CombinedAnimationProps,
 } from './JSISafeAnimations';
 
 // Default export for convenience
-export { default as JSISafeAnimations } from './JSISafeAnimations';
+export {default as JSISafeAnimations} from './JSISafeAnimations';

@@ -1,0 +1,1 @@
+﻿HasError=True; Patterns=[ReactNativeJS.*(TypeError|ReferenceError|Invariant Violation|Error:) => 19]

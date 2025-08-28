@@ -1,11 +1,7 @@
-/**
+﻿/**
  * Entry point for Sodam App
  * @format
- * real
  */
-
-// NOTE: Do not import or require 'react-native-gesture-handler' here.
-// RNGH will be required lazily inside App.tsx AFTER native module validation completes.
 import {AppRegistry, LogBox} from 'react-native';
 import {name as appName} from './app.json';
 
@@ -38,10 +34,6 @@ if (__DEV__) {
             if (!flat) return originalConsoleError(...args);
             if (flat.includes("Screen native module hasn't been linked")) {
                 // Drop this error to keep Logcat clean during staged recovery
-                return;
-            }
-            if (flat.includes("'RNGestureHandlerModule' could not be found") || flat.includes('RNGestureHandlerModule')) {
-                // Drop RNGestureHandler missing native module errors during staged recovery
                 return;
             }
         } catch {

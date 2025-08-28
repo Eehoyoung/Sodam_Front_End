@@ -1,14 +1,32 @@
 import React, {useEffect} from 'react';
 import {Dimensions, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withRepeat,
-    withSequence,
-    withTiming,
-} from 'react-native-reanimated';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withTiming: any;
+let withDelay: any;
+let withRepeat: any;
+let withSequence: any;
+let Easing: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withTiming = reanimated.withTiming;
+    withDelay = reanimated.withDelay;
+    withRepeat = reanimated.withRepeat;
+    withSequence = reanimated.withSequence;
+    Easing = reanimated.Easing;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] ConversionSection: Reanimated import failed, using fallback', error);
+}
 
 const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
@@ -31,11 +49,14 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                                                                  onDownload,
                                                                  onWebTrial
                                                              }) => {
-    const fadeAnim = useSharedValue(0);
-    const ctaSlideAnim = useSharedValue(50);
-    const testimonialAnim1 = useSharedValue(50);
-    const testimonialAnim2 = useSharedValue(50);
-    const pulseAnim = useSharedValue(1);
+    const shouldUseAnimations = ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE);
+
+    // Only use animated values when animations are enabled
+    const fadeAnim = shouldUseAnimations && useSharedValue ? useSharedValue(0) : null;
+    const ctaSlideAnim = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const testimonialAnim1 = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const testimonialAnim2 = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const pulseAnim = shouldUseAnimations && useSharedValue ? useSharedValue(1) : null;
 
     const testimonials: Testimonial[] = [
         {
@@ -55,7 +76,12 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     ];
 
     useEffect(() => {
-        if (isVisible) {
+        if (!shouldUseAnimations) {
+            // No animations - just return
+            return;
+        }
+
+        if (isVisible && fadeAnim && ctaSlideAnim && testimonialAnim1 && testimonialAnim2 && pulseAnim) {
             // 섹션 전체 페이드인 (Reanimated 3)
             fadeAnim.value = withTiming(1, {
                 duration: 500,
@@ -97,7 +123,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                     );
                 }
             }));
-        } else {
+        } else if (!isVisible && fadeAnim && ctaSlideAnim && testimonialAnim1 && testimonialAnim2 && pulseAnim) {
             // 컴포넌트가 보이지 않을 때 애니메이션 리셋
             fadeAnim.value = 0;
             ctaSlideAnim.value = 50;
@@ -105,28 +131,28 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
             testimonialAnim2.value = 50;
             pulseAnim.value = 1;
         }
-    }, [isVisible]);
+    }, [isVisible, shouldUseAnimations]);
 
-    // Animated styles using Reanimated 3
-    const containerStyle = useAnimatedStyle(() => ({
+    // Conditionally create animated styles only when animations are enabled
+    const containerStyle = shouldUseAnimations && useAnimatedStyle && fadeAnim ? useAnimatedStyle(() => ({
         opacity: fadeAnim.value,
-    }));
+    })) : null;
 
-    const ctaStyle = useAnimatedStyle(() => ({
+    const ctaStyle = shouldUseAnimations && useAnimatedStyle && ctaSlideAnim ? useAnimatedStyle(() => ({
         transform: [{translateY: ctaSlideAnim.value}],
-    }));
+    })) : null;
 
-    const testimonial1Style = useAnimatedStyle(() => ({
+    const testimonial1Style = shouldUseAnimations && useAnimatedStyle && testimonialAnim1 ? useAnimatedStyle(() => ({
         transform: [{translateY: testimonialAnim1.value}],
-    }));
+    })) : null;
 
-    const testimonial2Style = useAnimatedStyle(() => ({
+    const testimonial2Style = shouldUseAnimations && useAnimatedStyle && testimonialAnim2 ? useAnimatedStyle(() => ({
         transform: [{translateY: testimonialAnim2.value}],
-    }));
+    })) : null;
 
-    const pulseStyle = useAnimatedStyle(() => ({
+    const pulseStyle = shouldUseAnimations && useAnimatedStyle && pulseAnim ? useAnimatedStyle(() => ({
         transform: [{scale: pulseAnim.value}],
-    }));
+    })) : null;
 
 
     const renderStars = (rating: number) => {
@@ -142,8 +168,11 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                                                                                         index
                                                                                     }) => {
         const testimonialStyles = [testimonial1Style, testimonial2Style];
+        const CardComponent = shouldUseAnimations && Animated ? Animated.View : View;
+        const cardStyle = shouldUseAnimations ? testimonialStyles[index] : null;
+
         return (
-            <Animated.View style={[styles.testimonialCard, testimonialStyles[index]]}>
+            <CardComponent style={[styles.testimonialCard, cardStyle]}>
                 <View style={styles.testimonialHeader}>
                     <View style={styles.starsContainer}>
                         {renderStars(testimonial.rating)}
@@ -154,15 +183,79 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                     <Text style={styles.testimonialAuthor}>- {testimonial.author}</Text>
                     <Text style={styles.testimonialRole}>{testimonial.role}</Text>
                 </View>
-            </Animated.View>
+            </CardComponent>
         );
     };
 
+    // Define components conditionally
+    const ContainerComponent = shouldUseAnimations && Animated ? Animated.View : View;
+    const CtaComponent = shouldUseAnimations && Animated ? Animated.View : View;
+    const PulseComponent = shouldUseAnimations && Animated ? Animated.View : View;
+    const TrustComponent = shouldUseAnimations && Animated ? Animated.View : View;
+
+    if (!shouldUseAnimations) {
+        // Fallback to regular components when animations are disabled
+        return (
+            <View style={[styles.container, isVisible ? {opacity: 1} : {opacity: 0}]}>
+                <View style={styles.content}>
+                    {/* CTA 섹션 */}
+                    <View style={styles.ctaContainer}>
+                        <Text style={styles.ctaTitle}>🚀 지금 바로 시작하기</Text>
+
+                        <View style={styles.benefits}>
+                            <Text style={styles.benefit}>✨ 30일 무료 체험</Text>
+                            <Text style={styles.benefit}>💳 신용카드 등록 불필요</Text>
+                            <Text style={styles.benefit}>📞 전화 상담 무료 제공</Text>
+                        </View>
+
+                        <View style={styles.actionButtons}>
+                            <View>
+                                <TouchableOpacity
+                                    style={styles.primaryButton}
+                                    onPress={onDownload}
+                                    activeOpacity={0.8}
+                                >
+                                    <Text style={styles.primaryButtonText}>📱 모바일 앱 다운로드</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            <TouchableOpacity
+                                style={styles.secondaryButton}
+                                onPress={onWebTrial}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={styles.secondaryButtonText}>🌐 웹에서 바로 체험</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    {/* 사용자 후기 섹션 */}
+                    <View style={styles.testimonialsContainer}>
+                        <Text style={styles.testimonialsTitle}>💬 실제 사용자 후기</Text>
+                        {testimonials.map((testimonial, index) => (
+                            <TestimonialCard
+                                key={testimonial.id}
+                                testimonial={testimonial}
+                                index={index}
+                            />
+                        ))}
+                    </View>
+
+                    {/* 신뢰 신호 */}
+                    <View style={styles.trustSignals}>
+                        <Text style={styles.trustSignal}>🔒 안전한 데이터 보호</Text>
+                        <Text style={styles.trustSignal}>📞 24/7 고객 지원</Text>
+                    </View>
+                </View>
+            </View>
+        );
+    }
+
     return (
-        <Animated.View style={[styles.container, containerStyle]}>
+        <ContainerComponent style={[styles.container, containerStyle]}>
             <View style={styles.content}>
                 {/* CTA 섹션 */}
-                <Animated.View style={[styles.ctaContainer, ctaStyle]}>
+                <CtaComponent style={[styles.ctaContainer, ctaStyle]}>
                     <Text style={styles.ctaTitle}>🚀 지금 바로 시작하기</Text>
 
                     <View style={styles.benefits}>
@@ -172,7 +265,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                     </View>
 
                     <View style={styles.actionButtons}>
-                        <Animated.View style={pulseStyle}>
+                        <PulseComponent style={pulseStyle}>
                             <TouchableOpacity
                                 style={styles.primaryButton}
                                 onPress={onDownload}
@@ -180,7 +273,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                             >
                                 <Text style={styles.primaryButtonText}>📱 모바일 앱 다운로드</Text>
                             </TouchableOpacity>
-                        </Animated.View>
+                        </PulseComponent>
 
                         <TouchableOpacity
                             style={styles.secondaryButton}
@@ -190,7 +283,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                             <Text style={styles.secondaryButtonText}>🌐 웹에서 바로 체험</Text>
                         </TouchableOpacity>
                     </View>
-                </Animated.View>
+                </CtaComponent>
 
                 {/* 사용자 후기 섹션 */}
                 <View style={styles.testimonialsContainer}>
@@ -205,12 +298,12 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                 </View>
 
                 {/* 신뢰 신호 */}
-                <Animated.View style={[styles.trustSignals, {opacity: fadeAnim}]}>
+                <TrustComponent style={[styles.trustSignals, containerStyle]}>
                     <Text style={styles.trustSignal}>🔒 안전한 데이터 보호</Text>
                     <Text style={styles.trustSignal}>📞 24/7 고객 지원</Text>
-                </Animated.View>
+                </TrustComponent>
             </View>
-        </Animated.View>
+        </ContainerComponent>
     );
 };
 

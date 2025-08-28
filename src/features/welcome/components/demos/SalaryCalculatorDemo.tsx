@@ -1,6 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import {Easing,} from 'react-native-reanimated';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Easing: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Easing = reanimated.Easing;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] SalaryCalculatorDemo: Reanimated import failed, using fallback', error);
+}
 import {useJSISafeDimensions} from '../../../../hooks/useJSISafeDimensions';
 import {CombinedAnimation, NumberCountAnimation, ProgressAnimation} from '../../../../common/components/animations';
 

@@ -1,21 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withTiming,
-    withSpring,
-    withRepeat,
-    withSequence,
-    runOnJS,
-    Easing,
-} from 'react-native-reanimated';
-import { useJSISafeDimensions } from '../../../../hooks/useJSISafeDimensions';
-import {
-    CombinedAnimation,
-    ProgressAnimation,
-    PulseAnimation
-} from '../../../../common/components/animations';
+import {useJSISafeDimensions} from '../../../../hooks/useJSISafeDimensions';
+import {ProgressAnimation, PulseAnimation} from '../../../../common/components/animations';
 
 interface DemoResult {
     success: boolean;
@@ -92,7 +78,7 @@ const NFCDemo: React.FC<NFCDemoProps> = ({onDemoComplete, isVisible}) => {
         <PulseAnimation
             isActive={demoStep === 'reading'}
             style={styles.nfcReader}
-            config={{ minScale: 1, maxScale: 1.15, duration: 800 }}
+            config={{minScale: 1, maxScale: 1.15, duration: 800}}
         >
             <View style={styles.nfcFrame}>
                 <View style={styles.nfcIcon}>
@@ -101,9 +87,9 @@ const NFCDemo: React.FC<NFCDemoProps> = ({onDemoComplete, isVisible}) => {
 
                 {demoStep === 'reading' && (
                     <View style={styles.nfcWaves}>
-                        <View style={[styles.wave, styles.wave1]} />
-                        <View style={[styles.wave, styles.wave2]} />
-                        <View style={[styles.wave, styles.wave3]} />
+                        <View style={[styles.wave, styles.wave1]}/>
+                        <View style={[styles.wave, styles.wave2]}/>
+                        <View style={[styles.wave, styles.wave3]}/>
                     </View>
                 )}
 

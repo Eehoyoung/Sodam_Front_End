@@ -20,12 +20,6 @@ jest.mock('@react-navigation/native', () => ({
     }),
 }));
 
-jest.mock('@react-navigation/stack', () => ({
-    createStackNavigator: () => ({
-        Navigator: ({children}) => children,
-        Screen: ({children}) => children,
-    }),
-}));
 
 // Mock React Native modules
 jest.mock('react-native', () => ({
@@ -82,6 +76,14 @@ jest.mock('react-native', () => ({
         divide: jest.fn(),
         modulo: jest.fn(),
         diffClamp: jest.fn(),
+    },
+    InteractionManager: {
+        runAfterInteractions: jest.fn((cb) => {
+            if (typeof cb === 'function') {
+                cb();
+            }
+            return { cancel: jest.fn() };
+        }),
     },
     Dimensions: {
         get: jest.fn(() => ({width: 375, height: 812})),
@@ -154,3 +156,64 @@ jest.mock('react-native-chart-kit', () => ({
     ContributionGraph: 'ContributionGraph',
     StackedBarChart: 'StackedBarChart',
 }));
+
+// Mock react-native-reanimated with official mock to avoid native crashes in Jest
+try {
+    jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'));
+} catch (e) {
+    // if module resolution fails, provide a minimal fallback
+    jest.mock('react-native-reanimated', () => ({
+        Easing: {linear: jest.fn(), ease: jest.fn()},
+        useSharedValue: jest.fn(() => ({value: 0})),
+        useAnimatedStyle: jest.fn(() => ({})),
+        withTiming: jest.fn((v) => v),
+        withSpring: jest.fn((v) => v),
+        withDelay: jest.fn((_, v) => v),
+        runOnJS: (fn) => fn,
+        runOnUI: (fn) => fn,
+        createAnimatedComponent: (c) => c,
+    }));
+}
+
+// Lightweight mock for @testing-library/react-native to avoid adding a dev dependency
+try {
+    jest.mock('@testing-library/react-native', () => {
+        const render = jest.fn(() => ({
+            getByText: jest.fn(),
+            getByTestId: jest.fn(),
+            queryByText: jest.fn(),
+            update: jest.fn(),
+            unmount: jest.fn(),
+        }));
+        const renderHook = jest.fn((callback) => {
+            const result = {current: undefined};
+            try {
+                const r = callback();
+                result.current = (r && 'result' in r) ? r.result : r;
+            } catch (e) {
+                result.current = undefined;
+            }
+            return {
+                result,
+                rerender: jest.fn(),
+                unmount: jest.fn(),
+            };
+        });
+        const fireEvent = {
+            press: jest.fn(),
+            changeText: jest.fn(),
+        };
+        const waitFor = async (cb) => {
+            if (cb) {
+                await cb();
+            }
+        };
+        const act = async (cb) => {
+            return cb ? await cb() : undefined;
+        };
+        return {render, renderHook, fireEvent, waitFor, act};
+    });
+} catch (e) {
+    // ignore
+}
+

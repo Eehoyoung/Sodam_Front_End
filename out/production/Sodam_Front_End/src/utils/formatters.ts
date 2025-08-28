@@ -17,10 +17,13 @@ export const formatCurrency = (amount: number): string => {
  * @returns Formatted date string
  */
 export const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('ko-KR', {
+    // Use UTC to avoid timezone-induced date shifting in tests and consistent formatting
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        timeZone: 'UTC',
     });
 };
 

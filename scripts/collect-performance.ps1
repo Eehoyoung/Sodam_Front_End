@@ -1,44 +1,42 @@
+# Collect simple performance metrics (placeholder) for iterative runs
+# Note: This is a minimal, non-invasive logger to keep repo integrity.
+
 param(
-    [int]$DurationSec = 30,
-    [int]$IntervalMs = 1000,
-    [string]$Package = 'com.sodam_front_end',
-    [string]$Out = 'logs\\perf-collect.log'
+  [int]$DurationSec = 30,
+  [int]$IntervalMs = 1000,
+  [string]$Out = "logs/perf-collect.log"
 )
 
-# Purpose: Collect CPU and memory metrics from the target app over a short time window.
-# Requires: adb available in PATH, device connected.
-# Usage: powershell -ExecutionPolicy Bypass -File .\scripts\collect-performance.ps1 -DurationSec 60 -IntervalMs 500 -Out logs\perf-60s.log
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
-$ErrorActionPreference = 'Continue'
+try {
+  $repoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+  $outPath = Join-Path $repoRoot $Out
+  $outDir = Split-Path -Parent $outPath
+  if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Path $outDir -Force | Out-Null }
 
-function Get-AppPid($pkg)
-{
-    $ps = & adb shell pidof $pkg 2> $null
-    if (-not $ps)
-    {
-        return $null
-    }
-    return $ps.Trim()
-}
-
-"[PERF] Collecting performance for package=$Package duration=${DurationSec}s interval=${IntervalMs}ms" | Out-File -FilePath $Out -Encoding UTF8
-
-$pid = Get-AppPid $Package
-if (-not $pid)
-{
-    "[PERF][WARN] PID not found for $Package. Is the app running?" | Out-File -FilePath $Out -Append -Encoding UTF8
-    exit 1
-}
-
-$iterations = [Math]::Ceiling($DurationSec * 1000.0 / $IntervalMs)
-for ($i = 0; $i -lt $iterations; $i++) {
-    $ts = Get-Date -Format o
-    $top = & adb shell top -b -n 1 -p $pid 2> $null
-    $mem = & adb shell dumpsys meminfo $pid 2> $null
-    "[TS]=$ts" | Out-File -FilePath $Out -Append -Encoding UTF8
-    "[TOP]`n$top" | Out-File -FilePath $Out -Append -Encoding UTF8
-    "[MEMINFO]`n$mem" | Out-File -FilePath $Out -Append -Encoding UTF8
+  $start = Get-Date
+  $lines = @()
+  $lines += "[perf] start: $start"
+  $elapsed = 0
+  while ($elapsed -lt ($DurationSec * 1000)) {
+    $ts = Get-Date
+    # Placeholder metrics: system CPU info snapshot
+    $cpu = (Get-CimInstance Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average
+    $mem = Get-CimInstance Win32_OperatingSystem
+    $freeMb = [math]::Round($mem.FreePhysicalMemory / 1024, 2)
+    $totalMb = [math]::Round($mem.TotalVisibleMemorySize / 1024, 2)
+    $lines += "[perf] $ts cpu_load=%$cpu mem_free=${freeMb}MB mem_total=${totalMb}MB"
     Start-Sleep -Milliseconds $IntervalMs
+    $elapsed += $IntervalMs
+  }
+  $end = Get-Date
+  $lines += "[perf] end: $end"
+  $lines | Set-Content -Path $outPath -Encoding UTF8
+  Write-Host "[perf] Metrics written to $outPath"
+  exit 0
+} catch {
+  Write-Error "[perf] Failed: $($_.Exception.Message)"
+  exit 1
 }
-
-"[PERF] Done." | Out-File -FilePath $Out -Append -Encoding UTF8

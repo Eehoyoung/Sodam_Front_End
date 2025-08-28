@@ -3,8 +3,8 @@
 This document provides comprehensive guidelines and instructions for developers working on the Sodam Front End project -
 a cross-platform attendance and payroll management application for part-time workers and small business owners.
 
-**Last Updated**: 2025-08-06  
-**Version**: 2.1 - Enhanced with comprehensive development standards
+**Last Updated**: 2025-08-28  
+**Version**: 2.1.2 - Documentation standardization and Master Work Plan adoption (NFC standardization, QR deprecation, Welcome page main)
 
 ## Role
 
@@ -643,7 +643,7 @@ export const validateAttendanceData = (data: unknown) => {
 ### Unit Testing Configuration
 
 ```javascript
-// jest.config.cjs
+// jest.config.js
 module.exports = {
   preset: 'react-native',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
@@ -746,7 +746,7 @@ describe('NFCAttendanceService', () => {
 ### Bundle Optimization
 
 ```javascript
-// metro.config.cjs
+// metro.config.js
 const { getDefaultConfig } = require('@react-native/metro-config');
 
 module.exports = (() => {
@@ -1297,3 +1297,72 @@ Each feature should have comprehensive documentation including:
 ---
 
 *이 가이드라인은 백엔드 개발팀의 표준과 일치하도록 지속적으로 업데이트됩니다.*
+
+
+## Maintenance & Change Management
+
+### Purpose
+- Establish a consistent process for maintaining, deprecating, and evolving features across mobile (Android/iOS) and Web targets.
+- Ensure operational safety via checklists, automation, and CI guardrails.
+
+### Principles
+- Security and stability first. All deprecations must be safe-by-default (feature flags or complete removal) and reversible via version control.
+- Minimize functional coupling. Identify upstream/downstream dependencies before changing service boundaries.
+- Automation over manual checks. Each policy must come with a scriptable verification where feasible.
+
+### Standard Deprecation Workflow
+1. Inventory & Coupling Analysis
+   - Map affected files: code (services/hooks/components), navigation/routes, native manifests, tests, docs.
+   - Identify coupling: shared types, analytics events, permissions, environment variables, build configs.
+2. Plan & Communicate
+   - Draft a removal plan (scope, impact, acceptance criteria, rollback path) and share in docs/.
+3. Implement
+   - Remove/replace feature code; update navigation; adjust native permissions and build configs.
+   - Update tests and documentation accordingly.
+4. Verify (Local)
+   - Run unit tests and static checks.
+   - Run feature-specific scanners if available (see QR example below).
+5. Guard (CI)
+   - Add CI step to fail builds if residuals are detected (scripts listed below).
+6. Rollback
+   - Keep changes in a feature branch and use PR-level reverts if needed.
+
+### NFC Standardization and QR Deprecation (2025-08-28)
+- Context: QR attendance has been fully deprecated; NFC is the single source for tag-based attendance.
+- Implemented Changes (summary):
+  - Removed QR services/hooks/components:
+    - src\features\attendance\services\qrAttendanceService.ts (deleted)
+    - src\features\attendance\services\attendanceService.ts: removed verifyQrCodeAttendance, getWorkplaceQrCode
+    - src\features\attendance\hooks\useAttendanceQueries.ts: removed useVerifyQrCodeAttendance
+    - src\features\welcome\components\demos\QRCodeDemo.tsx (deleted)
+  - Android manifest cleanup:
+    - Removed CAMERA permission and camera uses-feature entries
+    - Kept NFC permissions and TAG/NDEF intent-filters
+  - Added automation:
+    - scripts\scan-qr-residue.ps1 to scan repository and produce logs\qr-scan-report.md
+- Acceptance Criteria:
+  - No QR code endpoints/components/hooks/permissions remain (code, tests, docs), except in the guideline and scan artifacts.
+  - CI step fails if residual QR keywords are found outside allowed paths.
+- How to run the scanner (Windows PowerShell):
+  - powershell -ExecutionPolicy Bypass -File .\scripts\scan-qr-residue.ps1
+  - powershell -ExecutionPolicy Bypass -File .\scripts\scan-qr-residue.ps1 -FailOnMatch
+
+### Welcome Page as Main (Minimal mode decommissioned)
+- Initial route fixed to 'Welcome'; MinimalNavigator path removed from routing.
+- See: docs\개편_웰컴페이지_방향성_v2.1_2025-08-28.md for IA and acceptance criteria.
+
+### CI Guardrails
+- Integrate scripts\scan-qr-residue.ps1 with -FailOnMatch in CI so builds fail when disallowed residuals are detected.
+- Keep exclusions limited to:
+  - docs\QR_Residual_Removal_Guide_2025-08-28.md
+  - scripts\scan-qr-residue.ps1
+  - Generated bundle artifacts and lock files
+
+### Ownership & SLO
+- Owner: RN Lead (Junie) for app-layer; Android/iOS leads for native manifests; QA for CI guardrails.
+- SLO: Residual-deprecation regressions (e.g., QR references reintroduced) must be triaged within 24h and hotfixed within 72h.
+
+### Related Documents
+- docs\QR_Residual_Removal_Guide_2025-08-28.md
+- docs\개편_웰컴페이지_방향성_v2.1_2025-08-28.md
+- docs\작업계획서_Sodam_FE_웰컴메인_및_문서표준화_v2.1.2_2025-08-28.md

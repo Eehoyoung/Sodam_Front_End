@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Dimensions} from 'react-native';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
-import {RootStackParamList} from '../../../navigation/AppNavigator';
+import {HomeStackParamList} from '../../../navigation/types';
 import homeService from '../services/homeService';
 import {Service} from '../types';
 
@@ -9,7 +9,7 @@ import {Service} from '../types';
 const {width} = Dimensions.get('window');
 
 const ServiceCards = () => {
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const navigation = useNavigation<NavigationProp<HomeStackParamList>>();
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);

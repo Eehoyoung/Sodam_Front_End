@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Event, LaborInfo, Policy, TaxInfo, Tip, Testimonial, Service} from '../types';
+import {Event, LaborInfo, Policy, Service, TaxInfo, Testimonial, Tip} from '../types';
 
 /**
  * 홈 화면에 필요한 데이터를 가져오는 서비스

@@ -2,12 +2,12 @@ import React from 'react';
 import {Alert, Dimensions, Linking, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useResponsiveStyles} from '../../../utils/responsive';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {RootStackParamList} from '../../../navigation/AppNavigator';
+import {HomeStackParamList} from '../../../navigation/types';
 
 const Footer = () => {
     const {isSmallScreen, isMediumScreen, responsiveStyles} = useResponsiveStyles();
     const screenWidth = Dimensions.get('window').width;
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const navigation = useNavigation<NavigationProp<HomeStackParamList>>();
 
     // 외부 링크 열기
     const openExternalLink = (url: string) => {

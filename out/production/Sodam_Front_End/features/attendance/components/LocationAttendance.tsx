@@ -1,17 +1,11 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {View, Text, StyleSheet, Alert, Platform, PermissionsAndroid, ViewStyle, TextStyle} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {PermissionsAndroid, Platform, StyleSheet, Text, TextStyle, View, ViewStyle} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import {Button} from '../../../common/components';
-import {Card} from '../../../common/components';
+import {Button, Card, Toast} from '../../../common/components';
 import {colors, spacing} from '../../../common/styles/theme';
 import {useAuth} from '../../../contexts/AuthContext';
 import {useWorkplaces} from '../../workplace/hooks/useWorkplaces';
-import {
-    verifyCheckInByLocation,
-    verifyCheckOutByLocation,
-    isWithinRadius
-} from '../services/locationAttendanceService';
-import {Toast} from '../../../common/components';
+import {isWithinRadius, verifyCheckInByLocation, verifyCheckOutByLocation} from '../services/locationAttendanceService';
 
 interface LocationAttendanceProps {
     storeId: string;

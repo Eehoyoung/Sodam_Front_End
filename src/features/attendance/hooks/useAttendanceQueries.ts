@@ -460,37 +460,6 @@ export const useVerifyLocationAttendance = () => {
     });
 };
 
-/**
- * QR 코드 기반 출퇴근 검증 뮤테이션
- * QR 코드를 통해 출퇴근 가능 여부를 검증합니다.
- */
-export const useVerifyQrCodeAttendance = () => {
-    return useMutation({
-        mutationFn: async ({
-                               employeeId,
-                               workplaceId,
-                               qrCode
-                           }: {
-            employeeId: string;
-            workplaceId: string;
-            qrCode: string;
-        }) => {
-            try {
-                return await attendanceService.verifyQrCodeAttendance(
-                    employeeId,
-                    workplaceId,
-                    qrCode
-                );
-            } catch (error) {
-                handleQueryError(error, 'verifyQrCodeAttendance');
-                throw error;
-            }
-        },
-        meta: {
-            errorMessage: 'QR 코드 기반 출퇴근 검증에 실패했습니다.',
-        },
-    });
-};
 
 /**
  * 출퇴근 상태 일괄 업데이트 뮤테이션

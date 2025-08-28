@@ -1,15 +1,34 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import {Dimensions, StyleSheet, Text, View} from 'react-native';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withTiming,
-    withDelay,
-    withRepeat,
-    withSequence,
-    runOnJS,
-    Easing,
-} from 'react-native-reanimated';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withTiming: any;
+let withDelay: any;
+let withRepeat: any;
+let withSequence: any;
+let runOnJS: any;
+let Easing: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withTiming = reanimated.withTiming;
+    withDelay = reanimated.withDelay;
+    withRepeat = reanimated.withRepeat;
+    withSequence = reanimated.withSequence;
+    runOnJS = reanimated.runOnJS;
+    Easing = reanimated.Easing;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] StorytellingSection: Reanimated import failed, using fallback', error);
+}
 
 const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
 
@@ -30,11 +49,14 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
                                                                      isVisible,
                                                                      onComplete
                                                                  }) => {
-    const fadeAnim = useSharedValue(0);
-    const slideAnim1 = useSharedValue(50);
-    const slideAnim2 = useSharedValue(50);
-    const slideAnim3 = useSharedValue(50);
-    const arrowBounce = useSharedValue(0);
+    const shouldUseAnimations = ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE);
+
+    // Only use animated values when animations are enabled
+    const fadeAnim = shouldUseAnimations && useSharedValue ? useSharedValue(0) : null;
+    const slideAnim1 = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const slideAnim2 = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const slideAnim3 = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const arrowBounce = shouldUseAnimations && useSharedValue ? useSharedValue(0) : null;
 
     const problems: Problem[] = [
         {
@@ -61,7 +83,17 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
     ];
 
     useEffect(() => {
-        if (isVisible) {
+        if (!shouldUseAnimations) {
+            // No animations - just trigger onComplete after a delay
+            if (isVisible && onComplete) {
+                setTimeout(() => {
+                    onComplete();
+                }, 1000);
+            }
+            return;
+        }
+
+        if (isVisible && fadeAnim && slideAnim1 && slideAnim2 && slideAnim3 && arrowBounce) {
             // 섹션 전체 페이드인 (Reanimated 3)
             fadeAnim.value = withTiming(1, {
                 duration: 500,
@@ -108,7 +140,7 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
                     }
                 }
             }));
-        } else {
+        } else if (!isVisible && fadeAnim && slideAnim1 && slideAnim2 && slideAnim3 && arrowBounce) {
             // 컴포넌트가 보이지 않을 때 애니메이션 리셋
             fadeAnim.value = 0;
             slideAnim1.value = 50;
@@ -116,45 +148,78 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
             slideAnim3.value = 50;
             arrowBounce.value = 0;
         }
-    }, [isVisible]);
+    }, [isVisible, shouldUseAnimations]);
 
-    // Animated styles using Reanimated 3
-    const containerStyle = useAnimatedStyle(() => ({
+    // Conditionally create animated styles only when animations are enabled
+    const containerStyle = shouldUseAnimations && useAnimatedStyle && fadeAnim ? useAnimatedStyle(() => ({
         opacity: fadeAnim.value,
-    }));
+    })) : null;
 
-    const problemCard1Style = useAnimatedStyle(() => ({
-        transform: [{ translateY: slideAnim1.value }],
-    }));
+    const problemCard1Style = shouldUseAnimations && useAnimatedStyle && slideAnim1 ? useAnimatedStyle(() => ({
+        transform: [{translateY: slideAnim1.value}],
+    })) : null;
 
-    const problemCard2Style = useAnimatedStyle(() => ({
-        transform: [{ translateY: slideAnim2.value }],
-    }));
+    const problemCard2Style = shouldUseAnimations && useAnimatedStyle && slideAnim2 ? useAnimatedStyle(() => ({
+        transform: [{translateY: slideAnim2.value}],
+    })) : null;
 
-    const problemCard3Style = useAnimatedStyle(() => ({
-        transform: [{ translateY: slideAnim3.value }],
-    }));
+    const problemCard3Style = shouldUseAnimations && useAnimatedStyle && slideAnim3 ? useAnimatedStyle(() => ({
+        transform: [{translateY: slideAnim3.value}],
+    })) : null;
 
-    const arrowStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: arrowBounce.value }],
-    }));
-
+    const arrowStyle = shouldUseAnimations && useAnimatedStyle && arrowBounce ? useAnimatedStyle(() => ({
+        transform: [{translateY: arrowBounce.value}],
+    })) : null;
 
     const ProblemCard: React.FC<{ problem: Problem; index: number }> = ({problem, index}) => {
         const cardStyles = [problemCard1Style, problemCard2Style, problemCard3Style];
+        const CardComponent = shouldUseAnimations && Animated ? Animated.View : View;
+        const cardStyle = shouldUseAnimations ? cardStyles[index] : null;
+
         return (
-            <Animated.View style={[styles.problemCard, cardStyles[index]]}>
+            <CardComponent style={[styles.problemCard, cardStyle]}>
                 <View style={styles.problemHeader}>
                     <Text style={styles.problemEmoji}>{problem.emoji}</Text>
                     <Text style={styles.problemTitle}>{problem.title}</Text>
                 </View>
                 <Text style={styles.problemDescription}>{problem.description}</Text>
-            </Animated.View>
+            </CardComponent>
         );
     };
 
+    if (!shouldUseAnimations) {
+        // Fallback to regular View components when animations are disabled
+        return (
+            <View style={[styles.container, isVisible ? {opacity: 1} : {opacity: 0}]}>
+                <View style={styles.content}>
+                    <Text style={styles.sectionTitle}>이런 고민, 혹시 있으신가요?</Text>
+
+                    <View style={styles.problemsContainer}>
+                        {problems.map((problem, index) => (
+                            <ProblemCard
+                                key={problem.id}
+                                problem={problem}
+                                index={index}
+                            />
+                        ))}
+                    </View>
+
+                    <View style={styles.transitionHint}>
+                        <Text style={styles.hintText}>이 모든 걱정을...</Text>
+                        <View style={styles.scrollIndicator}>
+                            <Text style={styles.arrowText}>↓</Text>
+                        </View>
+                    </View>
+                </View>
+            </View>
+        );
+    }
+
+    const ContainerComponent = Animated ? Animated.View : View;
+    const ArrowComponent = Animated ? Animated.View : View;
+
     return (
-        <Animated.View style={[styles.container, containerStyle]}>
+        <ContainerComponent style={[styles.container, containerStyle]}>
             <View style={styles.content}>
                 <Text style={styles.sectionTitle}>이런 고민, 혹시 있으신가요?</Text>
 
@@ -170,12 +235,12 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
 
                 <View style={styles.transitionHint}>
                     <Text style={styles.hintText}>이 모든 걱정을...</Text>
-                    <Animated.View style={[styles.scrollIndicator, arrowStyle]}>
+                    <ArrowComponent style={[styles.scrollIndicator, arrowStyle]}>
                         <Text style={styles.arrowText}>↓</Text>
-                    </Animated.View>
+                    </ArrowComponent>
                 </View>
             </View>
-        </Animated.View>
+        </ContainerComponent>
     );
 };
 

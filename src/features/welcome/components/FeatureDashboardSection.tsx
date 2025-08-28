@@ -1,13 +1,30 @@
 import React, {useEffect, useState} from 'react';
 import {Dimensions, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import Animated, {
-    Easing,
-    interpolate,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withTiming,
-} from 'react-native-reanimated';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withTiming: any;
+let withDelay: any;
+let interpolate: any;
+let Easing: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withTiming = reanimated.withTiming;
+    withDelay = reanimated.withDelay;
+    interpolate = reanimated.interpolate;
+    Easing = reanimated.Easing;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] FeatureDashboardSection: Reanimated import failed, using fallback', error);
+}
 import NFCDemo from './demos/NFCDemo';
 import SalaryCalculatorDemo from './demos/SalaryCalculatorDemo';
 import StoreManagementDemo from './demos/StoreManagementDemo';
@@ -38,11 +55,14 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
                                                                              isVisible,
                                                                              onFeatureTest
                                                                          }) => {
-    const fadeAnim = useSharedValue(0);
-    const slideAnim1 = useSharedValue(50);
-    const slideAnim2 = useSharedValue(50);
-    const slideAnim3 = useSharedValue(50);
-    const statsAnim = useSharedValue(0);
+    const shouldUseAnimations = ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE);
+
+    // Only use animated values when animations are enabled
+    const fadeAnim = shouldUseAnimations && useSharedValue ? useSharedValue(0) : null;
+    const slideAnim1 = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const slideAnim2 = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const slideAnim3 = shouldUseAnimations && useSharedValue ? useSharedValue(50) : null;
+    const statsAnim = shouldUseAnimations && useSharedValue ? useSharedValue(0) : null;
 
     // Demo state management
     const [activeDemo, setActiveDemo] = useState<string | null>(null);
@@ -93,7 +113,12 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
     ];
 
     useEffect(() => {
-        if (isVisible) {
+        if (!shouldUseAnimations) {
+            // No animations - just trigger any completion callbacks
+            return;
+        }
+
+        if (isVisible && fadeAnim && slideAnim1 && slideAnim2 && slideAnim3 && statsAnim) {
             // 섹션 전체 페이드인 (Reanimated 3)
             fadeAnim.value = withTiming(1, {
                 duration: 500,
@@ -122,7 +147,7 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
                 easing: Easing.out(Easing.quad),
             }));
         }
-    }, [isVisible]);
+    }, [isVisible, shouldUseAnimations]);
 
     const getFeatureAnimationStyle = (index: number) => {
         const anims = [slideAnim1, slideAnim2, slideAnim3];
@@ -142,41 +167,50 @@ const FeatureDashboardSection: React.FC<FeatureDashboardSectionProps> = ({
     };
 
     const FeatureCard: React.FC<{ feature: Feature; index: number }> = ({feature, index}) => {
-        const cardScaleAnim = useSharedValue(1);
-        const buttonScaleAnim = useSharedValue(1);
-        const shadowAnim = useSharedValue(0.1);
+        // Only use animated values when animations are enabled
+        const cardScaleAnim = shouldUseAnimations && useSharedValue ? useSharedValue(1) : null;
+        const buttonScaleAnim = shouldUseAnimations && useSharedValue ? useSharedValue(1) : null;
+        const shadowAnim = shouldUseAnimations && useSharedValue ? useSharedValue(0.1) : null;
 
         const handleCardPressIn = () => {
-            cardScaleAnim.value = withTiming(0.98, {duration: 150});
-            shadowAnim.value = withTiming(0.2, {duration: 150});
+            if (shouldUseAnimations && cardScaleAnim && shadowAnim && withTiming) {
+                cardScaleAnim.value = withTiming(0.98, {duration: 150});
+                shadowAnim.value = withTiming(0.2, {duration: 150});
+            }
         };
 
         const handleCardPressOut = () => {
-            cardScaleAnim.value = withTiming(1, {duration: 150});
-            shadowAnim.value = withTiming(0.1, {duration: 150});
+            if (shouldUseAnimations && cardScaleAnim && shadowAnim && withTiming) {
+                cardScaleAnim.value = withTiming(1, {duration: 150});
+                shadowAnim.value = withTiming(0.1, {duration: 150});
+            }
         };
 
         const handleButtonPressIn = () => {
-            buttonScaleAnim.value = withTiming(0.95, {duration: 100});
+            if (shouldUseAnimations && buttonScaleAnim && withTiming) {
+                buttonScaleAnim.value = withTiming(0.95, {duration: 100});
+            }
         };
 
         const handleButtonPressOut = () => {
-            buttonScaleAnim.value = withTiming(1, {duration: 100});
+            if (shouldUseAnimations && buttonScaleAnim && withTiming) {
+                buttonScaleAnim.value = withTiming(1, {duration: 100});
+            }
         };
 
-        // Animated styles for FeatureCard
-        const cardAnimatedStyle = useAnimatedStyle(() => ({
+        // Conditionally create animated styles only when animations are enabled
+        const cardAnimatedStyle = shouldUseAnimations && useAnimatedStyle && cardScaleAnim && shadowAnim ? useAnimatedStyle(() => ({
             transform: [{scale: cardScaleAnim.value}],
             shadowOpacity: interpolate(
                 shadowAnim.value,
                 [0.1, 0.2],
                 [0.1, 0.2]
             ),
-        }));
+        })) : null;
 
-        const buttonAnimatedStyle = useAnimatedStyle(() => ({
+        const buttonAnimatedStyle = shouldUseAnimations && useAnimatedStyle && buttonScaleAnim ? useAnimatedStyle(() => ({
             transform: [{scale: buttonScaleAnim.value}],
-        }));
+        })) : null;
 
         return (
             <TouchableOpacity

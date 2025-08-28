@@ -1,14 +1,32 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import Animated, {
-    Easing,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withSpring,
-    withTiming,
-} from 'react-native-reanimated';
+import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../../../navigation/config';
+
+// Conditionally import Reanimated components only when needed
+let Animated: any;
+let Easing: any;
+let runOnJS: any;
+let useAnimatedStyle: any;
+let useSharedValue: any;
+let withDelay: any;
+let withSpring: any;
+let withTiming: any;
+
+try {
+  if (ENABLE_ANIMATIONS && stageAtLeast(ANIMATION_RECOVERY_STAGE)) {
+    const reanimated = require('react-native-reanimated');
+    Animated = reanimated.default;
+    Easing = reanimated.Easing;
+    runOnJS = reanimated.runOnJS;
+    useAnimatedStyle = reanimated.useAnimatedStyle;
+    useSharedValue = reanimated.useSharedValue;
+    withDelay = reanimated.withDelay;
+    withSpring = reanimated.withSpring;
+    withTiming = reanimated.withTiming;
+  }
+} catch (error) {
+  console.warn('[RECOVERY] StoreManagementDemo: Reanimated import failed, using fallback', error);
+}
 import {useJSISafeDimensions} from '../../../../hooks/useJSISafeDimensions';
 
 interface Store {

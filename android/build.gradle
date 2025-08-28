@@ -9,8 +9,8 @@ buildscript {
 
 // 1. 플러그인 선언 (반드시 최상단)
 plugins {
-    id("com.android.application") version "8.11.0" apply false
-    id("org.jetbrains.kotlin.android") version "2.2.0" apply false
+    id("com.android.application") version "8.11.1" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.24" apply false
     id("com.facebook.react") version "0.81.0" apply false
 }
 
@@ -22,7 +22,7 @@ ext {
     targetSdkVersion = 36
     // Ensure Hermes engine is enabled for app module
     hermesEnabled = "true"
-    kotlinVersion = "1.6.21"
+    kotlinVersion = "1.9.24"
 }
 
 // 3. allprojects
@@ -30,13 +30,19 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://www.jitpack.io" }
+        maven { url = "https://www.jitpack.io" }
     }
 
-    // Fix for expo-module-gradle-plugin dependency resolution
+    // Fix for expo-module-gradle-plugin dependency resolution and ensure RN Android artifact is used
     configurations.configureEach {
         resolutionStrategy {
+            // Keep RN gradle plugin version consistent
             force 'com.facebook.react:react-native-gradle-plugin:0.81.0'
+            // Ensure libraries depending on 'react-native' resolve to 'react-android' 0.81.0 (provides Fabric classes)
+            force 'com.facebook.react:react-android:0.81.0'
+            dependencySubstitution {
+                substitute module('com.facebook.react:react-native') using module('com.facebook.react:react-android:0.81.0')
+            }
         }
     }
 }
@@ -67,6 +73,10 @@ subprojects { subproject ->
                 subproject.android.kotlinOptions {
                     jvmTarget = '17'
                 }
+            }
+            // Ensure RN Android classes (Fabric, etc.) are available to library modules during compilation
+            subproject.dependencies {
+                add("compileOnly", "com.facebook.react:react-android:0.81.0")
             }
         }
     }

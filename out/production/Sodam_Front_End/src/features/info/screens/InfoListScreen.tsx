@@ -1,24 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    FlatList,
-    TouchableOpacity,
     ActivityIndicator,
+    Alert,
+    FlatList,
     RefreshControl,
-    Alert
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import { MaterialIcons as Icon } from '@expo/vector-icons';
-import {MainLayout} from '../../../common/components';
-import {Card} from '../../../common/components';
+import {MaterialIcons as Icon} from '@expo/vector-icons';
+import {Card, MainLayout} from '../../../common/components';
 import laborInfoService from '../services/laborInfoService';
 import taxInfoService from '../services/taxInfoService';
 import policyService from '../services/policyService';
 import tipsService from '../services/tipsService';
-import {InfoCategory, InfoArticle, LaborInfo, TaxInfo, PolicyInfo, TipsInfo} from '../types';
+import {InfoArticle, InfoCategory} from '../types';
 
 // 네비게이션 타입 정의
 type InfoStackParamList = {

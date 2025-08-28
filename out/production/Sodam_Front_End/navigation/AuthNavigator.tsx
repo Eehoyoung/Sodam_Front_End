@@ -1,5 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LoginScreen from '../features/auth/screens/LoginScreen';
 import SignupScreen from '../features/auth/screens/SignupScreen';
 
@@ -8,7 +8,7 @@ export type AuthStackParamList = {
     Signup: undefined;
 };
 
-const Stack = createStackNavigator<AuthStackParamList>();
+const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 /**
  * 인증 관련 화면들을 위한 네비게이터

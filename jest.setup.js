@@ -20,12 +20,6 @@ jest.mock('@react-navigation/native', () => ({
     }),
 }));
 
-jest.mock('@react-navigation/stack', () => ({
-    createStackNavigator: () => ({
-        Navigator: ({children}) => children,
-        Screen: ({children}) => children,
-    }),
-}));
 
 // Mock React Native modules
 jest.mock('react-native', () => ({
@@ -82,6 +76,14 @@ jest.mock('react-native', () => ({
         divide: jest.fn(),
         modulo: jest.fn(),
         diffClamp: jest.fn(),
+    },
+    InteractionManager: {
+        runAfterInteractions: jest.fn((cb) => {
+            if (typeof cb === 'function') {
+                cb();
+            }
+            return { cancel: jest.fn() };
+        }),
     },
     Dimensions: {
         get: jest.fn(() => ({width: 375, height: 812})),
@@ -214,3 +216,4 @@ try {
 } catch (e) {
     // ignore
 }
+

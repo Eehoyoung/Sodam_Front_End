@@ -70,5 +70,66 @@ dependencies {
         implementation "io.github.react-native-community:jsc-android:2026004.+"
     }
 
-    // React Native 라이브러리들은 autolinking으로 자동 처리됨
+    // Explicitly wire autolinked RN libraries to ensure classes are on the classpath
+    // This complements the RN Gradle plugin in case autolinking dependency injection is skipped
+    implementation project(":react-native-async-storage_async-storage")
+    implementation project(":react-native-geolocation-service")
+    implementation project(":react-native-nfc-manager")
+    implementation project(":react-native-permissions")
+    implementation project(":react-native-reanimated")
+    implementation project(":react-native-safe-area-context")
+    implementation project(":react-native-screens")
+    implementation project(":react-native-svg")
+}
+
+
+// ---------------------------------------------------------------------------------
+// Ensure codegen and autolinking run before CMake configure (RN New Architecture)
+// This wires all configureCMake* tasks to depend on any generateAutolinking*
+// and generateCodegenArtifactsFromSchema* tasks so CMake sees generated JNI dirs.
+afterEvaluate {
+  // Collect generation tasks in a mutable collection
+  def genTasks = [] as LinkedHashSet
+
+  // Discover tasks dynamically in this project
+  tasks.matching { it.name.startsWith('generateAutolinking') || it.name.startsWith('generateCodegenArtifactsFromSchema') }.all { t ->
+    genTasks.add(t)
+  }
+  // Discover tasks in all subprojects (libraries with codegen live here)
+  rootProject.allprojects.each { proj ->
+    proj.tasks.matching { it.name.startsWith('generateCodegenArtifactsFromSchema') || it.name.startsWith('generateAutolinking') }.all { t ->
+      genTasks.add(t)
+    }
+  }
+
+  // Add common, variant-specific task names if present (defensive)
+  [
+    // Autolinking helpers
+    'generateAutolinkingNewArchitectureFiles',
+    'generateAutolinkingPackageList',
+    'generateAutolinkingSourcesDebug',
+    'generateAutolinkingResourcesDebug',
+    'generateAutolinkingSourcesRelease',
+    'generateAutolinkingResourcesRelease',
+    // Codegen schema + artifacts (app-level variants and generic)
+    'generateCodegenSchemaFromJavaScript',
+    'generateCodegenArtifactsFromSchema',
+    'generateCodegenArtifactsFromSchemaDebug',
+    'generateCodegenArtifactsFromSchemaRelease'
+  ].each { n ->
+    def t = tasks.findByName(n)
+    if (t != null) genTasks.add(t)
+  }
+  // Also add schema tasks from subprojects
+  rootProject.allprojects.each { proj ->
+    ['generateCodegenSchemaFromJavaScript', 'generateCodegenArtifactsFromSchema'].each { base ->
+      def tt = proj.tasks.findByName(base)
+      if (tt != null) genTasks.add(tt)
+    }
+  }
+
+  // Make every configureCMake* task depend on the generation tasks
+  tasks.matching { it.name.startsWith('configureCMake') }.configureEach { cfg ->
+    genTasks.each { cfg.dependsOn(it) }
+  }
 }

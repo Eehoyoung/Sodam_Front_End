@@ -1,0 +1,362 @@
+## feature/migrate-to-native-stack
+ M .junie/guidelines.md
+AD .output.txt
+ M App.tsx
+A  __tests__/navigation/nativeStackNavigation.test.tsx
+ M android/app/build.gradle
+ M android/app/src/main/AndroidManifest.xml
+ D android/app/src/main/java/PackageList.java
+ M android/app/src/main/java/com/sodam_front_end/MainApplication.kt
+ M android/build.gradle
+ M android/gradle.properties
+ M android/settings.gradle
+D  babel.config.cjs
+D  babel.config.cjs.old-arch-backup
+AM babel.config.js
+D  babel.config.js.backup
+ M index.js
+D  jest.config.cjs
+AM jest.config.js
+ M jest.setup.js
+D  metro.config.cjs
+D  metro.config.cjs.old-arch-backup
+A  metro.config.js
+ M out/production/Sodam_Front_End/.eslintrc.js
+ M out/production/Sodam_Front_End/.eslintrc.jsi-safety.js
+ M out/production/Sodam_Front_End/.gitignore
+ D out/production/Sodam_Front_End/.output.txt
+ M out/production/Sodam_Front_End/.prettierrc.js
+ M out/production/Sodam_Front_End/.watchmanconfig
+ M out/production/Sodam_Front_End/App.tsx
+ M out/production/Sodam_Front_End/Gemfile
+ D out/production/Sodam_Front_End/analyze-dependencies-improved.ps1
+ D out/production/Sodam_Front_End/analyze-dependencies.ps1
+ D out/production/Sodam_Front_End/api.json
+ D out/production/Sodam_Front_End/babel.config.cjs
+ D out/production/Sodam_Front_End/babel.config.cjs.old-arch-backup
+ D out/production/Sodam_Front_End/babel.config.js.backup
+ D out/production/Sodam_Front_End/check_app_installation.bat
+ D out/production/Sodam_Front_End/check_app_installation.ps1
+ D out/production/Sodam_Front_End/clean-build.bat
+ M out/production/Sodam_Front_End/common/components/ErrorBoundary.tsx
+ M out/production/Sodam_Front_End/common/components/animations/JSISafeAnimations.tsx
+ M out/production/Sodam_Front_End/common/components/animations/index.ts
+ M out/production/Sodam_Front_End/common/components/feedback/Modal.tsx
+ M out/production/Sodam_Front_End/common/components/feedback/Toast.tsx
+ M out/production/Sodam_Front_End/common/components/layout/Footer.tsx
+ M out/production/Sodam_Front_End/common/components/layout/Header.tsx
+ M out/production/Sodam_Front_End/common/components/layout/MainLayout.tsx
+ M out/production/Sodam_Front_End/common/hooks/useDimensions.ts
+ M out/production/Sodam_Front_End/common/hooks/useOfflineSync.ts
+ M out/production/Sodam_Front_End/common/hooks/usePerformanceMonitor.ts
+ M out/production/Sodam_Front_End/common/providers/ThemeProvider.tsx
+ M out/production/Sodam_Front_End/common/utils/cacheStrategy.ts
+ M out/production/Sodam_Front_End/common/utils/queryClient.ts
+ M out/production/Sodam_Front_End/common/utils/unifiedStorage.ts
+ M out/production/Sodam_Front_End/components/ErrorBoundary.tsx
+ M out/production/Sodam_Front_End/components/animations/JSISafeAnimatedComponents.tsx
+ M out/production/Sodam_Front_End/contexts/AuthContext.tsx
+ M out/production/Sodam_Front_End/contexts/AuthMockProvider.tsx
+ M out/production/Sodam_Front_End/contexts/ThemeContext.tsx
+ M out/production/Sodam_Front_End/contexts/auth/__tests__/AuthProvider.integration.test.tsx
+ M out/production/Sodam_Front_End/contexts/auth/__tests__/useAuthActions.test.ts
+ M out/production/Sodam_Front_End/contexts/auth/__tests__/useAuthState.test.ts
+ M out/production/Sodam_Front_End/contexts/auth/__tests__/useFirstLaunch.test.ts
+ M out/production/Sodam_Front_End/contexts/auth/__tests__/useStorage.test.ts
+ M out/production/Sodam_Front_End/contexts/auth/hooks/useAuthActions.ts
+ M out/production/Sodam_Front_End/contexts/auth/hooks/useAuthState.ts
+ M out/production/Sodam_Front_End/contexts/auth/hooks/useFirstLaunch.ts
+ M out/production/Sodam_Front_End/contexts/auth/hooks/useStorage.ts
+ M out/production/Sodam_Front_End/contexts/auth/index.ts
+ M out/production/Sodam_Front_End/contexts/auth/providers/AuthProvider.tsx
+ M out/production/Sodam_Front_End/debug-dimensions-hook.cjs
+ M out/production/Sodam_Front_End/features/admin/components/JSIPerformanceDashboard.tsx
+ M out/production/Sodam_Front_End/features/attendance/components/LocationAttendance.tsx
+ M out/production/Sodam_Front_End/features/attendance/components/NFCAttendance.tsx
+ M out/production/Sodam_Front_End/features/attendance/hooks/useAttendanceQueries.ts
+ M out/production/Sodam_Front_End/features/attendance/screens/AttendanceScreen.tsx
+ M out/production/Sodam_Front_End/features/attendance/services/attendanceService.ts
+ D out/production/Sodam_Front_End/features/attendance/services/qrAttendanceService.ts
+ M out/production/Sodam_Front_End/features/auth/hooks/useAuthQueries.ts
+ M out/production/Sodam_Front_End/features/home/components/ServiceCards.tsx
+ M out/production/Sodam_Front_End/features/home/screens/HomeScreen.tsx
+ M out/production/Sodam_Front_End/features/home/services/homeService.ts
+ M out/production/Sodam_Front_End/features/info/screens/InfoListScreen.tsx
+ M out/production/Sodam_Front_End/features/info/screens/LaborInfoDetailScreen.tsx
+ M out/production/Sodam_Front_End/features/info/screens/PolicyDetailScreen.tsx
+ M out/production/Sodam_Front_End/features/info/screens/TaxInfoDetailScreen.tsx
+ M out/production/Sodam_Front_End/features/info/screens/TipsDetailScreen.tsx
+ M out/production/Sodam_Front_End/features/salary/hooks/useSalaryQueries.ts
+ M out/production/Sodam_Front_End/features/salary/screens/SalaryListScreen.tsx
+ M out/production/Sodam_Front_End/features/welcome/components/ConversionSection.tsx
+ M out/production/Sodam_Front_End/features/welcome/components/FeatureDashboardSection.tsx
+ M out/production/Sodam_Front_End/features/welcome/components/StorytellingSection.tsx
+ M out/production/Sodam_Front_End/features/welcome/components/demos/NFCDemo.tsx
+ D out/production/Sodam_Front_End/features/welcome/components/demos/QRCodeDemo.tsx
+ M out/production/Sodam_Front_End/features/welcome/components/demos/SalaryCalculatorDemo.tsx
+ M out/production/Sodam_Front_End/features/welcome/components/demos/StoreManagementDemo.tsx
+ M out/production/Sodam_Front_End/features/welcome/screens/HybridMainScreen.tsx
+ D out/production/Sodam_Front_End/fix-metro-assets.ps1
+ M out/production/Sodam_Front_End/hooks/useJSICrashReporting.ts
+ M out/production/Sodam_Front_End/hooks/useJSIHealthMonitoring.ts
+ M out/production/Sodam_Front_End/hooks/useJSISafeDimensions.ts
+ M out/production/Sodam_Front_End/index.js
+ M out/production/Sodam_Front_End/ios/.xcode.env
+ M out/production/Sodam_Front_End/ios/Sodam_Front_End.xcodeproj/project.pbxproj
+ M out/production/Sodam_Front_End/ios/Sodam_Front_End.xcodeproj/xcshareddata/xcschemes/Sodam_Front_End.xcscheme
+ M out/production/Sodam_Front_End/ios/Sodam_Front_End/AppDelegate.swift
+ M out/production/Sodam_Front_End/ios/Sodam_Front_End/Images.xcassets/AppIcon.appiconset/Contents.json
+ M out/production/Sodam_Front_End/ios/Sodam_Front_End/Images.xcassets/Contents.json
+ M out/production/Sodam_Front_End/ios/Sodam_Front_End/LaunchScreen.storyboard
+ M out/production/Sodam_Front_End/ios/Sodam_Front_End/PrivacyInfo.xcprivacy
+ D out/production/Sodam_Front_End/jest.config.cjs
+ M out/production/Sodam_Front_End/jest.setup.js
+ D out/production/Sodam_Front_End/metro.config.cjs
+ D out/production/Sodam_Front_End/metro.config.cjs.old-arch-backup
+ M out/production/Sodam_Front_End/navigation/AppNavigator.tsx
+ M out/production/Sodam_Front_End/navigation/AuthNavigator.tsx
+ M out/production/Sodam_Front_End/navigation/HomeNavigator.tsx
+ M out/production/Sodam_Front_End/navigation/MinimalNavigator.tsx
+ M out/production/Sodam_Front_End/navigation/config.ts
+ M out/production/Sodam_Front_End/navigation/types.ts
+ M out/production/Sodam_Front_End/package-lock.json
+ M out/production/Sodam_Front_End/package.json
+ D out/production/Sodam_Front_End/react-native.config.cjs
+ D out/production/Sodam_Front_End/react-native.config.cjs.backup
+ D out/production/Sodam_Front_End/react-native.config.cjs.old-arch-backup
+ M out/production/Sodam_Front_End/scripts/collect-performance.ps1
+ M out/production/Sodam_Front_End/scripts/jsi-safety-analyzer.js
+ M out/production/Sodam_Front_End/scripts/logcat-clear.ps1
+ M out/production/Sodam_Front_End/scripts/logcat-monitor.ps1
+ M out/production/Sodam_Front_End/scripts/run-iter-suite.ps1
+ M out/production/Sodam_Front_End/scripts/validate-worklets.js
+ M out/production/Sodam_Front_End/scripts/verify-native-modules.ps1
+ M out/production/Sodam_Front_End/services/AccessibilityService.ts
+ M out/production/Sodam_Front_End/services/JSIPerformanceMonitor.ts
+ M out/production/Sodam_Front_End/services/PermissionService.ts
+ M out/production/Sodam_Front_End/src/common/components/ErrorBoundary.tsx
+ M out/production/Sodam_Front_End/src/common/components/animations/JSISafeAnimations.tsx
+ M out/production/Sodam_Front_End/src/common/components/animations/index.ts
+ M out/production/Sodam_Front_End/src/common/components/feedback/Modal.tsx
+ M out/production/Sodam_Front_End/src/common/components/feedback/Toast.tsx
+ M out/production/Sodam_Front_End/src/common/components/layout/Footer.tsx
+ M out/production/Sodam_Front_End/src/common/components/layout/Header.tsx
+ M out/production/Sodam_Front_End/src/common/components/layout/MainLayout.tsx
+ M out/production/Sodam_Front_End/src/common/hooks/useDimensions.ts
+ M out/production/Sodam_Front_End/src/common/hooks/useOfflineSync.ts
+ M out/production/Sodam_Front_End/src/common/hooks/usePerformanceMonitor.ts
+ M out/production/Sodam_Front_End/src/common/providers/ThemeProvider.tsx
+ M out/production/Sodam_Front_End/src/common/utils/cacheStrategy.ts
+ M out/production/Sodam_Front_End/src/common/utils/queryClient.ts
+ M out/production/Sodam_Front_End/src/common/utils/unifiedStorage.ts
+ M out/production/Sodam_Front_End/src/components/ErrorBoundary.tsx
+ M out/production/Sodam_Front_End/src/components/animations/JSISafeAnimatedComponents.tsx
+ M out/production/Sodam_Front_End/src/contexts/AuthContext.tsx
+ M out/production/Sodam_Front_End/src/contexts/AuthMockProvider.tsx
+ M out/production/Sodam_Front_End/src/contexts/ThemeContext.tsx
+ M out/production/Sodam_Front_End/src/contexts/auth/__tests__/AuthProvider.integration.test.tsx
+ M out/production/Sodam_Front_End/src/contexts/auth/__tests__/useAuthActions.test.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/__tests__/useAuthState.test.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/__tests__/useFirstLaunch.test.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/__tests__/useStorage.test.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/hooks/useAuthActions.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/hooks/useAuthState.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/hooks/useFirstLaunch.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/hooks/useStorage.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/index.ts
+ M out/production/Sodam_Front_End/src/contexts/auth/providers/AuthProvider.tsx
+ M out/production/Sodam_Front_End/src/features/admin/components/JSIPerformanceDashboard.tsx
+ M out/production/Sodam_Front_End/src/features/attendance/components/LocationAttendance.tsx
+ M out/production/Sodam_Front_End/src/features/attendance/components/NFCAttendance.tsx
+ M out/production/Sodam_Front_End/src/features/attendance/hooks/useAttendanceQueries.ts
+ M out/production/Sodam_Front_End/src/features/attendance/screens/AttendanceScreen.tsx
+ M out/production/Sodam_Front_End/src/features/attendance/services/attendanceService.ts
+ D out/production/Sodam_Front_End/src/features/attendance/services/qrAttendanceService.ts
+ M out/production/Sodam_Front_End/src/features/auth/hooks/useAuthQueries.ts
+ M out/production/Sodam_Front_End/src/features/home/components/ServiceCards.tsx
+ M out/production/Sodam_Front_End/src/features/home/screens/HomeScreen.tsx
+ M out/production/Sodam_Front_End/src/features/home/services/homeService.ts
+ M out/production/Sodam_Front_End/src/features/info/screens/InfoListScreen.tsx
+ M out/production/Sodam_Front_End/src/features/info/screens/LaborInfoDetailScreen.tsx
+ M out/production/Sodam_Front_End/src/features/info/screens/PolicyDetailScreen.tsx
+ M out/production/Sodam_Front_End/src/features/info/screens/TaxInfoDetailScreen.tsx
+ M out/production/Sodam_Front_End/src/features/info/screens/TipsDetailScreen.tsx
+ M out/production/Sodam_Front_End/src/features/salary/hooks/useSalaryQueries.ts
+ M out/production/Sodam_Front_End/src/features/salary/screens/SalaryListScreen.tsx
+ M out/production/Sodam_Front_End/src/features/welcome/components/ConversionSection.tsx
+ M out/production/Sodam_Front_End/src/features/welcome/components/FeatureDashboardSection.tsx
+ M out/production/Sodam_Front_End/src/features/welcome/components/StorytellingSection.tsx
+ M out/production/Sodam_Front_End/src/features/welcome/components/demos/NFCDemo.tsx
+ D out/production/Sodam_Front_End/src/features/welcome/components/demos/QRCodeDemo.tsx
+ M out/production/Sodam_Front_End/src/features/welcome/components/demos/SalaryCalculatorDemo.tsx
+ M out/production/Sodam_Front_End/src/features/welcome/components/demos/StoreManagementDemo.tsx
+ M out/production/Sodam_Front_End/src/features/welcome/screens/HybridMainScreen.tsx
+ M out/production/Sodam_Front_End/src/hooks/useJSICrashReporting.ts
+ M out/production/Sodam_Front_End/src/hooks/useJSIHealthMonitoring.ts
+ M out/production/Sodam_Front_End/src/hooks/useJSISafeDimensions.ts
+ M out/production/Sodam_Front_End/src/navigation/AppNavigator.tsx
+ M out/production/Sodam_Front_End/src/navigation/AuthNavigator.tsx
+ M out/production/Sodam_Front_End/src/navigation/HomeNavigator.tsx
+ M out/production/Sodam_Front_End/src/navigation/MinimalNavigator.tsx
+ M out/production/Sodam_Front_End/src/navigation/config.ts
+ M out/production/Sodam_Front_End/src/navigation/types.ts
+ M out/production/Sodam_Front_End/src/services/AccessibilityService.ts
+ M out/production/Sodam_Front_End/src/services/JSIPerformanceMonitor.ts
+ M out/production/Sodam_Front_End/src/services/PermissionService.ts
+ M out/production/Sodam_Front_End/src/theme/colors.ts
+ M out/production/Sodam_Front_End/src/theme/typography.ts
+ M out/production/Sodam_Front_End/src/utils/NativeModuleValidator.ts
+ D out/production/Sodam_Front_End/src/utils/__tests__/formatters.test.ts
+ M out/production/Sodam_Front_End/src/utils/animations/__tests__/animationTestUtils.ts
+ M out/production/Sodam_Front_End/src/utils/animations/__tests__/commonAnimations.test.ts
+ M out/production/Sodam_Front_End/src/utils/animations/animationHooks.ts
+ M out/production/Sodam_Front_End/src/utils/animations/commonAnimations.ts
+ M out/production/Sodam_Front_End/src/utils/animations/constants.ts
+ M out/production/Sodam_Front_End/src/utils/animations/index.ts
+ M out/production/Sodam_Front_End/src/utils/animations/types.ts
+ M out/production/Sodam_Front_End/src/utils/errorMonitoring.ts
+ M out/production/Sodam_Front_End/src/utils/formatters.ts
+ M out/production/Sodam_Front_End/src/utils/jsiMonitor.ts
+ D out/production/Sodam_Front_End/test-current-authprovider-error.js
+ D out/production/Sodam_Front_End/test-dimensions-error-verification.cjs
+ D out/production/Sodam_Front_End/test-mainlayout-fix.js
+ D out/production/Sodam_Front_End/test-prototype-error-reproduction.cjs
+ D out/production/Sodam_Front_End/test-scripts/asyncstorage-console-error-reproduction.js
+ D out/production/Sodam_Front_End/test-scripts/comprehensive-error-test.js
+ D out/production/Sodam_Front_End/test-scripts/debug_imports.js
+ D out/production/Sodam_Front_End/test-scripts/index_minimal.js
+ D out/production/Sodam_Front_End/test-scripts/index_original.js
+ D out/production/Sodam_Front_End/test-scripts/logbox-error-test.js
+ D out/production/Sodam_Front_End/test-scripts/stack-trace-error-reproduction.js
+ D out/production/Sodam_Front_End/test-scripts/test-auth-context-render-error.js
+ D out/production/Sodam_Front_End/test-scripts/test-scripts/asyncstorage-fix-verification.js
+ D out/production/Sodam_Front_End/test-scripts/test_app_detailed.js
+ D out/production/Sodam_Front_End/test-scripts/test_app_import.js
+ D out/production/Sodam_Front_End/test-scripts/test_appcomponent_import.js
+ D out/production/Sodam_Front_End/test-scripts/test_minimal_index.js
+ D out/production/Sodam_Front_End/test-scripts/test_white_screen_issue.js
+ D out/production/Sodam_Front_End/test-scripts/verify-auth-context-fix.js
+ D out/production/Sodam_Front_End/test-scripts/verify_app_registration.js
+ M out/production/Sodam_Front_End/theme/colors.ts
+ M out/production/Sodam_Front_End/theme/typography.ts
+ M out/production/Sodam_Front_End/utils/NativeModuleValidator.ts
+ D out/production/Sodam_Front_End/utils/__tests__/formatters.test.ts
+ M out/production/Sodam_Front_End/utils/animations/__tests__/animationTestUtils.ts
+ M out/production/Sodam_Front_End/utils/animations/__tests__/commonAnimations.test.ts
+ M out/production/Sodam_Front_End/utils/animations/animationHooks.ts
+ M out/production/Sodam_Front_End/utils/animations/commonAnimations.ts
+ M out/production/Sodam_Front_End/utils/animations/constants.ts
+ M out/production/Sodam_Front_End/utils/animations/index.ts
+ M out/production/Sodam_Front_End/utils/animations/types.ts
+ M out/production/Sodam_Front_End/utils/errorMonitoring.ts
+ M out/production/Sodam_Front_End/utils/formatters.ts
+ M out/production/Sodam_Front_End/utils/jsiMonitor.ts
+ D out/test/Sodam_Front_End/asyncstorage-console-error-reproduction.js
+ D out/test/Sodam_Front_End/comprehensive-error-test.js
+ D out/test/Sodam_Front_End/debug_imports.js
+ D out/test/Sodam_Front_End/index_minimal.js
+ D out/test/Sodam_Front_End/index_original.js
+ D out/test/Sodam_Front_End/logbox-error-test.js
+ D out/test/Sodam_Front_End/stack-trace-error-reproduction.js
+ D out/test/Sodam_Front_End/test-auth-context-render-error.js
+ D out/test/Sodam_Front_End/test-scripts/asyncstorage-fix-verification.js
+ D out/test/Sodam_Front_End/test_app_detailed.js
+ D out/test/Sodam_Front_End/test_app_import.js
+ D out/test/Sodam_Front_End/test_appcomponent_import.js
+ D out/test/Sodam_Front_End/test_minimal_index.js
+ D out/test/Sodam_Front_End/test_white_screen_issue.js
+ D out/test/Sodam_Front_End/verify-auth-context-fix.js
+ D out/test/Sodam_Front_End/verify_app_registration.js
+D  package-lock.json
+ M package.json
+D  react-native.config.cjs
+D  react-native.config.cjs.backup
+D  react-native.config.cjs.old-arch-backup
+AM react-native.config.js
+ M scripts/collect-performance.ps1
+ M scripts/fix-metro-assets.ps1
+ M scripts/run-iter-suite.ps1
+ M scripts/verify-intellij-setup.ps1
+ M scripts/verify-native-modules.ps1
+ M src/common/components/animations/JSISafeAnimations.tsx
+ M src/common/components/feedback/Modal.tsx
+ M src/common/components/feedback/Toast.tsx
+ M src/common/components/layout/Footer.tsx
+ M src/common/components/layout/Header.tsx
+ M src/common/components/layout/MainLayout.tsx
+ M src/components/animations/JSISafeAnimatedComponents.tsx
+ M src/features/attendance/hooks/useAttendanceQueries.ts
+ M src/features/attendance/services/attendanceService.ts
+ D src/features/attendance/services/qrAttendanceService.ts
+ M src/features/home/components/ServiceCards.tsx
+ M src/features/welcome/components/ConversionSection.tsx
+ M src/features/welcome/components/FeatureDashboardSection.tsx
+ M src/features/welcome/components/StorytellingSection.tsx
+ D src/features/welcome/components/demos/QRCodeDemo.tsx
+ M src/features/welcome/components/demos/SalaryCalculatorDemo.tsx
+ M src/features/welcome/components/demos/StoreManagementDemo.tsx
+ M src/navigation/AppNavigator.tsx
+ M src/navigation/AuthNavigator.tsx
+ M src/navigation/HomeNavigator.tsx
+ M src/navigation/MinimalNavigator.tsx
+ M src/navigation/config.ts
+ M src/navigation/types.ts
+AM src/tests/navigation/nativeStackNavigation.test.tsx
+ D src/utils/__tests__/formatters.test.ts
+ M src/utils/animations/index.ts
+ M src/utils/errorMonitoring.ts
+?? android/android/
+?? android/logs/
+?? android/react-native.config.js
+?? android/src/
+?? index.js.bak-rngh-reapply
+?? logs/
+?? out/production/Sodam_Front_End/__tests__/
+?? out/production/Sodam_Front_End/babel.config.js
+?? out/production/Sodam_Front_End/common/components/animations/SafeAnimatedWrapper.tsx
+?? out/production/Sodam_Front_End/common/providers/SafeAreaProviderGuard.tsx
+?? out/production/Sodam_Front_End/common/providers/__tests__/
+?? out/production/Sodam_Front_End/components/InitializationErrorBoundary.tsx
+?? out/production/Sodam_Front_End/index.js.bak-rngh-reapply
+?? out/production/Sodam_Front_End/jest.config.js
+?? out/production/Sodam_Front_End/metro.config.js
+?? out/production/Sodam_Front_End/react-native.config.js
+?? out/production/Sodam_Front_End/scripts/analyze-dependencies-improved.ps1
+?? out/production/Sodam_Front_End/scripts/analyze-dependencies.ps1
+?? out/production/Sodam_Front_End/scripts/android-clean.ps1
+?? out/production/Sodam_Front_End/scripts/capture-logcat.ps1
+?? out/production/Sodam_Front_End/scripts/check_app_installation.bat
+?? out/production/Sodam_Front_End/scripts/check_app_installation.ps1
+?? out/production/Sodam_Front_End/scripts/clean-build.bat
+?? out/production/Sodam_Front_End/scripts/fix-metro-assets.ps1
+?? out/production/Sodam_Front_End/scripts/grant-permissions.ps1
+?? out/production/Sodam_Front_End/scripts/print-rn-config.js
+?? out/production/Sodam_Front_End/scripts/scan-qr-residue.ps1
+?? out/production/Sodam_Front_End/scripts/verify-intellij-setup.ps1
+?? out/production/Sodam_Front_End/src/common/components/animations/SafeAnimatedWrapper.tsx
+?? out/production/Sodam_Front_End/src/common/providers/SafeAreaProviderGuard.tsx
+?? out/production/Sodam_Front_End/src/common/providers/__tests__/
+?? out/production/Sodam_Front_End/src/components/InitializationErrorBoundary.tsx
+?? out/production/Sodam_Front_End/src/tests/
+?? out/production/Sodam_Front_End/src/utils/contextReadiness.ts
+?? out/production/Sodam_Front_End/utils/contextReadiness.ts
+?? out/test/Sodam_Front_End/navigation/
+?? package-lock.json
+?? scripts/android-clean.ps1
+?? scripts/capture-logcat.ps1
+?? scripts/grant-permissions.ps1
+?? scripts/print-rn-config.js
+?? scripts/scan-qr-residue.ps1
+?? src/common/components/animations/SafeAnimatedWrapper.tsx
+?? src/common/providers/SafeAreaProviderGuard.tsx
+?? src/common/providers/__tests__/
+?? src/components/InitializationErrorBoundary.tsx
+?? src/tests/NativeStackNavigation.test.tsx
+?? src/tests/app/
+?? src/tests/babel-smoke.test.tsx
+?? src/tests/components/
+?? src/tests/mocks/
+?? src/tests/navigation/config.test.ts
+?? src/tests/utils/
+?? src/utils/NativeModuleValidator.ts
+?? src/utils/contextReadiness.ts
