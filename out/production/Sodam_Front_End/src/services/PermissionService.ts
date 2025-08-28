@@ -17,7 +17,6 @@ import {safeLogger} from '../utils/safeLogger';
  */
 export type PermissionType =
     | 'location'
-    | 'camera'
     | 'microphone'
     | 'storage'
     | 'notification'
@@ -64,13 +63,6 @@ const PERMISSION_MAP: Record<PermissionType, PermissionConfig> = {
         title: '위치 권한',
         description: '출퇴근 위치 확인을 위해 위치 권한이 필요합니다.',
         rationale: '정확한 출퇴근 관리를 위해 현재 위치를 확인해야 합니다. 위치 정보는 출퇴근 기록에만 사용됩니다.',
-    },
-    camera: {
-        android: PERMISSIONS.ANDROID.CAMERA,
-        ios: PERMISSIONS.IOS.CAMERA,
-        title: '카메라 권한',
-        description: 'QR 코드 스캔을 위해 카메라 권한이 필요합니다.',
-        rationale: 'QR 코드를 통한 출퇴근 등록을 위해 카메라 접근이 필요합니다.',
     },
     microphone: {
         android: PERMISSIONS.ANDROID.RECORD_AUDIO,
@@ -398,7 +390,7 @@ export class PermissionService {
      */
     static async requestAttendancePermissions(): Promise<MultiplePermissionResult> {
         const requiredPermissions: PermissionType[] = ['location'];
-        const optionalPermissions: PermissionType[] = ['camera', 'nfc'];
+        const optionalPermissions: PermissionType[] = ['nfc'];
 
         console.log('[DEBUG_LOG] 출퇴근 관리 권한 요청 시작');
 

@@ -172,7 +172,7 @@ class AnalyticsService {
     /**
      * Track demo interaction
      */
-    async trackDemoInteraction(demoType: 'qr' | 'salary' | 'store', action: 'start' | 'complete' | 'skip', metadata?: Record<string, any>): Promise<void> {
+    async trackDemoInteraction(demoType: 'nfc' | 'salary' | 'store', action: 'start' | 'complete' | 'skip', metadata?: Record<string, any>): Promise<void> {
         await this.trackEvent({
             eventName: `demo_${action}`,
             section: 'demo',

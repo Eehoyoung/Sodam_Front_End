@@ -78,3 +78,17 @@
   - Logcat에 네비게이션 관련 에러(Undefined route 등) 미발생 확인.
 - 리스크/완화:
   - 추후 실제 인증 도입 시 이 Placeholder를 교체하되 경로(`Auth/Login`, `Auth/Signup`)는 유지하여 리그레션 최소화.
+
+
+### 2025-08-29 02:03 — 런타임 블랭크 스크린 원인 및 조치 (.js CRUD 보고)
+- 원인: 엔트리 파일(index.js) 최상단에 'react-native-gesture-handler' 미임포트로 인해, 안드로이드에서 제스처 핸들러 초기화 이전 네비게이션 트리를 접근하면서 화면이 표시되지 않을 수 있는 상태 확인.
+- 조치: index.js 최상단에 `import 'react-native-gesture-handler';` 추가(백업본 index.js.bak-rngh-reapply와 정합). 다른 로직 변경 없음.
+- 검증:
+  - [빌드] 성공 (functions.build)
+  - [스캐너] `scripts\\scan-qr-residue.ps1 -FailOnMatch` 재실행 → 허용 경로 외 0건 유지
+- 런타임 검증 가이드(Logcat): 아래 마커들이 순서대로 출력되는지 확인
+  1) [DEBUG_LOG] About to require AppComponent
+  2) [RECOVERY] App baseline mounted
+  3) [DEBUG_LOG] Component registered successfully
+  4) Welcome 화면 렌더 확인
+- 영향도: .ts/.tsx 변경 없음, 네이티브 권한/설정 영향 없음, NFC-only/QR 잔재 정책 영향 없음.

@@ -166,7 +166,7 @@ export const isNFCTagValid = (timestamp: string, expiryMinutes: number = 30): bo
         const currentTime = new Date().getTime();
         const diffMinutes = (currentTime - generatedTime) / (1000 * 60);
 
-        // NFC 태그는 QR 코드보다 더 긴 유효 시간을 가질 수 있음 (기본 30분)
+        // NFC 태그 기본 유효 시간은 30분입니다.
         return diffMinutes <= expiryMinutes;
     } catch (error) {
         console.error('NFC 태그 유효성 검사 실패:', error);

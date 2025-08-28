@@ -3,8 +3,8 @@
 This document provides comprehensive guidelines and instructions for developers working on the Sodam Front End project -
 a cross-platform attendance and payroll management application for part-time workers and small business owners.
 
-**Last Updated**: 2025-08-28  
-**Version**: 2.1.2 - Documentation standardization and Master Work Plan adoption (NFC standardization, QR deprecation, Welcome page main)
+**Last Updated**: 2025-08-29  
+**Version**: 2.1.3 - NFC-only enforcement and documentation version bump (QR fully removed; Welcome page main)
 
 ## Role
 
@@ -1365,4 +1365,4 @@ Each feature should have comprehensive documentation including:
 ### Related Documents
 - docs\QR_Residual_Removal_Guide_2025-08-28.md
 - docs\개편_웰컴페이지_방향성_v2.1_2025-08-28.md
-- docs\작업계획서_Sodam_FE_웰컴메인_및_문서표준화_v2.1.2_2025-08-28.md
+- docs\작업계획서_Sodam_FE_웰컴메인_및_문서표준화_v2.1.4_2025-08-29.md
