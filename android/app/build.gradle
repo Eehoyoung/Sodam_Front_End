@@ -7,7 +7,7 @@ plugins {
 android {
     namespace 'com.sodam_front_end'
     compileSdkVersion 36
-    buildToolsVersion "36.0.0"
+    buildToolsVersion "35.0.0"
     ndkVersion "27.1.12297006"
 
     defaultConfig {
@@ -70,16 +70,16 @@ dependencies {
         implementation "io.github.react-native-community:jsc-android:2026004.+"
     }
 
-    // Explicitly wire autolinked RN libraries to ensure classes are on the classpath
-    // This complements the RN Gradle plugin in case autolinking dependency injection is skipped
-    implementation project(":react-native-async-storage_async-storage")
-    implementation project(":react-native-geolocation-service")
-    implementation project(":react-native-nfc-manager")
-    implementation project(":react-native-permissions")
-    implementation project(":react-native-reanimated")
-    implementation project(":react-native-safe-area-context")
-    implementation project(":react-native-screens")
-    implementation project(":react-native-svg")
+    // Explicitly wire autolinked RN libraries only if included as Gradle projects (defensive for RN 0.81 plugin-managed autolinking)
+    def maybeImpl = { String path -> if (project.findProject(path) != null) { implementation project(path) } }
+    maybeImpl(":react-native-async-storage_async-storage")
+    maybeImpl(":react-native-geolocation-service")
+    maybeImpl(":react-native-nfc-manager")
+    maybeImpl(":react-native-permissions")
+    maybeImpl(":react-native-reanimated")
+    maybeImpl(":react-native-safe-area-context")
+    maybeImpl(":react-native-screens")
+    maybeImpl(":react-native-svg")
 }
 
 

@@ -34,9 +34,9 @@ try {
   foreach ($d in $depsToCheck) {
     $pattern = '"' + $d + '"'
     if ($pkgText -match $pattern) {
-      $lines += "[dep] $d: present"
+      $lines += "[dep] ${d}: present"
     } else {
-      $lines += "[dep] $d: missing"
+      $lines += "[dep] ${d}: missing"
     }
   }
 

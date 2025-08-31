@@ -63,6 +63,14 @@ const App: React.FC = () => {
             task?.cancel?.();
         };
     }, []);
+    // Context readiness state and subscription
+    const [contextReady, setContextReady] = useState(contextManager.isContextReady());
+    useEffect(() => {
+        if (contextManager.isContextReady()) return;
+        contextManager.onReady(() => {
+            setContextReady(true);
+        });
+    }, [contextManager]);
     // Critical native module validation gating
     const [validation, setValidation] = useState<{
         isValid: boolean;
@@ -140,6 +148,15 @@ const App: React.FC = () => {
                         {validation.error}
                     </Text>
                 ) : null}
+            </View>
+        );
+    }
+    // Wait for context readiness before mounting NavigationContainer to avoid focus race
+    if (!contextReady) {
+        return (
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <ActivityIndicator size="large" color={colors.brandPrimary} />
+                <Text style={{marginTop: 12, color: colors.textSecondary}}>Preparing UI...</Text>
             </View>
         );
     }

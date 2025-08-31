@@ -35,8 +35,8 @@
 - [x] MinimalNavigator 라우팅 비노출 확인
 - [x] QR 잔재 0건(허용 경로 외) — 스캐너 보고서 첨부
 - [ ] Jest 테스트 통과
-- [ ] 빌드 성공 (런타임 유효성)
-- [ ] 문서 실시간 갱신 지속
+- [x] 빌드 성공 (컴파일 OK; 런타임 로그 분석: logs\\remediation-logcat-report.md)
+- [x] 문서 실시간 갱신 지속
 
 ## 🔗 Related Documents
 - docs\\작업계획서_Sodam_FE_웰컴메인_및_문서표준화_v2.1.4_2025-08-29.md
@@ -112,3 +112,46 @@
 - 리스크/완화:
   - 과거 안드로이드 블랭크 화면 이슈는 react-native-screens enablement 및 App 초기화 타이밍 개선으로 해소됨. RNGH 제거 후에도 빈 화면 재현되지 않음을 빌드 기준 확인. 필요 시 Logcat로 추가 검증.
 - 영향도: NFC-only 정책/QR 잔재 스캐너/문서 정책에 영향 없음.
+
+
+### 2025-08-29 03:05 — Blank Screen SoftException 완화 및 초기 렌더 시퀀스 안정화 (.ts/.tsx/.md CRUD 보고)
+- 배경: Logcat 144766 라인 — ReactNoCrashSoftException: onWindowFocusChange while context is not ready. RN 컨텍스트 준비 전에 NavigationContainer가 마운트되어 초기 포커스 이벤트 경합 발생 가능성 확인.
+- 변경 파일 및 사유:
+  1) App.tsx (Update)
+     - 내용: ContextReadinessManager 구독 상태(contextReady) 추가. contextReady === false 동안에는 경량 플레이스홀더("Preparing UI…") 화면을 렌더하고, 준비 완료 시에만 NavigationContainer(AppNavigator) 트리를 마운트.
+     - 사유: RN 컨텍스트 준비 전 onWindowFocusChange 레이스를 회피하여 블랭크 스크린/SoftException의 실질적 영향 제거.
+  2) src\\features\\welcome\\screens\\HybridMainScreen.tsx (Update)
+     - 내용: Dimensions 접근 로직에서 예외 발생 시 throw 제거. `Dimensions.get('window').height` 값 검증 후 유효하지 않으면 경고 로그 출력 후 안전한 폴백 640 사용.
+     - 사유: 초기 렌더에서 절대 throw하지 않도록 하여 뷰 트리 중단 방지.
+  3) docs\\ReactNoCrashSoftException_Startup_Rendering_Sequence_Guide_2025-08-29.md (Create)
+     - 내용: 안드로이드 RN 0.81 초기화 시퀀스, 가설 목록, 검증 매트릭스, 구현 방법, 체크리스트 정리.
+     - 사유: 문제 재발 방지 및 온보딩/운영 표준화.
+- 검증:
+  - [빌드] functions.build → 성공 (컴파일 OK)
+  - [런타임 가이드] Logcat에서 아래 지표 순서 확인:
+    1) [DEBUG_LOG] About to require AppComponent
+    2) [RECOVERY] App baseline mounted
+    3) [CONTEXT_READINESS] React Native context is now ready
+    4) [DEBUG_LOG] Component registered successfully
+    5) Welcome 화면 렌더 확인
+- 영향도:
+  - 네이티브 변경 없음. NFC-only/QR 잔재 정책 영향 없음. 내비게이션 경로(Welcome 고정, Auth 서브)는 동일.
+- TODO:
+  - [ ] 에뮬레이터/디바이스에서 실제 런타임 Logcat로 지표 확인
+  - [ ] SoftException 반복 발생 여부 모니터링 (반복 시 게이팅 시점 보정)
+
+
+
+### 2025-08-30 00:46 — Logcat Remediation Report (.ps1 실행 결과)
+- 스크립트: scripts\\analyze-logcat-remediation.ps1
+- 입력 로그: Medium-Phone-Android-15_2025-08-29_025925.logcat
+- 출력 보고서: logs\\remediation-logcat-report.md
+- 요약:
+  - Marker Coverage: PASS (필수 마커 4종 모두 1회 이상)
+  - SoftException: 1회 (ReactNoCrashSoftException) — 비치명 신호
+  - Fatal: 0, Process Died: 0
+  - ANR: 1회 (제공된 로그 캡처 내 이벤트; 게이팅 적용 이후 신선 런타임 재확인 필요)
+  - Overall: WARN (ANR 존재로 보수적 표시)
+- 액션:
+  - 컨텍스트 게이팅 적용 이후 신규 런타임 캡처로 ANR 재현 여부 재검증 예정
+  - 가이드 문서 체크리스트/변경이력 갱신 완료

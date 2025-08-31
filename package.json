@@ -26,7 +26,8 @@
     "clean:all": "npm run gradle-clean && rmdir /s /q node_modules && npm install",
     "diag:native": "powershell -ExecutionPolicy Bypass -File .\\scripts\\verify-native-modules.ps1 -Device auto -Out logs\\verify-native-modules.log",
     "perf:capture": "powershell -ExecutionPolicy Bypass -File .\\scripts\\collect-performance.ps1 -DurationSec 30 -IntervalMs 1000 -Out logs\\perf-collect.log",
-    "run:iter": "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-iter-suite.ps1 -Device auto -TimeoutSec 15"
+    "run:iter": "powershell -ExecutionPolicy Bypass -File .\\scripts\\run-iter-suite.ps1 -Device auto -TimeoutSec 15",
+    "sync:gradle": "powershell -ExecutionPolicy Bypass -File .\\scripts\\reproduce-gradle-sync.ps1"
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",

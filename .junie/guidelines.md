@@ -1,10 +1,10 @@
-# Sodam Front End Project Guidelines v2.1
+# Sodam Front End Project Guidelines v3.0
 
 This document provides comprehensive guidelines and instructions for developers working on the Sodam Front End project -
 a cross-platform attendance and payroll management application for part-time workers and small business owners.
 
-**Last Updated**: 2025-08-29  
-**Version**: 2.1.3 - NFC-only enforcement and documentation version bump (QR fully removed; Welcome page main)
+**Last Updated**: 2025-08-30  
+**Version**: 3.0.0 - AI Prompting v3 standard, prompt generator script, RN config consistency (0.81.0), NFC-only enforcement retained
 
 ## Role
 
@@ -484,7 +484,7 @@ NDK: 27.1.12297006
   },
   "dependencies": {
     "react": "19.1.0",
-    "react-native": "^0.80.1",
+    "react-native": "0.81.0",
     "react-native-nfc-manager": "^3.14.13"
   }
 }
@@ -1366,3 +1366,132 @@ Each feature should have comprehensive documentation including:
 - docs\QR_Residual_Removal_Guide_2025-08-28.md
 - docs\개편_웰컴페이지_방향성_v2.1_2025-08-28.md
 - docs\작업계획서_Sodam_FE_웰컴메인_및_문서표준화_v2.1.4_2025-08-29.md
+
+### Library & Feature Lifecycle Coverage
+- Scope: Applies to app-layer features and commonly used React Native libraries.
+- Library Categories (examples; extend as needed):
+  - Navigation: React Navigation (core, stacks, tabs), react-native-screens
+  - Animations/Gestures: React Native Reanimated, react-native-gesture-handler
+  - Permissions/Device Capabilities: react-native-permissions, NFC Manager, camera modules (if reintroduced)
+  - Networking/State/Storage: axios, AsyncStorage/MMKV, React Query (if used)
+  - Firebase Suite: @react-native-firebase (analytics, crashlytics, messaging)
+  - Maps/Location: react-native-maps, geolocation
+  - Notifications/Deep Link: FCM/APNs, Linking configuration
+  - Web/Build: React Native Web, Metro/Hermes configs
+  - Android/iOS Build Tooling: AGP/Kotlin/NDK, Xcode/Pods
+- Update/Deprecation Playbooks (high-level):
+  - React Navigation (major upgrade):
+    1) Inventory navigators/types/routes; 2) Upgrade packages; 3) Adjust linking and type defs; 4) Smoke test core flows; 5) Update docs.
+  - Reanimated (upgrade/removal):
+    1) Verify Babel plugin/JSI flags; 2) Migrate APIs (v2->v3); 3) Replace animations if removing; 4) Run Android/iOS build; 5) Remove unused code.
+  - Firebase module (add/remove):
+    1) Add/remove native config (Android/iOS); 2) Update permission declarations; 3) Verify initialization; 4) Add mocks to tests; 5) Document data/privacy impact.
+  - Permissions change:
+    - Follow camera deprecation precedent: remove uses-permission/features, update screens, and run a residue scanner.
+- Test Requirements (per change):
+  - Unit tests for affected utilities/hooks and smoke tests for top 3 user flows; mock native modules as needed.
+
+### Minimal Change Principle vs. Full Structural Transformation (Policy)
+- Default: Prefer minimal, localized changes with clear verification and rollback.
+- When Full Structural Transformation is allowed (examples):
+  - App architecture/navigator overhaul, global state management refactor, build system migration (AGP/Hermes/Metro), feature domain reorganization, or cross-cutting native module strategy change.
+- Mandatory process for Full Structural Transformation:
+  1) Prepare a change proposal .md using template: docs\\change-proposals\\Full_Structural_Change_Proposal_Template_v1.0.md
+  2) Save as: docs\\change-proposals\\<YYMMDD>_<slug>_structural_change_proposal.md
+  3) Create a dedicated branch: feat/structural-change/<slug>-<YYMMDD>
+  4) Request explicit user approval referencing the proposal doc before implementation.
+  5) Gate behind feature flags where feasible; keep rollback path documented.
+  6) Verification: run unit tests, relevant scanners (e.g., QR scanner as example), and build both Android/iOS if native changes are involved.
+- Acceptance Criteria (structural changes):
+  - Approval recorded in the proposal doc; CI green; scanners clean; critical user flows unaffected; rollback steps verified.
+
+### CI/Automation Extensions
+- Extend the scanner concept beyond QR when deprecating other features/libs by adding pattern-based scripts (follow scripts\\scan-qr-residue.ps1 as a reference) and enable -FailOnMatch in CI.
+
+
+## AI 어시스턴트 프롬프트 표준 v3
+
+본 섹션은 docs\가이드_AI_프롬프트_작성_베스트프랙티스_v2.1.3_2025-08-30.md의 표준을 프로젝트 운영 규칙으로 승격한 것입니다. 모든 AI 보조 작업(이슈 분석/수정/문서화)은 아래 규칙과 스켈레톤을 따라야 합니다.
+
+### 1) 기본 원칙 (Principles)
+- 구체성: 변경 대상 파일 경로, 함수/컴포넌트 이름, 재현 절차, 기대 결과를 명시합니다.
+- 제약 명시: OS(Windows), 셸(PowerShell), 경로 구분자(\\), RN/React/SDK 버전, “최소 변경” 원칙 등을 조건으로 고정합니다.
+- 수락기준(AC) 선제시: 완료 정의(정상 빌드, 특정 테스트 통과, 특정 스크린 진입 등)를 미리 제공합니다.
+- 안전성: 민감한 권한, 네이티브 설정 변경 시 근거와 영향 범위를 명시하고, 회귀 위험 줄이기(테스트/스캐너 실행)를 요청합니다.
+- 도구 우선: 프로젝트 내 제공되는 전용 도구와 스크립트를 먼저 사용하도록 지시합니다. (예: search_project, create, search_replace, run_test, PowerShell 스크립트 등)
+- 재현 가능성: 오류/현상 재현 스크립트 또는 테스트를 명시하고, 수정 후 재실행을 요구합니다.
+
+### 2) 필수 환경/조건 명세 (항상 프롬프트 상단 포함)
+- OS/셸: Windows, PowerShell 사용. 모든 경로는 백슬래시(\\) 사용.
+- RN/React: React Native 0.81.0(New Architecture, Hermes), React 19.1.0
+- Android 설정: Compile/Target SDK 36, Min SDK 24, Hermes 활성화
+- Node: >= 18
+- 테스트: Jest preset ‘react-native’, jest.setup.js 존재
+- 제품 정책: 태그 기반 근태(NFC 중심). 과거 잔존물 방지 준수(스캐너 사용).
+- 내비게이션: 초기 라우트는 Welcome 고정
+- 원칙: “최소 변경”으로 해결, 변경된 파일에 한해 관련 테스트 점검
+- 경로/명령: PowerShell 포맷, 전용 툴과 터미널 명령 한 줄 혼용 금지
+
+### 3) 프롬프트 스켈레톤 (복사 후 이슈에 맞게 작성)
+```
+[이슈 요약]
+- 문제/요청:
+- 영향 범위:
+- 재현 방법(있다면):
+- 기대 결과(수락기준):
+
+[환경/조건]
+- OS/셸: Windows + PowerShell, 경로는 \\ 사용
+- RN/React/Node: RN 0.81.0(New Arch, Hermes) / React 19.1.0 / Node >=18
+- Android: Compile/Target SDK 36, Min 24
+- 테스트: Jest preset ‘react-native’
+- 원칙: 최소 변경, 관련 테스트 유지, 문서 표준 준수
+
+[대상 파일/심볼]
+- 파일 경로:
+- 관련 컴포넌트/함수/훅/테스트:
+
+[세부 작업]
+- 단계별 할 일 목록:
+- 변경 후 검증 방법(테스트/빌드/스크립트):
+
+[출력 형식 요구]
+- <UPDATE> 섹션에 PREVIOUS_STEP/PLAN/NEXT_STEP 포함
+- PowerShell 규칙 및 특수 도구 사용 규칙 준수
+- 코드 수정 시 최소 변경, 에지 케이스 고려
+```
+
+### 4) <UPDATE> 운영 규칙
+- 모든 응답은 반드시 <UPDATE> 블록을 포함하고, 내부에 다음 3개 하위 태그를 갖습니다:
+  - <PREVIOUS_STEP>: 직전 결과/관찰 요약
+  - <PLAN>: 번호 매기기(1., 2., …) + 하위 불릿. 진행 상태 표기: ✓(완료), *(진행중), !(실패)
+  - <NEXT_STEP>: 다음으로 수행할 즉시 행동 요약
+- <UPDATE> 바로 뒤에 동일 응답 내에서 전용 도구 호출을 1회 이상 수행합니다. 도구 호출 전에는 절대 호출 금지.
+- 전용 도구와 터미널 명령을 같은 커맨드 라인에서 결합 금지.
+- Windows 경로(\\) 사용, PowerShell 문법 유지.
+
+### 5) 자동화 스크립트 (프롬프트 생성기)
+- 스크립트: scripts\generate-ai-prompt.ps1
+- 목적: 표준 프롬프트 스켈레톤을 신속히 생성하여 이슈 템플릿 품질을 균일화
+- 사용 예시(파일로 저장):
+  - powershell -ExecutionPolicy Bypass -File .\scripts\generate-ai-prompt.ps1 -Issue "빌드 오류" -Impact "Android 그레이들" -AC "CI 통과" -OutFile ".\docs\AI_Prompt_Example_250830.md"
+- 사용 예시(클립보드로 바로 복사):
+  - powershell -ExecutionPolicy Bypass -File .\scripts\generate-ai-prompt.ps1 -Issue "NFC 초기화 실패" | Set-Clipboard
+- 매개변수: -Issue, -Impact, -Repro, -AC, -Files(";" 구분), -Symbols(";" 구분), -Steps(";" 구분), -Verify(";" 구분), -OutFile
+
+### 6) 상황별 가이드
+- 버그 수정: 재현 스크립트/테스트를 먼저 제시하고, 수정 후 재실행 결과를 보고합니다.
+- 구성 변경: 변경 전/후 설정 차이, 영향 범위, 롤백 경로, 수락기준을 명시합니다.
+- 문서 개정: 버전/날짜/변경 요약을 문서 상단에 업데이트하고, 레퍼런스 문서를 링크합니다.
+
+### 7) 수락 기준(프롬프트 관점)
+- <UPDATE> 및 도구 호출 규칙 준수
+- 계획 항목과 진행 상태 기호의 일관성
+- 환경/조건 절 포함
+- 최소 변경 원칙과 검증 절차 명시
+
+## v3 변경 사항 요약 (2025-08-30)
+- 추가: AI 프롬프트 표준 v3 섹션(본 문서) 및 <UPDATE> 운영 규칙 명문화
+- 추가: scripts\generate-ai-prompt.ps1 프롬프트 생성 스크립트
+- 정합성: 예시 구성 JSON의 react-native 버전을 0.81.0으로 통일
+- 유지: NFC 전용 정책과 QR 잔존물 스캐너/CI 가드레일 정책 유지

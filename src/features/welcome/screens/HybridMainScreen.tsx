@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {Dimensions, Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {RootNavigationProp} from '../../../navigation/types';
@@ -18,16 +18,19 @@ interface SectionVisibility {
 const HybridMainScreen: React.FC = () => {
     const navigation = useNavigation<RootNavigationProp>();
 
-    // Cache screen height outside worklet to avoid JSI violation
-    let screenHeight;
+    // Determine screen height safely without throwing
+    let screenHeight: number;
     try {
-        screenHeight = useMemo(() => {
-            const dimensions = Dimensions.get('window');
-            return dimensions.height;
-        }, []);
+        const dimensions = Dimensions.get('window');
+        const h = (dimensions as any)?.height;
+        const valid = typeof h === 'number' && isFinite(h) && h > 0;
+        screenHeight = valid ? h : 640;
+        if (!valid) {
+            console.warn('HybridMainScreen: Invalid window height, using fallback 640');
+        }
     } catch (error) {
-        console.error('HybridMainScreen: Failed to get screen dimensions:', error);
-        throw error;
+        console.warn('HybridMainScreen: Failed to get screen dimensions, using fallback 640', error);
+        screenHeight = 640;
     }
 
     const [currentSection, setCurrentSection] = useState(0);
