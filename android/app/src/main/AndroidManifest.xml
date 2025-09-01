@@ -1,24 +1,45 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.sodam_front_end">  <!-- 이 줄을 추가해야 합니다! -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.NFC"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!-- 네트워크 권한 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <uses-feature android:name="android.hardware.location" android:required="false"/>
-    <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
-    <uses-feature android:name="android.hardware.nfc" android:required="false"/>
+    <!-- 위치 권한 - 정확한 비즈니스 요구사항에 따라 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- NFC 권한 - 소담 핵심 기능 -->
+    <uses-permission android:name="android.permission.NFC" />
+
+    <!-- 저장소 권한 - Android 13+ 호환 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+                     android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                     android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
+    <!-- 알림 권한 (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- 진동 권한 (UX 향상) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- 하드웨어 기능 선언 -->
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
 
     <application android:name=".MainApplication"
                  android:label="@string/app_name"
                  android:icon="@mipmap/ic_launcher"
                  android:roundIcon="@mipmap/ic_launcher_round"
-                 android:allowBackup="true"
+                 android:allowBackup="false"
                  android:theme="@style/AppTheme"
-                 android:supportsRtl="true">
+                 android:supportsRtl="true"
+                 android:usesCleartextTraffic="false"
+                 android:requestLegacyExternalStorage="false"
+                 android:preserveLegacyExternalStorage="false">
 
         <meta-data android:name="expo.modules.updates.ENABLED" android:value="false"/>
         <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
