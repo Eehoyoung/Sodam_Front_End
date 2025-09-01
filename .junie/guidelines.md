@@ -1490,8 +1490,42 @@ Each feature should have comprehensive documentation including:
 - 환경/조건 절 포함
 - 최소 변경 원칙과 검증 절차 명시
 
+## Maintenance Guidelines
+
+### Project Maintenance Standards
+
+For comprehensive maintenance procedures, refer to the dedicated maintenance guide:
+- **Document**: [Maintenance Guide v1.0](../docs/Maintenance_Guide_v1.0_2025-09-01.md)
+- **Scope**: Covers all aspects of project maintenance including regular checks, troubleshooting, security updates, and performance monitoring
+
+### Key Maintenance Principles
+
+1. **Preventive Maintenance**: Regular checks and proactive updates
+2. **Security First**: Immediate response to security vulnerabilities
+3. **Performance Monitoring**: Continuous tracking of build and runtime performance
+4. **Documentation**: Keep all maintenance procedures documented and up-to-date
+5. **Change Management**: Structured approach to updates and modifications
+
+### Maintenance Schedule
+
+- **Weekly**: Build status checks, security updates, performance monitoring
+- **Monthly**: Dependency updates, configuration reviews, code quality assessment  
+- **Quarterly**: Comprehensive security audit, performance benchmarking, dependency cleanup
+
+### Emergency Response
+
+For critical issues requiring immediate attention:
+1. Follow the emergency rollback procedures in the maintenance guide
+2. Contact RN Lead (Junie) for technical support
+3. Document all emergency actions for post-incident analysis
+
 ## v3 변경 사항 요약 (2025-08-30)
 - 추가: AI 프롬프트 표준 v3 섹션(본 문서) 및 <UPDATE> 운영 규칙 명문화
 - 추가: scripts\generate-ai-prompt.ps1 프롬프트 생성 스크립트
 - 정합성: 예시 구성 JSON의 react-native 버전을 0.81.0으로 통일
 - 유지: NFC 전용 정책과 QR 잔존물 스캐너/CI 가드레일 정책 유지
+
+## v3.1 변경 사항 요약 (2025-09-01)
+- 추가: 유지보수 가이드라인 섹션 및 전용 문서 연결
+- 업데이트: 엔터프라이즈급 설정 고도화 완료 반영
+- 강화: 보안 및 성능 모니터링 절차 명문화
