@@ -1,0 +1,311 @@
+[INFO] Using GRADLE_USER_HOME=C:\\guh
+Configuration on demand is an incubating feature.
+> Task :react-native-screens:externalNativeBuildCleanDebug
+Clean rnscreens-armeabi-v7a
+C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\armeabi-v7a'
+C/C++: [1/1] Cleaning all built files...
+C/C++: Cleaning... 6 files.
+Clean rnscreens-arm64-v8a
+C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\arm64-v8a'
+C/C++: [1/1] Cleaning all built files...
+C/C++: Cleaning... 6 files.
+Clean rnscreens-x86
+C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\x86'
+C/C++: [1/1] Cleaning all built files...
+C/C++: Cleaning... 6 files.
+Clean rnscreens-x86_64
+C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\x86_64'
+C/C++: [1/1] Cleaning all built files...
+C/C++: Cleaning... 6 files.
+> Task :react-native-geolocation-service:processDebugManifest
+package="com.agontuk.RNFusedLocation" found in source AndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-geolocation-service\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.agontuk.RNFusedLocation" from the source AndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-geolocation-service\android\src\main\AndroidManifest.xml.
+> Task :react-native-nfc-manager:processDebugManifest
+package="community.revteltech.nfc" found in source AndroidManifest.xml: C:\Users
+\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-nfc-manager\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="community.revteltech.nfc" from the source Androi
+dManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-nfc-manager\android\src\main\AndroidManifest.xml.
+> Task :react-native-async-storage_async-storage:processDebugManifest
+package="com.reactnativecommunity.asyncstorage" found in source AndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\@react-native-async-storage\async-storage\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.reactnativecommunity.asyncstorage" from the source AndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\@react-native-async-storage\async-storage\android\src\main\AndroidManifest.xml.
+> Task :react-native-safe-area-context:processDebugManifest
+package="com.th3rdwave.safeareacontext" found in source AndroidManifest.xml: C:\
+Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.th3rdwave.safeareacontext" from the source A
+ndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
+> Task :react-native-screens:configureCMakeDebug[arm64-v8a]
+C/C++: -- Configuring done
+C/C++: -- Generating done
+C/C++: -- Build files have been written to: C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-screens/android/.cxx/Debug/3b4v241h/arm64-v8a
+> Task :react-native-worklets:configureCMakeDebug[arm64-v8a]
+C/C++: -- The C compiler identification is Clang 18.0.1
+C/C++: -- The CXX compiler identification is Clang 18.0.1
+C/C++: -- Detecting C compiler ABI info
+C/C++: -- Detecting C compiler ABI info - done
+C/C++: -- Check for working C compiler: C:/Users/LeeHoYoung/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe - skipped
+C/C++: -- Detecting C compile features
+C/C++: -- Detecting C compile features - done
+C/C++: -- Detecting CXX compiler ABI info
+C/C++: -- Detecting CXX compiler ABI info - done
+C/C++: -- Check for working CXX compiler: C:/Users/LeeHoYoung/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe - skipped
+C/C++: -- Detecting CXX compile features
+C/C++: -- Detecting CXX compile features - done
+C/C++: -- Configuring done
+C/C++: -- Generating done
+C/C++: -- Build files have been written to: C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-worklets/android/.cxx/Debug/4t32r292/arm64-v8
+> Task :react-native-nfc-manager:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+> Task :react-native-screens:buildCMakeDebug[arm64-v8a] FAILED
+C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\arm64-v8a'
+C/C++: ninja: error: Stat(C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/.gradle-user-home/caches/8.13/transforms/6541f01c19d1054fa8e5015aa9bbce5f/transformed/jetified-react-android-0.81.0-debug/prefab/modules/reactnative/include/react/renderer/componentregistry/ComponentDescriptorFactory.h): Filename longer than 260 characters
+> Task :react-native-geolocation-service:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+> Task :react-native-async-storage_async-storage:compileDebugJavaWithJavac
+C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\@react-native-async-storage\async-storage\android\src\main\java\com\reactnativecommunity\asyncstorage\AsyncStorageModule.java:84: warning: [removal] onCatalystInstanceDestroy() in NativeModule has been deprecated and marked for removal
+  public void onCatalystInstanceDestroy() {
+              ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\@react-native-async-storage\async-storage\android\src\javaPackage\java\com\reactnativecommunity\asyncstorage\AsyncStoragePackage.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+1 warning
+> Task :react-native-svg:compileDebugJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+> Task :react-native-worklets:compileDebugJavaWithJavac
+Note: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-worklets\android\src\main\java\com\swmansion\worklets\WorkletsPackage.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+> Task :react-native-permissions:compileDebugKotlin
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-permissions/android/src/main/java/com/zoontek/rnpermissions/RNPermissionsPackage.kt:3:8 'class TurboReactPackage : BaseReactPackage' is deprecated. Use BaseReactPackage instead.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-permissions/android/src/main/java/com/zoontek/rnpermissions/RNPermissionsPackage.kt:9:30 'class TurboReactPackage : BaseReactPackage' is deprecated. Use BaseReactPackage instead.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-permissions/android/src/main/java/com/zoontek/rnpermissions/RNPermissionsPackage.kt:22:24 'constructor(name: String, className: String, canOverrideExistingModu
+le: Boolean, needsEagerInit: Boolean, hasConstants: Boolean, isCxxModule: Boolea
+n, isTurboModule: Boolean): ReactModuleInfo' is deprecated. This constructor is
+deprecated and will be removed in the future. Use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)].
+> Task :react-native-safe-area-context:compileDebugKotlin
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:59:23 'val uiImplementation: UIImplementation!' is deprecated. Deprecated in Java.
+> Task :react-native-screens:compileDebugKotlin
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:56:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'name'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:57:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'reactContext'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:70:17
+ 'constructor(name: String, className: String, canOverrideExistingModule: Boolea
+n, needsEagerInit: Boolean, hasConstants: Boolean, isCxxModule: Boolean, isTurbo
+Module: Boolean): ReactModuleInfo' is deprecated. This constructor is deprecated
+ and will be removed in the future. Use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)].
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:48:77 Unchecked
+ cast of '(CoordinatorLayout.Behavior<View!>?..CoordinatorLayout.Behavior<*>?)' to 'BottomSheetBehavior<Screen>'.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:383:36 'fun set
+Translucent(screen: Screen, activity: Activity?, context: ReactContext?): Unit'
+is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:402:36 'fun set
+Color(screen: Screen, activity: Activity?, context: ReactContext?): Unit' is dep
+recated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:420:36 'fun set
+NavigationBarColor(screen: Screen, activity: Activity?): Unit' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:437:36 'fun set
+NavigationBarTranslucent(screen: Screen, activity: Activity?): Unit' is deprecat
+ed. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:217:31 'var targetElevation: Float' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:22
+0:13 'fun setHasOptionsMenu(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:39
+7:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:40
+4:22 'fun onPrepareOptionsMenu(p0: Menu): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:40
+7:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:41
+2:22 'fun onCreateOptionsMenu(p0: Menu, p1: MenuInflater): Unit' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.k
+t:435:18 'val reactNativeHost: ReactNativeHost' is deprecated. You should not use ReactNativeHost directly in the New Architecture. Use ReactHost instead.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:203:
+14 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above
+this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:220:
+14 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK
+35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:237:
+14 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:246:
+14 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:55:
+42 'fun replaceSystemWindowInsets(p0: Int, p1: Int, p2: Int, p3: Int): WindowInsetsCompat' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:56:39 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:58:39 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:59:39 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:102:53 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:106
+:37 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above
+ this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:113:48 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:116:32 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:162
+:49 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK
+ 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:218
+:43 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:218:72 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:224:16 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:241
+:55 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:283
+:13 'fun setColor(screen: Screen, activity: Activity?, context: ReactContext?):
+Unit' is deprecated. For apps targeting SDK 35 or above this prop has no effect
+because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:285
+:13 'fun setTranslucent(screen: Screen, activity: Activity?, context: ReactConte
+xt?): Unit' is deprecated. For apps targeting SDK 35 or above this prop has no e
+ffect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:289
+:13 'fun setNavigationBarColor(screen: Screen, activity: Activity?): Unit' is de
+precated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:290
+:13 'fun setNavigationBarTranslucent(screen: Screen, activity: Activity?): Unit'
+ is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:354
+:42 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above
+ this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:356
+:48 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK
+ 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:359
+:57 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:360
+:63 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:7:8 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:25:13 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:32:9 The corresponding parameter in the supertype 'ReactViewGrou
+p' is named 'left'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:33:9 The corresponding parameter in the supertype 'ReactViewGrou
+p' is named 'top'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:34:9 The corresponding parameter in the supertype 'ReactViewGrou
+p' is named 'right'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:35:9 The corresponding parameter in the supertype 'ReactViewGrou
+p' is named 'bottom'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:71:9 The corresponding parameter in the supertype 'RootView' is
+named 'childView'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:72:9 The corresponding parameter in the supertype 'RootView' is
+named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:79:46 The corresponding parameter in the supertype 'RootView' is
+ named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:83:9 The corresponding parameter in the supertype 'RootView' is
+named 'childView'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:84:9 The corresponding parameter in the supertype 'RootView' is
+named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
+alogRootView.kt:95:34 The corresponding parameter in the supertype 'RootView' is
+ named 't'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.k
+t:63:9 The corresponding parameter in the supertype 'ReactCompoundView' is named
+ 'touchX'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.k
+t:64:9 The corresponding parameter in the supertype 'ReactCompoundView' is named
+ 'touchY'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.k
+t:68:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is
+named 'touchX'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.k
+t:69:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is
+named 'touchY'. This may cause problems when calling this function with named arguments.
+w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
+-screens/android/src/main/java/com/swmansion/rnscreens/gamma/tabs/TabsHostViewMa
+nager.kt:37:9 The corresponding parameter in the supertype 'ViewGroupManager' is
+ named 'view'. This may cause problems when calling this function with named arguments.
+[Incubating] Problems report is available at: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/android/build/reports/problems/problems-report.html
+FAILURE: Build failed with an exception.
+* What went wrong:
+Execution failed for task ':react-native-screens:buildCMakeDebug[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\arm64-v8a'
+  C++ build system [build] failed while executing:
+      @echo off
+      "C:\\Users\\LeeHoYoung\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        -C ^
+        "C:\\Users\\LeeHoYoung\\Desktop\\Sodam_Front_End\\node_modules\\react-native-screens\\android\\.cxx\\Debug\\3b4v241h\\arm64-v8a" ^
+        rnscreens
+    from C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android
+  ninja: error: Stat(C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/.gradle-user-ho
+me/caches/8.13/transforms/6541f01c19d1054fa8e5015aa9bbce5f/transformed/jetified-
+react-android-0.81.0-debug/prefab/modules/reactnative/include/react/renderer/com
+ponentregistry/ComponentDescriptorFactory.h): Filename longer than 260 characters
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+BUILD FAILED in 2m 30s
+235 actionable tasks: 172 executed, 35 from cache, 28 up-to-date
