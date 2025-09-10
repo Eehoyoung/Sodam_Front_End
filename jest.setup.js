@@ -17,6 +17,7 @@ jest.mock('@react-navigation/native', () => ({
     useNavigation: () => ({
         navigate: jest.fn(),
         goBack: jest.fn(),
+        reset: jest.fn(),
     }),
 }));
 
@@ -30,6 +31,7 @@ jest.mock('react-native', () => ({
     },
     View: 'View',
     Text: 'Text',
+    Button: 'Button',
     TouchableOpacity: 'TouchableOpacity',
     Image: 'Image',
     ScrollView: 'ScrollView',
@@ -110,16 +112,14 @@ jest.mock('react-native-safe-area-context', () => ({
     useSafeAreaInsets: () => ({top: 0, bottom: 0, left: 0, right: 0}),
 }));
 
-// react-native-vector-icons removed - migrated to @expo/vector-icons
+// RNGH is mapped via moduleNameMapper to a lightweight stub in tests/mocks/react-native-gesture-handler.js
 
-// Mock @expo/vector-icons
-jest.mock('@expo/vector-icons', () => ({
-    Ionicons: 'Ionicons',
-    FontAwesome: 'FontAwesome',
-    FontAwesome5: 'FontAwesome5',
-    MaterialIcons: 'MaterialIcons',
-    AntDesign: 'AntDesign',
-}));
+// @expo/vector-icons removed — migrated to react-native-vector-icons
+// Mock react-native-vector-icons icon sets
+jest.mock('react-native-vector-icons/Ionicons', () => 'Ionicons');
+jest.mock('react-native-vector-icons/MaterialIcons', () => 'MaterialIcons');
+jest.mock('react-native-vector-icons/FontAwesome', () => 'FontAwesome');
+jest.mock('react-native-vector-icons/FontAwesome5', () => 'FontAwesome5');
 
 // Mock react-native-svg
 jest.mock('react-native-svg', () => ({
@@ -217,3 +217,26 @@ try {
     // ignore
 }
 
+
+
+// Mock @react-navigation/native-stack to avoid native dependencies in tests
+try {
+  jest.mock('@react-navigation/native-stack', () => {
+    const createNativeStackNavigator = () => ({
+      Navigator: ({children}) => children,
+      Screen: ({children}) => children,
+    });
+    return { createNativeStackNavigator };
+  });
+} catch (e) {
+  // ignore
+}
+
+// Optional: mock elements to bypass masked view
+try {
+  jest.mock('@react-navigation/elements', () => ({
+    HeaderBackButton: ({children}) => children || null,
+  }));
+} catch (e) {
+  // ignore
+}

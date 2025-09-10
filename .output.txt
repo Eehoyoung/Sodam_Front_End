@@ -1,311 +1,601 @@
-[INFO] Using GRADLE_USER_HOME=C:\\guh
-Configuration on demand is an incubating feature.
-> Task :react-native-screens:externalNativeBuildCleanDebug
-Clean rnscreens-armeabi-v7a
-C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\armeabi-v7a'
-C/C++: [1/1] Cleaning all built files...
-C/C++: Cleaning... 6 files.
-Clean rnscreens-arm64-v8a
-C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\arm64-v8a'
-C/C++: [1/1] Cleaning all built files...
-C/C++: Cleaning... 6 files.
-Clean rnscreens-x86
-C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\x86'
-C/C++: [1/1] Cleaning all built files...
-C/C++: Cleaning... 6 files.
-Clean rnscreens-x86_64
-C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\x86_64'
-C/C++: [1/1] Cleaning all built files...
-C/C++: Cleaning... 6 files.
-> Task :react-native-geolocation-service:processDebugManifest
-package="com.agontuk.RNFusedLocation" found in source AndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-geolocation-service\android\src\main\AndroidManifest.xml.
-Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
-Recommendation: remove package="com.agontuk.RNFusedLocation" from the source AndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-geolocation-service\android\src\main\AndroidManifest.xml.
-> Task :react-native-nfc-manager:processDebugManifest
-package="community.revteltech.nfc" found in source AndroidManifest.xml: C:\Users
-\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-nfc-manager\android\src\main\AndroidManifest.xml.
-Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
-Recommendation: remove package="community.revteltech.nfc" from the source Androi
-dManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-nfc-manager\android\src\main\AndroidManifest.xml.
-> Task :react-native-async-storage_async-storage:processDebugManifest
-package="com.reactnativecommunity.asyncstorage" found in source AndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\@react-native-async-storage\async-storage\android\src\main\AndroidManifest.xml.
-Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
-Recommendation: remove package="com.reactnativecommunity.asyncstorage" from the source AndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\@react-native-async-storage\async-storage\android\src\main\AndroidManifest.xml.
-> Task :react-native-safe-area-context:processDebugManifest
-package="com.th3rdwave.safeareacontext" found in source AndroidManifest.xml: C:\
-Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
-Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
-Recommendation: remove package="com.th3rdwave.safeareacontext" from the source A
-ndroidManifest.xml: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
-> Task :react-native-screens:configureCMakeDebug[arm64-v8a]
-C/C++: -- Configuring done
-C/C++: -- Generating done
-C/C++: -- Build files have been written to: C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-screens/android/.cxx/Debug/3b4v241h/arm64-v8a
-> Task :react-native-worklets:configureCMakeDebug[arm64-v8a]
-C/C++: -- The C compiler identification is Clang 18.0.1
-C/C++: -- The CXX compiler identification is Clang 18.0.1
-C/C++: -- Detecting C compiler ABI info
-C/C++: -- Detecting C compiler ABI info - done
-C/C++: -- Check for working C compiler: C:/Users/LeeHoYoung/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe - skipped
-C/C++: -- Detecting C compile features
-C/C++: -- Detecting C compile features - done
-C/C++: -- Detecting CXX compiler ABI info
-C/C++: -- Detecting CXX compiler ABI info - done
-C/C++: -- Check for working CXX compiler: C:/Users/LeeHoYoung/AppData/Local/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe - skipped
-C/C++: -- Detecting CXX compile features
-C/C++: -- Detecting CXX compile features - done
-C/C++: -- Configuring done
-C/C++: -- Generating done
-C/C++: -- Build files have been written to: C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-worklets/android/.cxx/Debug/4t32r292/arm64-v8
-> Task :react-native-nfc-manager:compileDebugJavaWithJavac
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-> Task :react-native-screens:buildCMakeDebug[arm64-v8a] FAILED
-C/C++: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\arm64-v8a'
-C/C++: ninja: error: Stat(C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/.gradle-user-home/caches/8.13/transforms/6541f01c19d1054fa8e5015aa9bbce5f/transformed/jetified-react-android-0.81.0-debug/prefab/modules/reactnative/include/react/renderer/componentregistry/ComponentDescriptorFactory.h): Filename longer than 260 characters
-> Task :react-native-geolocation-service:compileDebugJavaWithJavac
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-> Task :react-native-async-storage_async-storage:compileDebugJavaWithJavac
-C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\@react-native-async-storage\async-storage\android\src\main\java\com\reactnativecommunity\asyncstorage\AsyncStorageModule.java:84: warning: [removal] onCatalystInstanceDestroy() in NativeModule has been deprecated and marked for removal
-  public void onCatalystInstanceDestroy() {
-              ^
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-Note: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\@react-native-async-storage\async-storage\android\src\javaPackage\java\com\reactnativecommunity\asyncstorage\AsyncStoragePackage.java uses unchecked or unsafe operations.
-Note: Recompile with -Xlint:unchecked for details.
-1 warning
-> Task :react-native-svg:compileDebugJavaWithJavac
-Note: Some input files use or override a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-Note: Some input files use unchecked or unsafe operations.
-Note: Recompile with -Xlint:unchecked for details.
-> Task :react-native-worklets:compileDebugJavaWithJavac
-Note: C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-worklets\android\src\main\java\com\swmansion\worklets\WorkletsPackage.java uses unchecked or unsafe operations.
-Note: Recompile with -Xlint:unchecked for details.
-> Task :react-native-permissions:compileDebugKotlin
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-permissions/android/src/main/java/com/zoontek/rnpermissions/RNPermissionsPackage.kt:3:8 'class TurboReactPackage : BaseReactPackage' is deprecated. Use BaseReactPackage instead.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-permissions/android/src/main/java/com/zoontek/rnpermissions/RNPermissionsPackage.kt:9:30 'class TurboReactPackage : BaseReactPackage' is deprecated. Use BaseReactPackage instead.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-permissions/android/src/main/java/com/zoontek/rnpermissions/RNPermissionsPackage.kt:22:24 'constructor(name: String, className: String, canOverrideExistingModu
-le: Boolean, needsEagerInit: Boolean, hasConstants: Boolean, isCxxModule: Boolea
-n, isTurboModule: Boolean): ReactModuleInfo' is deprecated. This constructor is
-deprecated and will be removed in the future. Use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)].
-> Task :react-native-safe-area-context:compileDebugKotlin
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:59:23 'val uiImplementation: UIImplementation!' is deprecated. Deprecated in Java.
-> Task :react-native-screens:compileDebugKotlin
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:56:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'name'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:57:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'reactContext'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:70:17
- 'constructor(name: String, className: String, canOverrideExistingModule: Boolea
-n, needsEagerInit: Boolean, hasConstants: Boolean, isCxxModule: Boolean, isTurbo
-Module: Boolean): ReactModuleInfo' is deprecated. This constructor is deprecated
- and will be removed in the future. Use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)].
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:48:77 Unchecked
- cast of '(CoordinatorLayout.Behavior<View!>?..CoordinatorLayout.Behavior<*>?)' to 'BottomSheetBehavior<Screen>'.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:383:36 'fun set
-Translucent(screen: Screen, activity: Activity?, context: ReactContext?): Unit'
-is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:402:36 'fun set
-Color(screen: Screen, activity: Activity?, context: ReactContext?): Unit' is dep
-recated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:420:36 'fun set
-NavigationBarColor(screen: Screen, activity: Activity?): Unit' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:437:36 'fun set
-NavigationBarTranslucent(screen: Screen, activity: Activity?): Unit' is deprecat
-ed. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:217:31 'var targetElevation: Float' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:22
-0:13 'fun setHasOptionsMenu(p0: Boolean): Unit' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:39
-7:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:40
-4:22 'fun onPrepareOptionsMenu(p0: Menu): Unit' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:40
-7:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:41
-2:22 'fun onCreateOptionsMenu(p0: Menu, p1: MenuInflater): Unit' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.k
-t:435:18 'val reactNativeHost: ReactNativeHost' is deprecated. You should not use ReactNativeHost directly in the New Architecture. Use ReactHost instead.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:203:
-14 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above
-this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:220:
-14 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK
-35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:237:
-14 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:246:
-14 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:55:
-42 'fun replaceSystemWindowInsets(p0: Int, p1: Int, p2: Int, p3: Int): WindowInsetsCompat' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:56:39 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:58:39 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:59:39 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:102:53 'var statusBarColor: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:106
-:37 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above
- this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:113:48 'var statusBarColor: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:116:32 'var statusBarColor: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:162
-:49 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK
- 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:218
-:43 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:218:72 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:224:16 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:241
-:55 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:283
-:13 'fun setColor(screen: Screen, activity: Activity?, context: ReactContext?):
-Unit' is deprecated. For apps targeting SDK 35 or above this prop has no effect
-because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:285
-:13 'fun setTranslucent(screen: Screen, activity: Activity?, context: ReactConte
-xt?): Unit' is deprecated. For apps targeting SDK 35 or above this prop has no e
-ffect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:289
-:13 'fun setNavigationBarColor(screen: Screen, activity: Activity?): Unit' is de
-precated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:290
-:13 'fun setNavigationBarTranslucent(screen: Screen, activity: Activity?): Unit'
- is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:354
-:42 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above
- this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:356
-:48 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK
- 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:359
-:57 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:360
-:63 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:7:8 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:25:13 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:32:9 The corresponding parameter in the supertype 'ReactViewGrou
-p' is named 'left'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:33:9 The corresponding parameter in the supertype 'ReactViewGrou
-p' is named 'top'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:34:9 The corresponding parameter in the supertype 'ReactViewGrou
-p' is named 'right'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:35:9 The corresponding parameter in the supertype 'ReactViewGrou
-p' is named 'bottom'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:71:9 The corresponding parameter in the supertype 'RootView' is
-named 'childView'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:72:9 The corresponding parameter in the supertype 'RootView' is
-named 'ev'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:79:46 The corresponding parameter in the supertype 'RootView' is
- named 'ev'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:83:9 The corresponding parameter in the supertype 'RootView' is
-named 'childView'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:84:9 The corresponding parameter in the supertype 'RootView' is
-named 'ev'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDi
-alogRootView.kt:95:34 The corresponding parameter in the supertype 'RootView' is
- named 't'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.k
-t:63:9 The corresponding parameter in the supertype 'ReactCompoundView' is named
- 'touchX'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.k
-t:64:9 The corresponding parameter in the supertype 'ReactCompoundView' is named
- 'touchY'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.k
-t:68:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is
-named 'touchX'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.k
-t:69:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is
-named 'touchY'. This may cause problems when calling this function with named arguments.
-w: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/node_modules/react-native
--screens/android/src/main/java/com/swmansion/rnscreens/gamma/tabs/TabsHostViewMa
-nager.kt:37:9 The corresponding parameter in the supertype 'ViewGroupManager' is
- named 'view'. This may cause problems when calling this function with named arguments.
-[Incubating] Problems report is available at: file:///C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/android/build/reports/problems/problems-report.html
-FAILURE: Build failed with an exception.
-* What went wrong:
-Execution failed for task ':react-native-screens:buildCMakeDebug[arm64-v8a]'.
-> com.android.ide.common.process.ProcessException: ninja: Entering directory `C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android\.cxx\Debug\3b4v241h\arm64-v8a'
-  C++ build system [build] failed while executing:
-      @echo off
-      "C:\\Users\\LeeHoYoung\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
-        -C ^
-        "C:\\Users\\LeeHoYoung\\Desktop\\Sodam_Front_End\\node_modules\\react-native-screens\\android\\.cxx\\Debug\\3b4v241h\\arm64-v8a" ^
-        rnscreens
-    from C:\Users\LeeHoYoung\Desktop\Sodam_Front_End\node_modules\react-native-screens\android
-  ninja: error: Stat(C:/Users/LeeHoYoung/Desktop/Sodam_Front_End/.gradle-user-ho
-me/caches/8.13/transforms/6541f01c19d1054fa8e5015aa9bbce5f/transformed/jetified-
-react-android-0.81.0-debug/prefab/modules/reactnative/include/react/renderer/com
-ponentregistry/ComponentDescriptorFactory.h): Filename longer than 260 characters
-* Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
-> Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
-Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
-You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
-For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
-BUILD FAILED in 2m 30s
-235 actionable tasks: 172 executed, 35 from cache, 28 up-to-date
+## feat/remove-expo-20250909
+ M .eslintrc.js
+ M .jest-cache/haste-map-fd43650ae2ad34a06d7a23157f2c94c4-7ea8da78d97f0cfce731f72e8b280133-69a8bdf9087cbb69996078e16f6d0f13
+ M .jest-cache/perf-cache-fd43650ae2ad34a06d7a23157f2c94c4-da39a3ee5e6b4b0d3255bfef95601890
+ M .junie/guidelines.md
+ D .output.txt
+ M App.tsx
+ M all_clear.ps1
+ M android/app/build.gradle
+ M android/app/src/main/AndroidManifest.xml
+ M android/app/src/main/java/com/sodam_front_end/MainActivity.kt
+ M android/app/src/main/java/com/sodam_front_end/MainApplication.kt
+ M android/build.gradle
+ M android/gradle/wrapper/gradle-wrapper.properties
+ M android/settings.gradle
+ M babel.config.js
+ M index.js
+ M jest.config.js
+ M jest.setup.js
+ M metro.config.js
+ D out/production/Sodam_Front_End/.eslintrc.js
+ D out/production/Sodam_Front_End/.eslintrc.jsi-safety.js
+ D out/production/Sodam_Front_End/.expo/devices.json
+ D out/production/Sodam_Front_End/.gitignore
+ D out/production/Sodam_Front_End/.husky/pre-commit
+ D out/production/Sodam_Front_End/.lintstagedrc.jsi-safety.json
+ D out/production/Sodam_Front_End/.prettierrc.js
+ D out/production/Sodam_Front_End/.watchmanconfig
+ D out/production/Sodam_Front_End/App.tsx
+ D out/production/Sodam_Front_End/Gemfile
+ D out/production/Sodam_Front_End/__tests__/navigation/nativeStackNavigation.test.tsx
+ D out/production/Sodam_Front_End/app.json
+ D out/production/Sodam_Front_End/babel.config.js
+ D out/production/Sodam_Front_End/common/components/ErrorBoundary.tsx
+ D out/production/Sodam_Front_End/common/components/Icon.tsx
+ D out/production/Sodam_Front_End/common/components/animations/JSISafeAnimations.tsx
+ D out/production/Sodam_Front_End/common/components/animations/SafeAnimatedWrapper.tsx
+ D out/production/Sodam_Front_End/common/components/animations/index.ts
+ D out/production/Sodam_Front_End/common/components/data-display/Avatar.tsx
+ D out/production/Sodam_Front_End/common/components/data-display/Badge.tsx
+ D out/production/Sodam_Front_End/common/components/data-display/Card.tsx
+ D out/production/Sodam_Front_End/common/components/data-display/index.ts
+ D out/production/Sodam_Front_End/common/components/feedback/List.tsx
+ D out/production/Sodam_Front_End/common/components/feedback/Modal.tsx
+ D out/production/Sodam_Front_End/common/components/feedback/Spinner.tsx
+ D out/production/Sodam_Front_End/common/components/feedback/Toast.tsx
+ D out/production/Sodam_Front_End/common/components/feedback/index.ts
+ D out/production/Sodam_Front_End/common/components/form/Button.tsx
+ D out/production/Sodam_Front_End/common/components/form/Checkbox.tsx
+ D out/production/Sodam_Front_End/common/components/form/Dropdown.tsx
+ D out/production/Sodam_Front_End/common/components/form/Input.tsx
+ D out/production/Sodam_Front_End/common/components/form/Toggle.tsx
+ D out/production/Sodam_Front_End/common/components/form/index.ts
+ D out/production/Sodam_Front_End/common/components/index.ts
+ D out/production/Sodam_Front_End/common/components/layout/Footer.tsx
+ D out/production/Sodam_Front_End/common/components/layout/Header.tsx
+ D out/production/Sodam_Front_End/common/components/layout/MainLayout.tsx
+ D out/production/Sodam_Front_End/common/components/layout/index.ts
+ D out/production/Sodam_Front_End/common/components/navigation/Breadcrumb.tsx
+ D out/production/Sodam_Front_End/common/components/navigation/Tab.tsx
+ D out/production/Sodam_Front_End/common/components/navigation/index.ts
+ D out/production/Sodam_Front_End/common/hooks/useDimensions.ts
+ D out/production/Sodam_Front_End/common/hooks/useOfflineSync.ts
+ D out/production/Sodam_Front_End/common/hooks/usePerformanceMonitor.ts
+ D out/production/Sodam_Front_End/common/providers/SafeAreaProviderGuard.tsx
+ D out/production/Sodam_Front_End/common/providers/ThemeProvider.tsx
+ D out/production/Sodam_Front_End/common/providers/__tests__/SafeAreaProviderGuard.test.tsx
+ D out/production/Sodam_Front_End/common/styles/theme.tsx
+ D out/production/Sodam_Front_End/common/utils/api.ts
+ D out/production/Sodam_Front_End/common/utils/cacheStrategy.ts
+ D out/production/Sodam_Front_End/common/utils/memoryStorage.ts
+ D out/production/Sodam_Front_End/common/utils/queryClient.ts
+ D out/production/Sodam_Front_End/common/utils/unifiedStorage.ts
+ D out/production/Sodam_Front_End/components/ErrorBoundary.tsx
+ D out/production/Sodam_Front_End/components/InitializationErrorBoundary.tsx
+ D out/production/Sodam_Front_End/components/animations/JSISafeAnimatedComponents.tsx
+ D out/production/Sodam_Front_End/contexts/AuthContext.tsx
+ D out/production/Sodam_Front_End/contexts/AuthMockProvider.tsx
+ D out/production/Sodam_Front_End/contexts/ThemeContext.tsx
+ D out/production/Sodam_Front_End/contexts/auth/__tests__/AuthProvider.integration.test.tsx
+ D out/production/Sodam_Front_End/contexts/auth/__tests__/useAuthActions.test.ts
+ D out/production/Sodam_Front_End/contexts/auth/__tests__/useAuthState.test.ts
+ D out/production/Sodam_Front_End/contexts/auth/__tests__/useFirstLaunch.test.ts
+ D out/production/Sodam_Front_End/contexts/auth/__tests__/useStorage.test.ts
+ D out/production/Sodam_Front_End/contexts/auth/hooks/useAuthActions.ts
+ D out/production/Sodam_Front_End/contexts/auth/hooks/useAuthState.ts
+ D out/production/Sodam_Front_End/contexts/auth/hooks/useFirstLaunch.ts
+ D out/production/Sodam_Front_End/contexts/auth/hooks/useStorage.ts
+ D out/production/Sodam_Front_End/contexts/auth/index.ts
+ D out/production/Sodam_Front_End/contexts/auth/providers/AuthProvider.tsx
+ D out/production/Sodam_Front_End/debug-dimensions-hook.cjs
+ D out/production/Sodam_Front_End/features/admin/components/JSIPerformanceDashboard.tsx
+ D out/production/Sodam_Front_End/features/attendance/components/LocationAttendance.tsx
+ D out/production/Sodam_Front_End/features/attendance/components/NFCAttendance.tsx
+ D out/production/Sodam_Front_End/features/attendance/hooks/useAttendance.ts
+ D out/production/Sodam_Front_End/features/attendance/hooks/useAttendanceQueries.ts
+ D out/production/Sodam_Front_End/features/attendance/screens/AttendanceScreen.tsx
+ D out/production/Sodam_Front_End/features/attendance/services/attendanceService.ts
+ D out/production/Sodam_Front_End/features/attendance/services/locationAttendanceService.ts
+ D out/production/Sodam_Front_End/features/attendance/services/nfcAttendanceService.ts
+ D out/production/Sodam_Front_End/features/attendance/types.ts
+ D out/production/Sodam_Front_End/features/auth/components/LoginForm.tsx
+ D out/production/Sodam_Front_End/features/auth/components/SignupForm.tsx
+ D out/production/Sodam_Front_End/features/auth/hooks/useAuthQueries.ts
+ D out/production/Sodam_Front_End/features/auth/screens/LoginScreen.tsx
+ D out/production/Sodam_Front_End/features/auth/screens/SignupScreen.tsx
+ D out/production/Sodam_Front_End/features/auth/services/authService.ts
+ D out/production/Sodam_Front_End/features/auth/types.ts
+ D out/production/Sodam_Front_End/features/home/components/EventSlider.tsx
+ D out/production/Sodam_Front_End/features/home/components/IntroSection.tsx
+ D out/production/Sodam_Front_End/features/home/components/LaborInfoBoard.tsx
+ D out/production/Sodam_Front_End/features/home/components/PolicyBoard.tsx
+ D out/production/Sodam_Front_End/features/home/components/ServiceCards.tsx
+ D out/production/Sodam_Front_End/features/home/components/TaxInfoBoard.tsx
+ D out/production/Sodam_Front_End/features/home/components/Testimonials.tsx
+ D out/production/Sodam_Front_End/features/home/components/TipsBoard.tsx
+ D out/production/Sodam_Front_End/features/home/hooks/useHomeData.ts
+ D out/production/Sodam_Front_End/features/home/screens/HomeScreen.tsx
+ D out/production/Sodam_Front_End/features/home/services/homeService.ts
+ D out/production/Sodam_Front_End/features/home/types.ts
+ D out/production/Sodam_Front_End/features/info/components/InfoCard.tsx
+ D out/production/Sodam_Front_End/features/info/screens/InfoListScreen.tsx
+ D out/production/Sodam_Front_End/features/info/screens/LaborInfoDetailScreen.tsx
+ D out/production/Sodam_Front_End/features/info/screens/PolicyDetailScreen.tsx
+ D out/production/Sodam_Front_End/features/info/screens/TaxInfoDetailScreen.tsx
+ D out/production/Sodam_Front_End/features/info/screens/TipsDetailScreen.tsx
+ D out/production/Sodam_Front_End/features/info/services/laborInfoService.ts
+ D out/production/Sodam_Front_End/features/info/services/policyService.ts
+ D out/production/Sodam_Front_End/features/info/services/taxInfoService.ts
+ D out/production/Sodam_Front_End/features/info/services/tipsService.ts
+ D out/production/Sodam_Front_End/features/info/types.ts
+ D out/production/Sodam_Front_End/features/myPage/components/ProfileSection.tsx
+ D out/production/Sodam_Front_End/features/myPage/screens/EmployeeMyPageScreen.tsx
+ D out/production/Sodam_Front_End/features/myPage/screens/ManagerMyPageScreen.tsx
+ D out/production/Sodam_Front_End/features/myPage/screens/MasterMyPageScreen.tsx
+ D out/production/Sodam_Front_End/features/myPage/screens/UserMyPageScreen.tsx
+ D out/production/Sodam_Front_End/features/myPage/services/reportService.ts
+ D out/production/Sodam_Front_End/features/myPage/services/salaryManagementService.ts
+ D out/production/Sodam_Front_End/features/myPage/services/userProfileService.ts
+ D out/production/Sodam_Front_End/features/myPage/types.ts
+ D out/production/Sodam_Front_End/features/qna/components/QuestionItem.tsx
+ D out/production/Sodam_Front_End/features/qna/screens/QnAScreen.tsx
+ D out/production/Sodam_Front_End/features/qna/services/qnaService.ts
+ D out/production/Sodam_Front_End/features/qna/types.ts
+ D out/production/Sodam_Front_End/features/salary/hooks/useSalary.ts
+ D out/production/Sodam_Front_End/features/salary/hooks/useSalaryQueries.ts
+ D out/production/Sodam_Front_End/features/salary/screens/SalaryListScreen.tsx
+ D out/production/Sodam_Front_End/features/salary/services/salaryPredictionService.ts
+ D out/production/Sodam_Front_End/features/salary/services/salaryService.ts
+ D out/production/Sodam_Front_End/features/salary/types.ts
+ D out/production/Sodam_Front_End/features/subscription/components/SubscriptionPlanCard.tsx
+ D out/production/Sodam_Front_End/features/subscription/screens/SubscribeScreen.tsx
+ D out/production/Sodam_Front_End/features/subscription/services/subscriptionService.ts
+ D out/production/Sodam_Front_End/features/subscription/types.ts
+ D out/production/Sodam_Front_End/features/welcome/components/ConversionSection.tsx
+ D out/production/Sodam_Front_End/features/welcome/components/FeatureDashboardSection.tsx
+ D out/production/Sodam_Front_End/features/welcome/components/Header.tsx
+ D out/production/Sodam_Front_End/features/welcome/components/StorytellingSection.tsx
+ D out/production/Sodam_Front_End/features/welcome/components/demos/NFCDemo.tsx
+ D out/production/Sodam_Front_End/features/welcome/components/demos/SalaryCalculatorDemo.tsx
+ D out/production/Sodam_Front_End/features/welcome/components/demos/StoreManagementDemo.tsx
+ D out/production/Sodam_Front_End/features/welcome/screens/HybridMainScreen.tsx
+ D out/production/Sodam_Front_End/features/workplace/components/WorkplaceCard.tsx
+ D out/production/Sodam_Front_End/features/workplace/components/WorkplaceForm.tsx
+ D out/production/Sodam_Front_End/features/workplace/components/index.ts
+ D out/production/Sodam_Front_End/features/workplace/hooks/useWorkplaces.ts
+ D out/production/Sodam_Front_End/features/workplace/screens/WorkplaceDetailScreen.tsx
+ D out/production/Sodam_Front_End/features/workplace/screens/WorkplaceListScreen.tsx
+ D out/production/Sodam_Front_End/features/workplace/screens/index.ts
+ D out/production/Sodam_Front_End/features/workplace/services/index.ts
+ D out/production/Sodam_Front_End/features/workplace/services/workplaceService.ts
+ D out/production/Sodam_Front_End/features/workplace/types.ts
+ D out/production/Sodam_Front_End/hooks/useJSICrashReporting.ts
+ D out/production/Sodam_Front_End/hooks/useJSIHealthMonitoring.ts
+ D out/production/Sodam_Front_End/hooks/useJSISafeDimensions.ts
+ D out/production/Sodam_Front_End/hooks/useLifecycleManagement.ts
+ D out/production/Sodam_Front_End/index.js
+ D out/production/Sodam_Front_End/index.js.bak-rngh-reapply
+ D out/production/Sodam_Front_End/ios/.xcode.env
+ D out/production/Sodam_Front_End/ios/Podfile
+ D out/production/Sodam_Front_End/ios/Sodam_Front_End.xcodeproj/project.pbxproj
+ D out/production/Sodam_Front_End/ios/Sodam_Front_End.xcodeproj/xcshareddata/xcschemes/Sodam_Front_End.xcscheme
+ D out/production/Sodam_Front_End/ios/Sodam_Front_End/AppDelegate.swift
+ D out/production/Sodam_Front_End/ios/Sodam_Front_End/Images.xcassets/AppIcon.appiconset/Contents.json
+ D out/production/Sodam_Front_End/ios/Sodam_Front_End/Images.xcassets/Contents.json
+ D out/production/Sodam_Front_End/ios/Sodam_Front_End/Info.plist
+ D out/production/Sodam_Front_End/ios/Sodam_Front_End/LaunchScreen.storyboard
+ D out/production/Sodam_Front_End/ios/Sodam_Front_End/PrivacyInfo.xcprivacy
+ D out/production/Sodam_Front_End/jest.config.js
+ D out/production/Sodam_Front_End/jest.setup.js
+ D out/production/Sodam_Front_End/metro.config.js
+ D out/production/Sodam_Front_End/navigation/AppNavigator.tsx
+ D out/production/Sodam_Front_End/navigation/AuthNavigator.tsx
+ D out/production/Sodam_Front_End/navigation/HomeNavigator.tsx
+ D out/production/Sodam_Front_End/navigation/MinimalNavigator.tsx
+ D out/production/Sodam_Front_End/navigation/config.ts
+ D out/production/Sodam_Front_End/navigation/types.ts
+ D out/production/Sodam_Front_End/package-lock.json
+ D out/production/Sodam_Front_End/package.json
+ D out/production/Sodam_Front_End/react-native.config.js
+ D out/production/Sodam_Front_End/scripts/analyze-dependencies-improved.ps1
+ D out/production/Sodam_Front_End/scripts/analyze-dependencies.ps1
+ D out/production/Sodam_Front_End/scripts/android-clean.ps1
+ D out/production/Sodam_Front_End/scripts/capture-logcat.ps1
+ D out/production/Sodam_Front_End/scripts/check_app_installation.bat
+ D out/production/Sodam_Front_End/scripts/check_app_installation.ps1
+ D out/production/Sodam_Front_End/scripts/clean-build.bat
+ D out/production/Sodam_Front_End/scripts/collect-performance.ps1
+ D out/production/Sodam_Front_End/scripts/fix-metro-assets.ps1
+ D out/production/Sodam_Front_End/scripts/grant-permissions.ps1
+ D out/production/Sodam_Front_End/scripts/jsi-safety-analyzer.js
+ D out/production/Sodam_Front_End/scripts/logcat-clear.ps1
+ D out/production/Sodam_Front_End/scripts/logcat-monitor.ps1
+ D out/production/Sodam_Front_End/scripts/print-rn-config.js
+ D out/production/Sodam_Front_End/scripts/run-iter-suite.ps1
+ D out/production/Sodam_Front_End/scripts/scan-qr-residue.ps1
+ D out/production/Sodam_Front_End/scripts/validate-worklets.js
+ D out/production/Sodam_Front_End/scripts/verify-intellij-setup.ps1
+ D out/production/Sodam_Front_End/scripts/verify-native-modules.ps1
+ D out/production/Sodam_Front_End/services/AccessibilityService.ts
+ D out/production/Sodam_Front_End/services/AnalyticsService.ts
+ D out/production/Sodam_Front_End/services/JSIPerformanceMonitor.ts
+ D out/production/Sodam_Front_End/services/PerformanceMonitor.ts
+ D out/production/Sodam_Front_End/services/PermissionService.ts
+ D out/production/Sodam_Front_End/src/common/components/ErrorBoundary.tsx
+ D out/production/Sodam_Front_End/src/common/components/Icon.tsx
+ D out/production/Sodam_Front_End/src/common/components/animations/JSISafeAnimations.tsx
+ D out/production/Sodam_Front_End/src/common/components/animations/SafeAnimatedWrapper.tsx
+ D out/production/Sodam_Front_End/src/common/components/animations/index.ts
+ D out/production/Sodam_Front_End/src/common/components/data-display/Avatar.tsx
+ D out/production/Sodam_Front_End/src/common/components/data-display/Badge.tsx
+ D out/production/Sodam_Front_End/src/common/components/data-display/Card.tsx
+ D out/production/Sodam_Front_End/src/common/components/data-display/index.ts
+ D out/production/Sodam_Front_End/src/common/components/feedback/List.tsx
+ D out/production/Sodam_Front_End/src/common/components/feedback/Modal.tsx
+ D out/production/Sodam_Front_End/src/common/components/feedback/Spinner.tsx
+ D out/production/Sodam_Front_End/src/common/components/feedback/Toast.tsx
+ D out/production/Sodam_Front_End/src/common/components/feedback/index.ts
+ D out/production/Sodam_Front_End/src/common/components/form/Button.tsx
+ D out/production/Sodam_Front_End/src/common/components/form/Checkbox.tsx
+ D out/production/Sodam_Front_End/src/common/components/form/Dropdown.tsx
+ D out/production/Sodam_Front_End/src/common/components/form/Input.tsx
+ D out/production/Sodam_Front_End/src/common/components/form/Toggle.tsx
+ D out/production/Sodam_Front_End/src/common/components/form/index.ts
+ D out/production/Sodam_Front_End/src/common/components/index.ts
+ D out/production/Sodam_Front_End/src/common/components/layout/Footer.tsx
+ D out/production/Sodam_Front_End/src/common/components/layout/Header.tsx
+ D out/production/Sodam_Front_End/src/common/components/layout/MainLayout.tsx
+ D out/production/Sodam_Front_End/src/common/components/layout/index.ts
+ D out/production/Sodam_Front_End/src/common/components/navigation/Breadcrumb.tsx
+ D out/production/Sodam_Front_End/src/common/components/navigation/Tab.tsx
+ D out/production/Sodam_Front_End/src/common/components/navigation/index.ts
+ D out/production/Sodam_Front_End/src/common/hooks/useDimensions.ts
+ D out/production/Sodam_Front_End/src/common/hooks/useOfflineSync.ts
+ D out/production/Sodam_Front_End/src/common/hooks/usePerformanceMonitor.ts
+ D out/production/Sodam_Front_End/src/common/providers/SafeAreaProviderGuard.tsx
+ D out/production/Sodam_Front_End/src/common/providers/ThemeProvider.tsx
+ D out/production/Sodam_Front_End/src/common/providers/__tests__/SafeAreaProviderGuard.test.tsx
+ D out/production/Sodam_Front_End/src/common/styles/theme.tsx
+ D out/production/Sodam_Front_End/src/common/utils/api.ts
+ D out/production/Sodam_Front_End/src/common/utils/cacheStrategy.ts
+ D out/production/Sodam_Front_End/src/common/utils/memoryStorage.ts
+ D out/production/Sodam_Front_End/src/common/utils/queryClient.ts
+ D out/production/Sodam_Front_End/src/common/utils/unifiedStorage.ts
+ D out/production/Sodam_Front_End/src/components/ErrorBoundary.tsx
+ D out/production/Sodam_Front_End/src/components/InitializationErrorBoundary.tsx
+ D out/production/Sodam_Front_End/src/components/animations/JSISafeAnimatedComponents.tsx
+ D out/production/Sodam_Front_End/src/contexts/AuthContext.tsx
+ D out/production/Sodam_Front_End/src/contexts/AuthMockProvider.tsx
+ D out/production/Sodam_Front_End/src/contexts/ThemeContext.tsx
+ D out/production/Sodam_Front_End/src/contexts/auth/__tests__/AuthProvider.integration.test.tsx
+ D out/production/Sodam_Front_End/src/contexts/auth/__tests__/useAuthActions.test.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/__tests__/useAuthState.test.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/__tests__/useFirstLaunch.test.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/__tests__/useStorage.test.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/hooks/useAuthActions.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/hooks/useAuthState.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/hooks/useFirstLaunch.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/hooks/useStorage.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/index.ts
+ D out/production/Sodam_Front_End/src/contexts/auth/providers/AuthProvider.tsx
+ D out/production/Sodam_Front_End/src/features/admin/components/JSIPerformanceDashboard.tsx
+ D out/production/Sodam_Front_End/src/features/attendance/components/LocationAttendance.tsx
+ D out/production/Sodam_Front_End/src/features/attendance/components/NFCAttendance.tsx
+ D out/production/Sodam_Front_End/src/features/attendance/hooks/useAttendance.ts
+ D out/production/Sodam_Front_End/src/features/attendance/hooks/useAttendanceQueries.ts
+ D out/production/Sodam_Front_End/src/features/attendance/screens/AttendanceScreen.tsx
+ D out/production/Sodam_Front_End/src/features/attendance/services/attendanceService.ts
+ D out/production/Sodam_Front_End/src/features/attendance/services/locationAttendanceService.ts
+ D out/production/Sodam_Front_End/src/features/attendance/services/nfcAttendanceService.ts
+ D out/production/Sodam_Front_End/src/features/attendance/types.ts
+ D out/production/Sodam_Front_End/src/features/auth/components/LoginForm.tsx
+ D out/production/Sodam_Front_End/src/features/auth/components/SignupForm.tsx
+ D out/production/Sodam_Front_End/src/features/auth/hooks/useAuthQueries.ts
+ D out/production/Sodam_Front_End/src/features/auth/screens/LoginScreen.tsx
+ D out/production/Sodam_Front_End/src/features/auth/screens/SignupScreen.tsx
+ D out/production/Sodam_Front_End/src/features/auth/services/authService.ts
+ D out/production/Sodam_Front_End/src/features/auth/types.ts
+ D out/production/Sodam_Front_End/src/features/home/components/EventSlider.tsx
+ D out/production/Sodam_Front_End/src/features/home/components/IntroSection.tsx
+ D out/production/Sodam_Front_End/src/features/home/components/LaborInfoBoard.tsx
+ D out/production/Sodam_Front_End/src/features/home/components/PolicyBoard.tsx
+ D out/production/Sodam_Front_End/src/features/home/components/ServiceCards.tsx
+ D out/production/Sodam_Front_End/src/features/home/components/TaxInfoBoard.tsx
+ D out/production/Sodam_Front_End/src/features/home/components/Testimonials.tsx
+ D out/production/Sodam_Front_End/src/features/home/components/TipsBoard.tsx
+ D out/production/Sodam_Front_End/src/features/home/hooks/useHomeData.ts
+ D out/production/Sodam_Front_End/src/features/home/screens/HomeScreen.tsx
+ D out/production/Sodam_Front_End/src/features/home/services/homeService.ts
+ D out/production/Sodam_Front_End/src/features/home/types.ts
+ D out/production/Sodam_Front_End/src/features/info/components/InfoCard.tsx
+ D out/production/Sodam_Front_End/src/features/info/screens/InfoListScreen.tsx
+ D out/production/Sodam_Front_End/src/features/info/screens/LaborInfoDetailScreen.tsx
+ D out/production/Sodam_Front_End/src/features/info/screens/PolicyDetailScreen.tsx
+ D out/production/Sodam_Front_End/src/features/info/screens/TaxInfoDetailScreen.tsx
+ D out/production/Sodam_Front_End/src/features/info/screens/TipsDetailScreen.tsx
+ D out/production/Sodam_Front_End/src/features/info/services/laborInfoService.ts
+ D out/production/Sodam_Front_End/src/features/info/services/policyService.ts
+ D out/production/Sodam_Front_End/src/features/info/services/taxInfoService.ts
+ D out/production/Sodam_Front_End/src/features/info/services/tipsService.ts
+ D out/production/Sodam_Front_End/src/features/info/types.ts
+ D out/production/Sodam_Front_End/src/features/myPage/components/ProfileSection.tsx
+ D out/production/Sodam_Front_End/src/features/myPage/screens/EmployeeMyPageScreen.tsx
+ D out/production/Sodam_Front_End/src/features/myPage/screens/ManagerMyPageScreen.tsx
+ D out/production/Sodam_Front_End/src/features/myPage/screens/MasterMyPageScreen.tsx
+ D out/production/Sodam_Front_End/src/features/myPage/screens/UserMyPageScreen.tsx
+ D out/production/Sodam_Front_End/src/features/myPage/services/reportService.ts
+ D out/production/Sodam_Front_End/src/features/myPage/services/salaryManagementService.ts
+ D out/production/Sodam_Front_End/src/features/myPage/services/userProfileService.ts
+ D out/production/Sodam_Front_End/src/features/myPage/types.ts
+ D out/production/Sodam_Front_End/src/features/qna/components/QuestionItem.tsx
+ D out/production/Sodam_Front_End/src/features/qna/screens/QnAScreen.tsx
+ D out/production/Sodam_Front_End/src/features/qna/services/qnaService.ts
+ D out/production/Sodam_Front_End/src/features/qna/types.ts
+ D out/production/Sodam_Front_End/src/features/salary/hooks/useSalary.ts
+ D out/production/Sodam_Front_End/src/features/salary/hooks/useSalaryQueries.ts
+ D out/production/Sodam_Front_End/src/features/salary/screens/SalaryListScreen.tsx
+ D out/production/Sodam_Front_End/src/features/salary/services/salaryPredictionService.ts
+ D out/production/Sodam_Front_End/src/features/salary/services/salaryService.ts
+ D out/production/Sodam_Front_End/src/features/salary/types.ts
+ D out/production/Sodam_Front_End/src/features/subscription/components/SubscriptionPlanCard.tsx
+ D out/production/Sodam_Front_End/src/features/subscription/screens/SubscribeScreen.tsx
+ D out/production/Sodam_Front_End/src/features/subscription/services/subscriptionService.ts
+ D out/production/Sodam_Front_End/src/features/subscription/types.ts
+ D out/production/Sodam_Front_End/src/features/welcome/components/ConversionSection.tsx
+ D out/production/Sodam_Front_End/src/features/welcome/components/FeatureDashboardSection.tsx
+ D out/production/Sodam_Front_End/src/features/welcome/components/Header.tsx
+ D out/production/Sodam_Front_End/src/features/welcome/components/StorytellingSection.tsx
+ D out/production/Sodam_Front_End/src/features/welcome/components/demos/NFCDemo.tsx
+ D out/production/Sodam_Front_End/src/features/welcome/components/demos/SalaryCalculatorDemo.tsx
+ D out/production/Sodam_Front_End/src/features/welcome/components/demos/StoreManagementDemo.tsx
+ D out/production/Sodam_Front_End/src/features/welcome/screens/HybridMainScreen.tsx
+ D out/production/Sodam_Front_End/src/features/workplace/components/WorkplaceCard.tsx
+ D out/production/Sodam_Front_End/src/features/workplace/components/WorkplaceForm.tsx
+ D out/production/Sodam_Front_End/src/features/workplace/components/index.ts
+ D out/production/Sodam_Front_End/src/features/workplace/hooks/useWorkplaces.ts
+ D out/production/Sodam_Front_End/src/features/workplace/screens/WorkplaceDetailScreen.tsx
+ D out/production/Sodam_Front_End/src/features/workplace/screens/WorkplaceListScreen.tsx
+ D out/production/Sodam_Front_End/src/features/workplace/screens/index.ts
+ D out/production/Sodam_Front_End/src/features/workplace/services/index.ts
+ D out/production/Sodam_Front_End/src/features/workplace/services/workplaceService.ts
+ D out/production/Sodam_Front_End/src/features/workplace/types.ts
+ D out/production/Sodam_Front_End/src/hooks/useJSICrashReporting.ts
+ D out/production/Sodam_Front_End/src/hooks/useJSIHealthMonitoring.ts
+ D out/production/Sodam_Front_End/src/hooks/useJSISafeDimensions.ts
+ D out/production/Sodam_Front_End/src/hooks/useLifecycleManagement.ts
+ D out/production/Sodam_Front_End/src/navigation/AppNavigator.tsx
+ D out/production/Sodam_Front_End/src/navigation/AuthNavigator.tsx
+ D out/production/Sodam_Front_End/src/navigation/HomeNavigator.tsx
+ D out/production/Sodam_Front_End/src/navigation/MinimalNavigator.tsx
+ D out/production/Sodam_Front_End/src/navigation/config.ts
+ D out/production/Sodam_Front_End/src/navigation/types.ts
+ D out/production/Sodam_Front_End/src/services/AccessibilityService.ts
+ D out/production/Sodam_Front_End/src/services/AnalyticsService.ts
+ D out/production/Sodam_Front_End/src/services/JSIPerformanceMonitor.ts
+ D out/production/Sodam_Front_End/src/services/PerformanceMonitor.ts
+ D out/production/Sodam_Front_End/src/services/PermissionService.ts
+ D out/production/Sodam_Front_End/src/tests/NativeStackNavigation.test.tsx
+ D out/production/Sodam_Front_End/src/tests/app/app.test.tsx
+ D out/production/Sodam_Front_End/src/tests/babel-smoke.test.tsx
+ D out/production/Sodam_Front_End/src/tests/components/error-boundary.test.tsx
+ D out/production/Sodam_Front_End/src/tests/mocks/AuthContext.mock.ts
+ D out/production/Sodam_Front_End/src/tests/navigation/config.test.ts
+ D out/production/Sodam_Front_End/src/tests/navigation/nativeStackNavigation.test.tsx
+ D out/production/Sodam_Front_End/src/tests/utils/errorMonitoring.test.ts
+ D out/production/Sodam_Front_End/src/tests/utils/safeLogger.test.ts
+ D out/production/Sodam_Front_End/src/theme/colors.ts
+ D out/production/Sodam_Front_End/src/theme/theme.ts
+ D out/production/Sodam_Front_End/src/theme/typography.ts
+ D out/production/Sodam_Front_End/src/types.d.ts
+ D out/production/Sodam_Front_End/src/types/global.d.ts
+ D out/production/Sodam_Front_End/src/utils/NativeModuleValidator.ts
+ D out/production/Sodam_Front_End/src/utils/animations/__tests__/animationTestUtils.ts
+ D out/production/Sodam_Front_End/src/utils/animations/__tests__/commonAnimations.test.ts
+ D out/production/Sodam_Front_End/src/utils/animations/animationHooks.ts
+ D out/production/Sodam_Front_End/src/utils/animations/commonAnimations.ts
+ D out/production/Sodam_Front_End/src/utils/animations/constants.ts
+ D out/production/Sodam_Front_End/src/utils/animations/index.ts
+ D out/production/Sodam_Front_End/src/utils/animations/types.ts
+ D out/production/Sodam_Front_End/src/utils/contextReadiness.ts
+ D out/production/Sodam_Front_End/src/utils/errorMonitoring.ts
+ D out/production/Sodam_Front_End/src/utils/formatters.ts
+ D out/production/Sodam_Front_End/src/utils/jsiMonitor.ts
+ D out/production/Sodam_Front_End/src/utils/responsive.tsx
+ D out/production/Sodam_Front_End/src/utils/safeLogger.ts
+ D out/production/Sodam_Front_End/theme/colors.ts
+ D out/production/Sodam_Front_End/theme/theme.ts
+ D out/production/Sodam_Front_End/theme/typography.ts
+ D out/production/Sodam_Front_End/tsconfig.json
+ D out/production/Sodam_Front_End/types.d.ts
+ D out/production/Sodam_Front_End/types/global.d.ts
+ D out/production/Sodam_Front_End/utils/NativeModuleValidator.ts
+ D out/production/Sodam_Front_End/utils/animations/__tests__/animationTestUtils.ts
+ D out/production/Sodam_Front_End/utils/animations/__tests__/commonAnimations.test.ts
+ D out/production/Sodam_Front_End/utils/animations/animationHooks.ts
+ D out/production/Sodam_Front_End/utils/animations/commonAnimations.ts
+ D out/production/Sodam_Front_End/utils/animations/constants.ts
+ D out/production/Sodam_Front_End/utils/animations/index.ts
+ D out/production/Sodam_Front_End/utils/animations/types.ts
+ D out/production/Sodam_Front_End/utils/contextReadiness.ts
+ D out/production/Sodam_Front_End/utils/errorMonitoring.ts
+ D out/production/Sodam_Front_End/utils/formatters.ts
+ D out/production/Sodam_Front_End/utils/jsiMonitor.ts
+ D out/production/Sodam_Front_End/utils/responsive.tsx
+ D out/production/Sodam_Front_End/utils/safeLogger.ts
+ D out/test/Sodam_Front_End/navigation/nativeStackNavigation.test.tsx
+ M package.json
+ M src/common/components/Icon.tsx
+ M src/common/components/animations/JSISafeAnimations.tsx
+ M src/common/components/feedback/Toast.tsx
+ M src/common/components/layout/Footer.tsx
+ M src/common/components/layout/Header.tsx
+ M src/common/components/layout/MainLayout.tsx
+ M src/common/utils/api.ts
+ M src/components/InitializationErrorBoundary.tsx
+ M src/components/animations/JSISafeAnimatedComponents.tsx
+ M src/features/attendance/screens/AttendanceScreen.tsx
+ M src/features/attendance/services/attendanceService.ts
+ M src/features/auth/screens/LoginScreen.tsx
+ M src/features/auth/services/authService.ts
+ M src/features/home/components/ServiceCards.tsx
+ M src/features/info/screens/InfoListScreen.tsx
+ M src/features/info/screens/LaborInfoDetailScreen.tsx
+ M src/features/info/screens/PolicyDetailScreen.tsx
+ M src/features/info/screens/TaxInfoDetailScreen.tsx
+ M src/features/info/screens/TipsDetailScreen.tsx
+ M src/features/myPage/screens/EmployeeMyPageScreen.tsx
+ M src/features/myPage/screens/MasterMyPageScreen.tsx
+ M src/features/myPage/screens/UserMyPageScreen.tsx
+ M src/features/myPage/services/salaryManagementService.ts
+ M src/features/myPage/types.ts
+ M src/features/salary/screens/SalaryListScreen.tsx
+ M src/features/subscription/screens/SubscribeScreen.tsx
+ M src/features/welcome/components/ConversionSection.tsx
+ M src/features/welcome/components/StorytellingSection.tsx
+ M src/features/welcome/components/demos/NFCDemo.tsx
+ M src/features/welcome/components/demos/StoreManagementDemo.tsx
+ M src/features/welcome/screens/HybridMainScreen.tsx
+ M src/hooks/useJSIHealthMonitoring.ts
+ M src/navigation/AppNavigator.tsx
+ M src/navigation/types.ts
+ M src/services/PermissionService.ts
+ M src/types/global.d.ts
+ M src/utils/contextReadiness.ts
+ M tsconfig.json
+?? .descriptions.xml
+?? .eslintignore
+?? .eslintrc.js.backup
+?? .gradle-user-home/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/03/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/04/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/05/LoginScreen_05ca07edce796f1184ef5b158a17a936
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/05/LoginScreen_05ca07edce796f1184ef5b158a17a936.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/09/Toggle_09c7d3ee644a9f475a5ab22c6f805682
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/09/Toggle_09c7d3ee644a9f475a5ab22c6f805682.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/09/jestsetup_09072fa97f3caa2325a54d56ab53a803
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/09/jestsetup_09072fa97f3caa2325a54d56ab53a803.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/0a/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/0b/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/0d/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/12/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/14/WelcomeMainScreen_145e7ed1cebcc311c3102c78f05006f7
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/14/WelcomeMainScreen_145e7ed1cebcc311c3102c78f05006f7.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/17/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/18/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/1a/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/1c/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/1f/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/20/ThemeProvider_2001bf6675f98ea20275d30413fc801c
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/20/ThemeProvider_2001bf6675f98ea20275d30413fc801c.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/22/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/23/queryClient_23e378a7b35ab2ce10db8880a5dd890c
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/23/queryClient_23e378a7b35ab2ce10db8880a5dd890c.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/24/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/26/setup_26e75b8349114b0f085c17f244368816
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/26/setup_26e75b8349114b0f085c17f244368816.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/27/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/28/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/2a/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/2d/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/2e/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/2f/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/32/HomeNavigator_32a54a003eb4819d8804c93748a8da29
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/32/HomeNavigator_32a54a003eb4819d8804c93748a8da29.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/33/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/35/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/36/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/3a/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/3d/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/3e/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/42/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/46/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/53/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/55/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/57/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/5b/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/5c/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/5e/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/5f/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/62/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/63/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/64/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/69/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/70/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/75/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/77/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/78/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/79/App_79097b3d3abce4fe4fc254cf5712e196
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/79/App_79097b3d3abce4fe4fc254cf5712e196.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/7c/configtest_7cd3e7efae1945ee8691f57cbba8416b
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/7c/configtest_7cd3e7efae1945ee8691f57cbba8416b.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/7e/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/82/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/83/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/88/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/8b/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/8d/TipsDetailScreen_8d1f034bd3efaeff98a8984e4de5f6e7
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/8d/TipsDetailScreen_8d1f034bd3efaeff98a8984e4de5f6e7.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/92/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/94/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/96/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/97/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/9a/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/9e/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/a0/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/a3/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/a5/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/a6/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/ab/SafeAreaProviderGuard_ab5d7d752aa3bd38f4db1be8c7d72778
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae
+7ca75eedb2aa53dc48338/ab/SafeAreaProviderGuard_ab5d7d752aa3bd38f4db1be8c7d72778.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/ad/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/ae/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/b1/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/ba/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/c4/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/c7/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/c8/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/c9/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/ce/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/d2/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/d4/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/d6/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/d7/AnimatedComponent_d7306c219ab7cfdbafa3524128c8fdaf
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/d7/AnimatedComponent_d7306c219ab7cfdbafa3524128c8fdaf.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/d8/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/db/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/dc/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/e2/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/e3/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/e4/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/e6/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/e7/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/e8/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/eb/config_ebd9099a5deba43dc94f07c841f0ff54
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/eb/config_ebd9099a5deba43dc94f07c841f0ff54.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/eb/logger_ebb6f855c8b97e0d8fccaf4b4878aa37
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/eb/logger_ebb6f855c8b97e0d8fccaf4b4878aa37.map
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/f0/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/fa/
+?? .jest-cache/jest-transform-cache-fd43650ae2ad34a06d7a23157f2c94c4-79ef2876fae7ca75eedb2aa53dc48338/fc/
+?? Eslint.xml
+?? Screenshot_20250908_165225.png
+?? Screenshot_20250909_010016.png
+?? __tests__/app.bootstrap.test.tsx
+?? __tests__/navigation/flow.moderate.test.tsx
+?? android/scripts/
+?? index.html
+?? logs/ps1-inventory-20250905-145520.txt
+?? package-lock.json
+?? script.js
+?? scripts/analyze-logcat.js
+?? scripts/analyze-logcat.ps1
+?? scripts/clean-gradle-cache.ps1
+?? scripts/deploy-android.ps1
+?? scripts/deploy-ios.ps1
+?? scripts/deploy-web.ps1
+?? scripts/measure-build-performance.ps1
+?? src/features/welcome/screens/WelcomeMainScreen.tsx
+?? src/tests/
+?? styles.css

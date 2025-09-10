@@ -1,5 +1,5 @@
 import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
-import {memoryStorage} from './memoryStorage';
+import {unifiedStorage} from './unifiedStorage';
 
 /**
  * API 클라이언트 설정
@@ -33,7 +33,7 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
         try {
-            const token = await memoryStorage.getItem('userToken');
+            const token = await unifiedStorage.getItem('userToken');
             if (token) {
                 config.headers.set('Authorization', `Bearer ${token}`);
             }
@@ -62,7 +62,7 @@ apiClient.interceptors.response.use(
             // 401 Unauthorized: 인증 실패
             if (status === 401) {
                 // 토큰 만료 등의 이유로 로그아웃 처리
-                memoryStorage.removeItem('userToken')
+                unifiedStorage.removeItem('userToken')
                     .catch(err => console.error('토큰 삭제 중 오류가 발생했습니다:', err));
                 // 로그인 페이지로 리다이렉트 등의 처리
             }

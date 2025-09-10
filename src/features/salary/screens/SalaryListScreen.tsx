@@ -13,9 +13,10 @@ import {
     View
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {MaterialIcons as Icon} from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+// TODO: Install @react-native-community/datetimepicker package
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import {Button, Card, MainLayout} from '../../../common/components';
 
 import salaryService from '../services/salaryService';
@@ -30,7 +31,7 @@ type SalaryStackParamList = {
     SalaryPolicy: { workplaceId: string };
 };
 
-type SalaryListScreenNavigationProp = StackNavigationProp<SalaryStackParamList, 'SalaryList'>;
+type SalaryListScreenNavigationProp = NativeStackNavigationProp<SalaryStackParamList, 'SalaryList'>;
 
 const SalaryListScreen = () => {
     const navigation = useNavigation<SalaryListScreenNavigationProp>();
@@ -483,12 +484,15 @@ const SalaryListScreen = () => {
             </View>
 
             {showDatePicker && (
-                <DateTimePicker
-                    value={tempDate}
-                    mode="date"
-                    display="default"
-                    onChange={handleDateChange}
-                />
+                <Text style={styles.placeholderText}>
+                    TODO: DateTimePicker component needs @react-native-community/datetimepicker package
+                </Text>
+                // <DateTimePicker
+                //     value={tempDate}
+                //     mode="date"
+                //     display="default"
+                //     onChange={handleDateChange}
+                // />
             )}
         </Modal>
     );
@@ -549,17 +553,20 @@ const SalaryListScreen = () => {
             </View>
 
             {showPaymentDatePicker && (
-                <DateTimePicker
-                    value={paymentDate}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                        setShowPaymentDatePicker(false);
-                        if (selectedDate) {
-                            setPaymentDate(selectedDate);
-                        }
-                    }}
-                />
+                <Text style={styles.placeholderText}>
+                    TODO: DateTimePicker component needs @react-native-community/datetimepicker package
+                </Text>
+                // <DateTimePicker
+                //     value={paymentDate}
+                //     mode="date"
+                //     display="default"
+                //     onChange={(event: any, selectedDate: Date | undefined) => {
+                //         setShowPaymentDatePicker(false);
+                //         if (selectedDate) {
+                //             setPaymentDate(selectedDate);
+                //         }
+                //     }}
+                // />
             )}
         </Modal>
     );
@@ -890,6 +897,12 @@ const styles = StyleSheet.create({
     },
     paymentDateButtonText: {
         color: '#666',
+    },
+    placeholderText: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+        padding: 16,
     },
 });
 

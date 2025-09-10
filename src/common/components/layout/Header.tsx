@@ -2,18 +2,16 @@ import React from 'react';
 import {Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 // useNavigation 타입을 import 합니다.
 import {CompositeNavigationProp, useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 // AppNavigator.tsx 또는 타입 정의 파일에서 정의한 RootStackParamList 타입을 import 합니다.
-import {RootStackParamList} from '../../../navigation/types';
-import {HomeStackParamList} from '../../../navigation/types';
+import {RootStackParamList,HomeStackParamList} from '../../../navigation/types';
 import {useResponsiveStyles} from "../../../utils/responsive";
 import {useAuth} from '../../../contexts/AuthContext';
-
 // 복합 네비게이션 타입 정의
 type HeaderNavigationProp = CompositeNavigationProp<
-    StackNavigationProp<RootStackParamList>,
-    StackNavigationProp<HomeStackParamList>
+    NativeStackNavigationProp<RootStackParamList>,
+    NativeStackNavigationProp<HomeStackParamList>
 >;
 
 interface HeaderProps {
@@ -21,7 +19,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({title}) => {
-    const {isSmallScreen, responsiveStyles} = useResponsiveStyles();
+    const {isSmallScreen} = useResponsiveStyles();
     const screenWidth = Dimensions.get('window').width;
 
     // AuthContext에서 인증 상태와 로그아웃 함수 가져오기

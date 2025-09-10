@@ -5,7 +5,7 @@
  */
 
 import React, {ReactNode} from 'react';
-import {ViewStyle, View} from 'react-native';
+import {ViewStyle, View, NativeSyntheticEvent, NativeScrollEvent} from 'react-native';
 import {ENABLE_ANIMATIONS, stageAtLeast, ANIMATION_RECOVERY_STAGE} from '../../navigation/config';
 
 // Conditionally import Reanimated components only when needed
@@ -84,13 +84,13 @@ export interface ScaleAnimationProps {
 
 export interface ScrollParallaxProps {
     children: ReactNode;
-    scrollY: Animated.SharedValue<number>;
+    scrollY: any; // SharedValue<number> - using any due to conditional import
     parallaxFactor?: number;
     style?: ViewStyle;
 }
 
 export interface ProgressBarProps {
-    progress: Animated.SharedValue<number>;
+    progress: any; // SharedValue<number> - using any due to conditional import
     height?: number;
     backgroundColor?: string;
     progressColor?: string;
@@ -134,7 +134,7 @@ export const JSISafeFadeAnimation: React.FC<FadeAnimationProps> = ({
                 withTiming(
                     isVisible ? 1 : 0,
                     {duration, easing},
-                    (finished) => {
+                    (finished: boolean) => {
                         'worklet';
                         if (finished && onAnimationComplete) {
                             runOnJS(onAnimationComplete)();
@@ -225,7 +225,7 @@ export const JSISafeSlideAnimation: React.FC<SlideAnimationProps> = ({
             withTiming(
                 isVisible ? 0 : initialPos.y,
                 {duration, easing},
-                (finished) => {
+                (finished: boolean) => {
                     'worklet';
                     if (finished && onAnimationComplete) {
                         runOnJS(onAnimationComplete)();
@@ -272,7 +272,7 @@ export const JSISafeScaleAnimation: React.FC<ScaleAnimationProps> = ({
         scale.value = withSpring(
             isVisible ? 1 : 0,
             {damping, stiffness, mass},
-            (finished) => {
+            (finished: boolean) => {
                 'worklet';
                 if (finished && onAnimationComplete) {
                     runOnJS(onAnimationComplete)();
@@ -389,18 +389,18 @@ export const useJSISafeScrollHandler = (
     const scrollY = useSharedValue(0);
 
     const scrollHandler = useAnimatedScrollHandler({
-        onScroll: (event) => {
-            scrollY.value = event.contentOffset.y;
+        onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+            scrollY.value = event.nativeEvent.contentOffset.y;
 
             // Safe JavaScript function calls
             if (onScroll) {
-                runOnJS(onScroll)(event.contentOffset.y);
+                runOnJS(onScroll)(event.nativeEvent.contentOffset.y);
             }
 
             // Threshold-based callbacks using cached values
             if (thresholds) {
                 thresholds.forEach((threshold, index) => {
-                    if (event.contentOffset.y > threshold) {
+                    if (event.nativeEvent.contentOffset.y > threshold) {
                         runOnJS(() => {
                             console.log(`[JSI-Safe] Scroll threshold ${index + 1} reached: ${threshold}`);
                         })();
@@ -498,7 +498,7 @@ export const JSISafeCombinedAnimation: React.FC<CombinedAnimationProps> = ({
                 withTiming(
                     isVisible ? 0 : initialY,
                     {duration, easing},
-                    (finished) => {
+                    (finished: boolean) => {
                         'worklet';
                         if (finished && onAnimationComplete) {
                             runOnJS(onAnimationComplete)();

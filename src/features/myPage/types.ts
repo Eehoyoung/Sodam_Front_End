@@ -64,3 +64,60 @@ export interface SubscriptionInfo {
     endDate: string;
     autoRenew: boolean;
 }
+
+export interface SalaryStatistics {
+    totalAmount: number;
+    averageAmount: number;
+    totalEmployees: number;
+    paidCount: number;
+    pendingCount: number;
+    monthlyStats: MonthlyStats[];
+}
+
+export interface MonthlyStats {
+    month: string; // YYYY-MM format
+    totalAmount: number;
+    employeeCount: number;
+    paidAmount: number;
+    pendingAmount: number;
+}
+
+export interface SalaryPolicy {
+    id: string;
+    workplaceId: string;
+    baseHourlyWage: number;
+    overtimeRate: number;
+    nightShiftRate: number;
+    holidayRate: number;
+    deductions: SalaryDeduction[];
+    allowances: SalaryAllowance[];
+    paymentDay: number; // 1-31
+    taxSettings: TaxSettings;
+}
+
+export interface SalaryDeduction {
+    type: 'TAX' | 'INSURANCE' | 'OTHER';
+    name: string;
+    amount: number;
+    isPercentage: boolean;
+}
+
+export interface SalaryAllowance {
+    type: 'MEAL' | 'TRANSPORT' | 'OTHER';
+    name: string;
+    amount: number;
+    isPercentage: boolean;
+}
+
+export interface TaxSettings {
+    incomeTaxRate: number;
+    localTaxRate: number;
+    nationalPensionRate: number;
+    healthInsuranceRate: number;
+    employmentInsuranceRate: number;
+}
+
+export interface UpdateSalaryStatusData {
+    status: 'PENDING' | 'PAID';
+    paymentDate?: string;
+}

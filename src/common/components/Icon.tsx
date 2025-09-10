@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleProp, TextStyle} from 'react-native';
-import {FontAwesome, FontAwesome5} from '@expo/vector-icons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type FontAwesomeIconProps = {
     name: React.ComponentProps<typeof FontAwesome>['name'];

@@ -3,7 +3,7 @@
  * Provides real-time JSI health monitoring and alerting
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Alert} from 'react-native';
 import JSIPerformanceMonitor, {JSIHealthStatus} from '../services/JSIPerformanceMonitor';
 import {useJSICrashReporting} from './useJSICrashReporting';

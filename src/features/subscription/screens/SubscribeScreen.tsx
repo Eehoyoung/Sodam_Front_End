@@ -10,7 +10,7 @@ import {
     View,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import MainLayout from '../../../common/components/layout/MainLayout';
 import {Button} from '../../../common/components';
 
@@ -21,7 +21,7 @@ type RootStackParamList = {
     Subscribe: undefined;
 };
 
-type SubscribeScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type SubscribeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 // 구독 플랜 타입 정의
 type PlanType = '구독' | '수수료' | '월정액' | '무료';

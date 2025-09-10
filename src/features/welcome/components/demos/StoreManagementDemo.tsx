@@ -99,10 +99,10 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
             padding: 24,
             width: dimensions.screenWidth * 0.9,  // ✅ Safe access to dimensions
             maxWidth: 400,
-            alignItems: 'center',
-            maxHeight: '85%',
+            alignItems: 'center' as const,
+            maxHeight: dimensions.screenHeight * 0.85,  // Use numeric value instead of string percentage
         },
-    }), [dimensions.screenWidth]);
+    }), [dimensions.screenWidth, dimensions.screenHeight]);
 
     const stores: Store[] = [
         {
@@ -179,7 +179,7 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
             progressAnim.value = withTiming(1, {
                 duration: 3000,
                 easing: Easing.out(Easing.quad),
-            }, (finished) => {
+            }, (finished: boolean) => {
                 'worklet';
                 if (finished) {
                     runOnJS(() => {
@@ -221,7 +221,7 @@ const StoreManagementDemo: React.FC<StoreManagementDemoProps> = ({
     const closeDemo = () => {
         // Reanimated 3 parallel animations
         fadeAnim.value = withTiming(0, {duration: 200});
-        scaleAnim.value = withTiming(0.8, {duration: 200}, (finished) => {
+        scaleAnim.value = withTiming(0.8, {duration: 200}, (finished: boolean) => {
             'worklet';
             if (finished) {
                 runOnJS(() => {

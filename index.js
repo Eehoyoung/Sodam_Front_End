@@ -2,8 +2,11 @@
  * Entry point for Sodam App
  * @format
  */
+import 'react-native-gesture-handler';
+import 'react-native-reanimated';
 import {AppRegistry, LogBox} from 'react-native';
 import {name as appName} from './app.json';
+
 
 // 개발 환경에서만 불필요한 경고 숨기기
 if (__DEV__) {
@@ -31,12 +34,15 @@ if (__DEV__) {
     console.error = (...args) => {
         try {
             const flat = args.map(a => (a instanceof Error ? (a.message || String(a)) : (typeof a === 'string' ? a : JSON.stringify(a)))).join(' ');
-            if (!flat) return originalConsoleError(...args);
+            if (!flat) {
+                return originalConsoleError(...args);
+            }
             if (flat.includes("Screen native module hasn't been linked")) {
                 // Drop this error to keep Logcat clean during staged recovery
                 return;
             }
-        } catch {
+        } catch (e) {
+            // swallow to keep console stable during staged recovery
         }
         originalConsoleError(...args);
     };
@@ -62,7 +68,7 @@ try {
 
     // 폴백 컴포넌트
     const React = require('react');
-    const {View, Text, StyleSheet} = require('react-native');
+    const {View, Text} = require('react-native');
 
     AppComponent = () => React.createElement(
         View,

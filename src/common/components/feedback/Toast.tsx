@@ -96,7 +96,7 @@ const Toast: ToastComponent = ({
 
         if (shouldUseAnimations && fadeAnim && withTiming && runOnJS) {
             // 페이드 아웃 애니메이션 실행 후 onClose 콜백 호출
-            fadeAnim.value = withTiming(0, {duration: 300}, (finished) => {
+            fadeAnim.value = withTiming(0, {duration: 300}, (finished: boolean) => {
                 'worklet';
                 if (finished && onClose) {
                     runOnJS(onClose)();

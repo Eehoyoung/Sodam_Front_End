@@ -106,9 +106,11 @@ const NFCDemo: React.FC<NFCDemoProps> = ({onDemoComplete, isVisible}) => {
         <ProgressAnimation
             progress={readProgress}
             style={styles.progressContainer}
-            barStyle={styles.progressBar}
-            fillStyle={styles.progressFill}
-        />
+        >
+            <View style={styles.progressBar}>
+                <View style={[styles.progressFill, {width: `${readProgress}%`}]} />
+            </View>
+        </ProgressAnimation>
     );
 
     const renderInstructions = () => {

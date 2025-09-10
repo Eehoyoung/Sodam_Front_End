@@ -16,8 +16,8 @@ import {
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {Button, MainLayout, Toast} from '../../../common/components';
-import {Ionicons} from '@expo/vector-icons';
-import {StackNavigationProp} from '@react-navigation/stack';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 
 // 꿀팁 상세 타입 정의
@@ -37,7 +37,7 @@ interface TipDetail {
     }>;
 }
 
-type TipsDetailScreenNavigationProp = StackNavigationProp<
+type TipsDetailScreenNavigationProp = NativeStackNavigationProp<
     RootStackParamList,
     'TipsDetail'
 >;

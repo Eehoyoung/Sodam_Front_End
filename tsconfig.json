@@ -1,7 +1,9 @@
 {
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "lib": ["dom", "es2017", "es2015", "esnext"],
+    "types": ["node", "react-native"]
   },
   "include": [
     "src/**/*",

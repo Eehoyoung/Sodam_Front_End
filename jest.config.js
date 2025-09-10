@@ -37,10 +37,11 @@ module.exports = {
         '^@features/(.*)$': '<rootDir>/src/features/$1',
         '^@contexts/(.*)$': '<rootDir>/src/contexts/$1',
         '^@types/(.*)$': '<rootDir>/src/types/$1',
+        '^react-native-gesture-handler$': '<rootDir>/tests/mocks/react-native-gesture-handler.js',
         '^\\./src/contexts/AuthContext$': '<rootDir>/src/tests/mocks/AuthContext.mock.ts'
     },
     transformIgnorePatterns: [
-        'node_modules/(?!(react-native|@react-native|@expo/vector-icons|react-native-chart-kit|react-native-reanimated|react-native-nfc-manager)/)'
+        'node_modules/(?!(react-native|@react-native|react-native-vector-icons|react-native-chart-kit|react-native-reanimated|react-native-nfc-manager)/)'
     ],
     testEnvironment: 'node',
     verbose: false, // 개발 중에는 간소화

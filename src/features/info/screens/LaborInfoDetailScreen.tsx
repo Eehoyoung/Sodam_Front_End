@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {Button, MainLayout, Toast} from '../../../common/components';
-import {Ionicons} from '@expo/vector-icons';
-import {StackNavigationProp} from '@react-navigation/stack';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
     LaborInfoDetail: { infoId: string };
@@ -20,7 +20,7 @@ interface LaborInfoDetail {
     category: string;
 }
 
-type LaborInfoDetailScreenNavigationProp = StackNavigationProp<
+type LaborInfoDetailScreenNavigationProp = NativeStackNavigationProp<
     RootStackParamList,
     'LaborInfoDetail'
 >;

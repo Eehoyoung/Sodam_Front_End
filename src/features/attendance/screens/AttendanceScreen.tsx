@@ -13,8 +13,8 @@ import {
     View
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {MaterialIcons as Icon} from '@expo/vector-icons';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import Geolocation from 'react-native-geolocation-service';
 import {PERMISSIONS, request, RESULTS} from 'react-native-permissions';
 import NfcManager from 'react-native-nfc-manager';
@@ -32,7 +32,7 @@ type AttendanceStackParamList = {
     NFCScan: undefined;
 };
 
-type AttendanceScreenNavigationProp = StackNavigationProp<AttendanceStackParamList, 'Attendance'>;
+type AttendanceScreenNavigationProp = NativeStackNavigationProp<AttendanceStackParamList, 'Attendance'>;
 
 const AttendanceScreen = () => {
     const navigation = useNavigation<AttendanceScreenNavigationProp>();
