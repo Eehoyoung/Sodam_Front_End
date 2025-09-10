@@ -10,8 +10,8 @@ import {
     View
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {MaterialIcons as Icon} from '@expo/vector-icons';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Card, MainLayout} from '../../../common/components';
 import laborInfoService from '../services/laborInfoService';
 import taxInfoService from '../services/taxInfoService';
@@ -28,7 +28,7 @@ type InfoStackParamList = {
     TipsDetail: { infoId: string };
 };
 
-type InfoListScreenNavigationProp = StackNavigationProp<InfoStackParamList, 'InfoList'>;
+type InfoListScreenNavigationProp = NativeStackNavigationProp<InfoStackParamList, 'InfoList'>;
 
 // 정보 타입 정의
 type InfoType = 'LABOR' | 'TAX' | 'POLICY' | 'TIPS';

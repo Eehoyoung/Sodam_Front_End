@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HybridMainScreen from '../features/welcome/screens/HybridMainScreen';
+import WelcomeMainScreen from '../features/welcome/screens/WelcomeMainScreen';
 import AuthNavigator from './AuthNavigator';
+import HomeNavigator from './HomeNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -10,6 +11,7 @@ interface Props {
   appReady?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AppNavigator: React.FC<Props> = ({ appReady = true }) => {
   return (
     <NavigationContainer>
@@ -17,9 +19,9 @@ const AppNavigator: React.FC<Props> = ({ appReady = true }) => {
         initialRouteName="Welcome"
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="Welcome" component={HybridMainScreen} />
+        <Stack.Screen name="Welcome" component={WelcomeMainScreen} />
         <Stack.Screen name="Auth" component={AuthNavigator} />
-        {/* Future routes for Main will be added here */}
+        <Stack.Screen name="HomeRoot" component={HomeNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,15 +1,7 @@
-export const AuthProvider = ({ children }: any) => {
-  return children as any;
+import React from 'react';
+
+export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
+  return React.createElement(React.Fragment, null, children ?? null);
 };
 
-export const useAuth = () => ({
-  user: null,
-  isAuthenticated: false,
-  login: jest.fn(),
-  logout: jest.fn(),
-});
-
-export default {
-  AuthProvider,
-  useAuth,
-};
+export default AuthProvider;

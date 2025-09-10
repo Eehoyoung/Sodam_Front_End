@@ -1,4 +1,5 @@
 import React, {Component, ReactNode} from 'react';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import {safeLogger} from '../utils/safeLogger';
 
 /**
@@ -57,7 +58,7 @@ export class InitializationErrorBoundary extends Component<
     /**
      * Enhanced error handling for timing issues
      */
-    static getDerivedStateFromError(error: Error): InitializationErrorBoundaryState {
+    static getDerivedStateFromError(_error: Error): InitializationErrorBoundaryState {
         // Don't update state for timing issues - let the app continue
         return {hasError: false};
     }
@@ -147,28 +148,17 @@ export class InitializationErrorBoundary extends Component<
         // Only show error UI for non-timing issues
         if (this.state.hasError && this.state.error && !this.isTimingIssue(this.state.error)) {
             return (
-                <div style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: 20,
-                    backgroundColor: '#f8f9fa'
-                }}>
-                    <h2>Initialization Error</h2>
-                    <p>A critical error occurred during app initialization.</p>
+                <View style={styles.container}>
+                    <Text style={styles.title}>Initialization Error</Text>
+                    <Text style={styles.message}>A critical error occurred during app initialization.</Text>
                     {__DEV__ && (
-                        <pre style={{
-                            backgroundColor: '#f8d7da',
-                            padding: 16,
-                            borderRadius: 8,
-                            fontSize: 12,
-                            maxWidth: '100%',
-                            overflow: 'auto'
-                        }}>
-                            {this.state.error.message}
-                        </pre>
+                        <ScrollView style={styles.errorContainer}>
+                            <Text style={styles.errorText}>
+                                {this.state.error.message}
+                            </Text>
+                        </ScrollView>
                     )}
-                </div>
+                </View>
             );
         }
 
@@ -190,9 +180,49 @@ export function withInitializationErrorBoundary<P extends object>(
         </InitializationErrorBoundary>
     );
 
-    WrappedComponent.displayName = `withInitializationErrorBoundary(${Component.displayName || Component.name})`;
+    WrappedComponent.displayName = `withInitializationErrorBoundary(${Component.displayName ?? Component.name})`;
 
     return WrappedComponent;
 }
+
+/**
+ * StyleSheet for InitializationErrorBoundary
+ */
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#f8f9fa',
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#721c24',
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    message: {
+        fontSize: 16,
+        color: '#721c24',
+        textAlign: 'center',
+        marginBottom: 16,
+        lineHeight: 24,
+    },
+    errorContainer: {
+        backgroundColor: '#f8d7da',
+        borderRadius: 8,
+        padding: 16,
+        maxHeight: 200,
+        width: '100%',
+    },
+    errorText: {
+        fontSize: 12,
+        color: '#721c24',
+        fontFamily: 'monospace',
+        lineHeight: 16,
+    },
+});
 
 export default InitializationErrorBoundary;

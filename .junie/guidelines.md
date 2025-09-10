@@ -1,14 +1,58 @@
-# Sodam Front End Project Guidelines v3.0
+# Sodam Front End Project Guidelines v3.2
 
 This document provides comprehensive guidelines and instructions for developers working on the Sodam Front End project -
 a cross-platform attendance and payroll management application for part-time workers and small business owners.
 
-**Last Updated**: 2025-08-30  
-**Version**: 3.0.0 - AI Prompting v3 standard, prompt generator script, RN config consistency (0.81.0), NFC-only enforcement retained
+**Last Updated**: 2025-09-05  
+**Version**: 3.2.0 - Change Scale Decision Framework implementation, balanced change policy, flexible approach to problem-solving
 
 ## Role
 
-Your role is the head of our project React-Native and is currently the best React-Native developer in our industry
+This section defines the principles and expectations regarding the assignment of roles in AI-assisted workflows
+
+### Automatic Role Assignment Policy
+
+1. At the beginning of every task or session, the AI must automatically determine and assign an appropriate role based on the task’s objective and contextual information.
+
+2. Role assignment should be guided by the following criteria:
+2.1 Purpose of the task (e.g., analysis, evaluation, generation, verification)
+2.2 Type of input documents or user requests
+2.3 Relevant policies, technical stack, and document structure
+
+3. Even when a role is not explicitly specified, the AI is expected to autonomously infer and assign a suitable role, which must be clearly stated at the top of logs or reports.
+
+4. **Example roles include:**
+- Document Consistency Verifier
+- Implementation Evaluator
+- Flow Analyst
+- Test Designer
+- UX Flow Reviewer
+- React Native Engineer — responsible for mobile architecture and UI logic
+- Backend Engineer — responsible for API integrity and system performance
+- QA Specialist — responsible for validation, edge case coverage, and regression prevention
+- Release Coordinator — ensures delivery alignment across environments
+- Security Reviewer — evaluates authentication, data handling, and policy compliance
+5. Role assignment is considered a mandatory procedure to ensure the quality, clarity, and consistency of all deliverables.
+
+## Post-Task Logging Policy
+- Upon completion of every task, the AI must immediately record a summary of the task in the central file named Master_Task_Log.md.
+- The log entry must include the following details:
+- Task title and unique identifier (e.g., Task #2025-09-08-01)
+- Assigned role(s) and functional responsibility
+- Summary of key changes or implementation details
+- Related file paths or code locations
+- Test status and result (e.g., PASS / FAIL / Skipped)
+- Recommended next steps or follow-up actions
+- Logging is considered a mandatory step in the task lifecycle. If omitted, the session is not considered complete.
+- [Master_Task_Log.md](../Master_Task_Log.md) serves as the single source of truth for all task history and must be updated sequentially without overwriting previous entries.
+- Example log format:
+- 
+### Task #2025-09-08-01 — Navigation Flow: Welcome → Auth → Home Completed
+- Role: Flow Analyst / React Native Engineer
+- Summary: Set initial route in AppNavigator; added reset logic in LoginScreen
+- Files: src\navigation\AppNavigator.tsx, src\features\auth\LoginScreen.tsx
+- Test: flow.moderate.test.tsx (PASS)
+- Next: Implement token-based initial routing logic
 
 ## Project Overview
 
@@ -1391,19 +1435,91 @@ Each feature should have comprehensive documentation including:
 - Test Requirements (per change):
   - Unit tests for affected utilities/hooks and smoke tests for top 3 user flows; mock native modules as needed.
 
-### Minimal Change Principle vs. Full Structural Transformation (Policy)
-- Default: Prefer minimal, localized changes with clear verification and rollback.
-- When Full Structural Transformation is allowed (examples):
-  - App architecture/navigator overhaul, global state management refactor, build system migration (AGP/Hermes/Metro), feature domain reorganization, or cross-cutting native module strategy change.
-- Mandatory process for Full Structural Transformation:
-  1) Prepare a change proposal .md using template: docs\\change-proposals\\Full_Structural_Change_Proposal_Template_v1.0.md
-  2) Save as: docs\\change-proposals\\<YYMMDD>_<slug>_structural_change_proposal.md
-  3) Create a dedicated branch: feat/structural-change/<slug>-<YYMMDD>
-  4) Request explicit user approval referencing the proposal doc before implementation.
-  5) Gate behind feature flags where feasible; keep rollback path documented.
-  6) Verification: run unit tests, relevant scanners (e.g., QR scanner as example), and build both Android/iOS if native changes are involved.
-- Acceptance Criteria (structural changes):
-  - Approval recorded in the proposal doc; CI green; scanners clean; critical user flows unaffected; rollback steps verified.
+### Change Scale Decision Framework (Policy)
+
+#### Core Philosophy: Right-Sized Changes for Right Problems
+
+**Important**: While efficiency favors minimal changes, sometimes small fixes create bigger problems. This framework helps determine the appropriate scale of change based on problem scope and risk assessment.
+
+#### Change Scale Categories
+
+1. **Minimal Changes** (Preferred when appropriate):
+   - Single file modifications
+   - Localized bug fixes
+   - Configuration adjustments
+   - Simple component updates
+   - **Use when**: Problem is isolated, well-understood, and low-risk
+
+2. **Moderate Changes** (Often necessary):
+   - Multi-file coordinated updates
+   - Feature enhancements
+   - Dependency upgrades
+   - Cross-component refactoring
+   - **Use when**: Problem spans multiple components but within single domain
+
+3. **Comprehensive Changes** (Sometimes essential):
+   - Architecture overhauls
+   - Build system migrations
+   - Global state management changes
+   - Cross-cutting security implementations
+   - **Use when**: Minimal fixes would create technical debt or instability
+
+#### When Small Changes Create Big Problems
+
+**Warning Signs** that minimal changes may backfire:
+- **Cascade Dependencies**: Fixing one small issue reveals interconnected problems
+- **Technical Debt Accumulation**: Quick fixes that compound maintenance burden
+- **Inconsistent Patterns**: Patch solutions that break architectural consistency
+- **Security Vulnerabilities**: Partial security fixes that leave attack vectors open
+- **Performance Degradation**: Localized optimizations that harm overall performance
+
+**Real Examples from Project History**:
+- QR code removal: Initially seemed like a small deprecation, but required comprehensive cleanup across navigation, permissions, and documentation
+- React Native Reanimated updates: Minor version bumps often require architectural changes due to breaking API changes
+- NFC permission management: Localized permission fixes often need coordinated manifest and runtime handling
+
+#### Decision Matrix
+
+| Problem Scope | Risk Level | Recommended Approach | Required Process |
+|---------------|------------|---------------------|------------------|
+| Single Component | Low | Minimal Change | Standard review |
+| Multiple Components | Low-Medium | Moderate Change | Enhanced testing |
+| Cross-Domain | Medium | Moderate-Comprehensive | Architecture review |
+| System-Wide | High | Comprehensive Change | Full proposal process |
+| Security/Stability | Any | Scale to eliminate risk | Immediate comprehensive |
+
+#### Implementation Guidelines
+
+**For Minimal Changes**:
+- Direct implementation with standard testing
+- Single PR with clear scope
+
+**For Moderate Changes**:
+- Break into logical phases when possible
+- Enhanced test coverage for affected areas
+- Documentation updates included
+
+**For Comprehensive Changes**:
+- Mandatory process retained from previous policy:
+  1) Prepare change proposal: docs\\change-proposals\\<YYMMDD>_<slug>_comprehensive_change_proposal.md
+  2) Create dedicated branch: feat/comprehensive-change/<slug>-<YYMMDD>
+  3) Request explicit approval before implementation
+  4) Feature flags and rollback documentation required
+  5) Full test suite and scanner verification
+
+#### Quality Gates (All Changes)
+
+- **Before Implementation**: Risk assessment and scope determination
+- **During Implementation**: Continuous verification and testing
+- **After Implementation**: Verification of acceptance criteria and monitoring
+
+#### Emergency Override Policy
+
+When critical issues (security, production outages) require immediate comprehensive changes:
+- Document emergency justification
+- Implement with maximum safety measures
+- Complete formal process documentation post-resolution
+- Conduct post-incident review for process improvement
 
 ### CI/Automation Extensions
 - Extend the scanner concept beyond QR when deprecating other features/libs by adding pattern-based scripts (follow scripts\\scan-qr-residue.ps1 as a reference) and enable -FailOnMatch in CI.
@@ -1415,7 +1531,7 @@ Each feature should have comprehensive documentation including:
 
 ### 1) 기본 원칙 (Principles)
 - 구체성: 변경 대상 파일 경로, 함수/컴포넌트 이름, 재현 절차, 기대 결과를 명시합니다.
-- 제약 명시: OS(Windows), 셸(PowerShell), 경로 구분자(\\), RN/React/SDK 버전, “최소 변경” 원칙 등을 조건으로 고정합니다.
+- 제약 명시: OS(Windows), 셸(PowerShell), 경로 구분자(\\), RN/React/SDK 버전, "적절한 규모의 변경" 원칙 등을 조건으로 고정합니다.
 - 수락기준(AC) 선제시: 완료 정의(정상 빌드, 특정 테스트 통과, 특정 스크린 진입 등)를 미리 제공합니다.
 - 안전성: 민감한 권한, 네이티브 설정 변경 시 근거와 영향 범위를 명시하고, 회귀 위험 줄이기(테스트/스캐너 실행)를 요청합니다.
 - 도구 우선: 프로젝트 내 제공되는 전용 도구와 스크립트를 먼저 사용하도록 지시합니다. (예: search_project, create, search_replace, run_test, PowerShell 스크립트 등)
@@ -1429,7 +1545,7 @@ Each feature should have comprehensive documentation including:
 - 테스트: Jest preset ‘react-native’, jest.setup.js 존재
 - 제품 정책: 태그 기반 근태(NFC 중심). 과거 잔존물 방지 준수(스캐너 사용).
 - 내비게이션: 초기 라우트는 Welcome 고정
-- 원칙: “최소 변경”으로 해결, 변경된 파일에 한해 관련 테스트 점검
+- 원칙: "적절한 규모의 변경"으로 해결, 변경된 파일에 한해 관련 테스트 점검
 - 경로/명령: PowerShell 포맷, 전용 툴과 터미널 명령 한 줄 혼용 금지
 
 ### 3) 프롬프트 스켈레톤 (복사 후 이슈에 맞게 작성)
@@ -1445,7 +1561,7 @@ Each feature should have comprehensive documentation including:
 - RN/React/Node: RN 0.81.0(New Arch, Hermes) / React 19.1.0 / Node >=18
 - Android: Compile/Target SDK 36, Min 24
 - 테스트: Jest preset ‘react-native’
-- 원칙: 최소 변경, 관련 테스트 유지, 문서 표준 준수
+- 원칙: 적절한 규모의 변경, 관련 테스트 유지, 문서 표준 준수
 
 [대상 파일/심볼]
 - 파일 경로:
@@ -1458,7 +1574,7 @@ Each feature should have comprehensive documentation including:
 [출력 형식 요구]
 - <UPDATE> 섹션에 PREVIOUS_STEP/PLAN/NEXT_STEP 포함
 - PowerShell 규칙 및 특수 도구 사용 규칙 준수
-- 코드 수정 시 최소 변경, 에지 케이스 고려
+- 코드 수정 시 적절한 규모의 변경, 에지 케이스 고려
 ```
 
 ### 4) <UPDATE> 운영 규칙
@@ -1488,7 +1604,7 @@ Each feature should have comprehensive documentation including:
 - <UPDATE> 및 도구 호출 규칙 준수
 - 계획 항목과 진행 상태 기호의 일관성
 - 환경/조건 절 포함
-- 최소 변경 원칙과 검증 절차 명시
+- 적절한 규모의 변경 원칙과 검증 절차 명시
 
 ## Maintenance Guidelines
 
@@ -1529,3 +1645,10 @@ For critical issues requiring immediate attention:
 - 추가: 유지보수 가이드라인 섹션 및 전용 문서 연결
 - 업데이트: 엔터프라이즈급 설정 고도화 완료 반영
 - 강화: 보안 및 성능 모니터링 절차 명문화
+
+## v3.2 변경 사항 요약 (2025-09-05)
+- 주요 개편: "Minimal Change Principle" → "Change Scale Decision Framework"로 전면 개선
+- 유연성 강화: 작은 변경이 큰 문제를 야기할 수 있는 사례와 판단 기준 명시
+- 정책 개선: "최소 변경" → "적절한 규모의 변경" 원칙으로 전환
+- 의사결정 지원: 변경 규모별 구체적인 가이드라인과 결정 매트릭스 제공
+- 실용성 증대: 상황별 맞춤형 접근 방식으로 개발 효율성과 품질 균형

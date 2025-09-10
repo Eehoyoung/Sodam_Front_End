@@ -5,15 +5,13 @@ plugins {
 }
 
 android {
-    namespace 'com.sodam_front_end'
+    namespace "com.sodam_front_end"
     compileSdkVersion 36
-    buildToolsVersion "35.0.0"
     ndkVersion "27.1.12297006"
 
     defaultConfig {
-        applicationId 'com.sodam_front_end'
+        applicationId "com.sodam_front_end"
         minSdkVersion 24
-        //noinspection OldTargetApi,EditedTargetSdkVersion
         targetSdkVersion 36
         versionCode 1
         versionName "0.0.1"
@@ -25,14 +23,13 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = "17"
     }
 
     buildTypes {
         release {
             minifyEnabled false
             shrinkResources false
-            crunchPngs false
             proguardFiles(
                     getDefaultProguardFile("proguard-android.txt"),
                     "proguard-rules.pro"
@@ -41,36 +38,19 @@ android {
     }
 
     packagingOptions {
-        // Keep only necessary pickFirst to avoid masking real conflicts
-        pickFirst '**/libc++_shared.so'
+        pickFirst "**/libc++_shared.so"
     }
 }
-
-// React Native Vector Icons font configuration - DISABLED
-// Autolinking is disabled for react-native-vector-icons in react-native.config.js
-// Therefore, fonts.gradle cannot be applied as it requires Android plugin configuration
-// project.ext.vectoricons = [
-//     iconFontNames: [ 'AntDesign.ttf', 'Entypo.ttf', 'EvilIcons.ttf', 'Feather.ttf', 'FontAwesome.ttf', 'FontAwesome5_Brands.ttf', 'FontAwesome5_Regular.ttf', 'FontAwesome5_Solid.ttf', 'Foundation.ttf', 'Ionicons.ttf', 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf', 'SimpleLineIcons.ttf', 'Octicons.ttf', 'Zocial.ttf' ]
-// ]
-
-// apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
-// Expo modules disabled due to gradle plugin dependency resolution issue
-// apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle")
-// useExpoModules()
-
-// React Native autolinking is handled automatically by settings.gradle
 
 dependencies {
     implementation "com.facebook.react:react-android"
 
-    // Hermes vs JSC 선택
-    if (project.hasProperty("hermesEnabled") && project.property("hermesEnabled") == "true") {
+    if (rootProject.ext.hermesEnabled) {
         implementation "com.facebook.react:hermes-android"
     } else {
         implementation "io.github.react-native-community:jsc-android:2026004.+"
     }
 
-    // Explicitly wire autolinked RN libraries only if included as Gradle projects (defensive for RN 0.81 plugin-managed autolinking)
     def maybeImpl = { String path -> if (project.findProject(path) != null) { implementation project(path) } }
     maybeImpl(":react-native-async-storage_async-storage")
     maybeImpl(":react-native-geolocation-service")
@@ -80,56 +60,28 @@ dependencies {
     maybeImpl(":react-native-safe-area-context")
     maybeImpl(":react-native-screens")
     maybeImpl(":react-native-svg")
+    maybeImpl(":react-native-worklets")
+    maybeImpl(":react-native-gesture-handler")
+    maybeImpl(":react-native-vector-icons")
 }
 
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
-// ---------------------------------------------------------------------------------
-// Ensure codegen and autolinking run before CMake configure (RN New Architecture)
-// This wires all configureCMake* tasks to depend on any generateAutolinking*
-// and generateCodegenArtifactsFromSchema* tasks so CMake sees generated JNI dirs.
+// Codegen & Autolinking → CMake 순서 보장
 afterEvaluate {
-  // Collect generation tasks in a mutable collection
-  def genTasks = [] as LinkedHashSet
-
-  // Discover tasks dynamically in this project
-  tasks.matching { it.name.startsWith('generateAutolinking') || it.name.startsWith('generateCodegenArtifactsFromSchema') }.all { t ->
-    genTasks.add(t)
-  }
-  // Discover tasks in all subprojects (libraries with codegen live here)
-  rootProject.allprojects.each { proj ->
-    proj.tasks.matching { it.name.startsWith('generateCodegenArtifactsFromSchema') || it.name.startsWith('generateAutolinking') }.all { t ->
-      genTasks.add(t)
+    def genTasks = [] as LinkedHashSet
+    tasks.matching { it.name.startsWith("generateAutolinking") || it.name.startsWith("generateCodegenArtifactsFromSchema") }.all { t ->
+        genTasks.add(t)
     }
-  }
-
-  // Add common, variant-specific task names if present (defensive)
-  [
-    // Autolinking helpers
-    'generateAutolinkingNewArchitectureFiles',
-    'generateAutolinkingPackageList',
-    'generateAutolinkingSourcesDebug',
-    'generateAutolinkingResourcesDebug',
-    'generateAutolinkingSourcesRelease',
-    'generateAutolinkingResourcesRelease',
-    // Codegen schema + artifacts (app-level variants and generic)
-    'generateCodegenSchemaFromJavaScript',
-    'generateCodegenArtifactsFromSchema',
-    'generateCodegenArtifactsFromSchemaDebug',
-    'generateCodegenArtifactsFromSchemaRelease'
-  ].each { n ->
-    def t = tasks.findByName(n)
-    if (t != null) genTasks.add(t)
-  }
-  // Also add schema tasks from subprojects
-  rootProject.allprojects.each { proj ->
-    ['generateCodegenSchemaFromJavaScript', 'generateCodegenArtifactsFromSchema'].each { base ->
-      def tt = proj.tasks.findByName(base)
-      if (tt != null) genTasks.add(tt)
+    rootProject.allprojects.each { proj ->
+        proj.tasks.matching { it.name.startsWith("generateCodegenArtifactsFromSchema") || it.name.startsWith("generateAutolinking") }.all { t ->
+            genTasks.add(t)
+        }
     }
-  }
-
-  // Make every configureCMake* task depend on the generation tasks
-  tasks.matching { it.name.startsWith('configureCMake') }.configureEach { cfg ->
-    genTasks.each { cfg.dependsOn(it) }
-  }
+    tasks.matching { it.name.startsWith("configureCMake") }.configureEach { cfg ->
+        genTasks.each { cfg.dependsOn(it) }
+    }
+    tasks.matching { it.name.startsWith("externalNativeBuildClean") }.configureEach { cln ->
+        genTasks.each { cln.dependsOn(it) }
+    }
 }

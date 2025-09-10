@@ -114,7 +114,7 @@ const StorytellingSection: React.FC<StorytellingSectionProps> = ({
             slideAnim3.value = withDelay(900, withTiming(0, {
                 duration: 800,
                 easing: Easing.out(Easing.back(1.2)),
-            }, (finished) => {
+            }, (finished: boolean) => {
                 'worklet';
                 if (finished) {
                     // 모든 애니메이션 완료 후 화살표 바운스 시작

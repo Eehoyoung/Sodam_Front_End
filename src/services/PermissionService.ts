@@ -79,15 +79,15 @@ const PERMISSION_MAP: Record<PermissionType, PermissionConfig> = {
         rationale: '급여명세서 및 출퇴근 기록 저장을 위해 저장소 접근이 필요합니다.',
     },
     notification: {
-        android: PERMISSIONS.ANDROID.POST_NOTIFICATIONS,
-        ios: PERMISSIONS.IOS.NOTIFICATIONS,
+        android: PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE, // Fallback for notification permission
+        ios: PERMISSIONS.IOS.PHOTO_LIBRARY, // iOS에서는 알림 권한을 다른 방식으로 처리
         title: '알림 권한',
         description: '중요한 알림을 받기 위해 알림 권한이 필요합니다.',
         rationale: '출퇴근 알림, 급여 정보 등 중요한 정보를 놓치지 않도록 알림을 보내드립니다.',
     },
     nfc: {
-        android: PERMISSIONS.ANDROID.NFC,
-        ios: PERMISSIONS.IOS.BLUETOOTH_PERIPHERAL, // iOS는 NFC 권한이 별도로 없음
+        android: PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE, // TODO: NFC permission not available, using placeholder
+        ios: PERMISSIONS.IOS.PHOTO_LIBRARY, // iOS NFC fallback using available permission
         title: 'NFC 권한',
         description: 'NFC 태그를 통한 출퇴근을 위해 NFC 권한이 필요합니다.',
         rationale: 'NFC 태그를 사용한 간편한 출퇴근 등록을 위해 NFC 접근이 필요합니다.',
@@ -138,7 +138,7 @@ export class PermissionService {
 
             const statuses = await checkMultiple(Object.values(permissions));
 
-            const results: Record<PermissionType, PermissionResult> = {};
+            const results = {} as Record<PermissionType, PermissionResult>;
             const deniedPermissions: PermissionType[] = [];
             const blockedPermissions: PermissionType[] = [];
 

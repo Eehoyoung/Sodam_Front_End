@@ -1,150 +1,16 @@
-import React, {useState} from 'react';
-import {Dimensions, Platform, ScrollView, StyleSheet, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {RootNavigationProp} from '../../../navigation/types';
-
-// Import section components
-import StorytellingSection from '../components/StorytellingSection';
-import FeatureDashboardSection from '../components/FeatureDashboardSection';
-import ConversionSection from '../components/ConversionSection';
-import Header from '../components/Header';
-
-interface SectionVisibility {
-    problems: boolean;
-    solutions: boolean;
-    cta: boolean;
-}
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 
 const HybridMainScreen: React.FC = () => {
-    const navigation = useNavigation<RootNavigationProp>();
-
-    // Determine screen height safely without throwing
-    let screenHeight: number;
-    try {
-        const dimensions = Dimensions.get('window');
-        const h = (dimensions as any)?.height;
-        const valid = typeof h === 'number' && isFinite(h) && h > 0;
-        screenHeight = valid ? h : 640;
-        if (!valid) {
-            console.warn('HybridMainScreen: Invalid window height, using fallback 640');
-        }
-    } catch (error) {
-        console.warn('HybridMainScreen: Failed to get screen dimensions, using fallback 640', error);
-        screenHeight = 640;
-    }
-
-    const [currentSection, setCurrentSection] = useState(0);
-    const [isVisible, setIsVisible] = useState<SectionVisibility>({
-        problems: true, // 첫 섹션은 즉시 표시
-        solutions: false,
-        cta: false
-    });
-
-    // Disabled for MVP stability - basic scroll handling
-    const handleScroll = (event: any) => {
-        const offsetY = event.nativeEvent.contentOffset.y;
-        const sectionHeight = screenHeight * 0.8;
-
-        // 섹션별 가시성 업데이트 (simplified without animations)
-        if (offsetY > sectionHeight * 0.3) {
-            setIsVisible(prev => {
-                if (!prev.solutions) {
-                    setCurrentSection(1);
-                    return {...prev, solutions: true};
-                }
-                return prev;
-            });
-        }
-        if (offsetY > sectionHeight * 1.2) {
-            setIsVisible(prev => {
-                if (!prev.cta) {
-                    setCurrentSection(2);
-                    return {...prev, cta: true};
-                }
-                return prev;
-            });
-        }
-    };
-
-    const handleFeatureTest = (featureId: string) => {
-        // TODO: 기능별 데모 구현
-    };
-
-    const handleAppDownload = () => {
-        // TODO: 앱 스토어 링크 연결
-    };
-
-    const handleWebTrial = () => {
-        navigation.navigate('Auth', {screen: 'Signup'});
-    };
-
-    const handleLogin = () => {
-        navigation.navigate('Auth', {screen: 'Login'});
-    };
-
-    const handleSignup = () => {
-        navigation.navigate('Auth', {screen: 'Signup'});
-    };
-
-    // Progress bar style (disabled animations for MVP)
-    const progressBarStyle = {
-        width: `${(currentSection + 1) * 33}%`,
-    };
-
-    // Progress dots styles (simplified for MVP)
-    const getProgressDotStyle = (index: number) => {
-        return {
-            backgroundColor: index <= currentSection ? '#2196F3' : '#E0E0E0',
-            transform: [{scale: index === currentSection ? 1.2 : 1}],
-        };
-    };
+    console.log('[WSOD_FIX] 🎉 HybridMainScreen 단순화 버전 렌더링 시작!');
 
     return (
         <View style={styles.container}>
-            <Header onLogin={handleLogin} onSignup={handleSignup}/>
-
-            {/* Scroll Progress Indicator */}
-            <View style={styles.progressContainer}>
-                <View style={styles.progressTrack}>
-                    <View
-                        style={[styles.progressBar]}
-                    />
-                </View>
-                <View style={styles.progressDots}>
-                    {[0, 1, 2].map((index) => (
-                        <View
-                            key={index}
-                            style={[styles.progressDot, getProgressDotStyle(index)]}
-                        />
-                    ))}
-                </View>
-            </View>
-
-            <ScrollView
-                style={styles.scrollView}
-                onScroll={handleScroll}
-                scrollEventThrottle={16}
-                showsVerticalScrollIndicator={false}
-            >
-                {/* Section 1: 스토리텔링 영역 */}
-                <StorytellingSection
-                    isVisible={isVisible.problems}
-                    onComplete={() => setCurrentSection(1)}
-                />
-
-                {/* Section 2: 기능 대시보드 영역 */}
-                <FeatureDashboardSection
-                    isVisible={isVisible.solutions}
-                    onFeatureTest={handleFeatureTest}
-                />
-
-                {/* Section 3: 체험 및 전환 영역 */}
-                <ConversionSection
-                    isVisible={isVisible.cta}
-                    onDownload={handleAppDownload}
-                    onWebTrial={handleWebTrial}
-                />
-            </ScrollView>
+            <Text style={styles.title}>Hello World!</Text>
+            <Text style={styles.subtitle}>WSOD 해결 테스트 중...</Text>
+            <Text style={styles.body}>
+                이 화면이 보이면 기본 UI 렌더링이 성공한 것입니다.
+            </Text>
         </View>
     );
 };
@@ -153,39 +19,28 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#FFFFFF',
-    },
-    scrollView: {
-        flex: 1,
-    },
-    progressContainer: {
-        position: 'absolute',
-        top: Platform.OS === 'ios' ? 100 : 80,
-        right: 20,
-        zIndex: 1000,
+        justifyContent: 'center',
         alignItems: 'center',
+        padding: 20,
     },
-    progressTrack: {
-        width: 4,
-        height: 120,
-        backgroundColor: '#E0E0E0',
-        borderRadius: 2,
-        marginBottom: 10,
-        overflow: 'hidden',
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        color: '#000000',
+        textAlign: 'center',
     },
-    progressBar: {
-        height: '100%',
-        backgroundColor: '#2196F3',
-        borderRadius: 2,
+    subtitle: {
+        fontSize: 16,
+        marginBottom: 16,
+        color: '#666666',
+        textAlign: 'center',
     },
-    progressDots: {
-        alignItems: 'center',
-    },
-    progressDot: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        marginVertical: 8,
-        backgroundColor: '#E0E0E0',
+    body: {
+        fontSize: 14,
+        textAlign: 'center',
+        color: '#333333',
+        lineHeight: 20,
     },
 });
 

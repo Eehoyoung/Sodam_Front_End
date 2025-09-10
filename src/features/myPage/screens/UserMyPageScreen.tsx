@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {Button} from '../../../common/components';
 
 // 네비게이션 타입 정의
@@ -13,7 +13,7 @@ type RootStackParamList = {
     ProfileEdit: undefined;
 };
 
-type UserMyPageScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type UserMyPageScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 /**
  * 일반 사용자 마이페이지 화면

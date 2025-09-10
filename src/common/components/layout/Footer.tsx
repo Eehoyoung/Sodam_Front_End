@@ -5,7 +5,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {HomeStackParamList} from '../../../navigation/types';
 
 const Footer = () => {
-    const {isSmallScreen, isMediumScreen, responsiveStyles} = useResponsiveStyles();
+    const {isSmallScreen, isMediumScreen} = useResponsiveStyles();
     const screenWidth = Dimensions.get('window').width;
     const navigation = useNavigation<NavigationProp<HomeStackParamList>>();
 

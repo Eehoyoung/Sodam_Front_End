@@ -1,22 +1,18 @@
 import {InteractionManager} from 'react-native';
 
 /**
- * Context Readiness Manager
- * Coordinates React Native context initialization with Android lifecycle events
- * to prevent ReactNoCrashSoftException timing issues
+ * Context Readiness Manager - SIMPLIFIED VERSION
+ * Always returns ready state to avoid UI blocking issues
+ * Original complex timing logic temporarily disabled for white screen fix
  */
 export class ContextReadinessManager {
     private static instance: ContextReadinessManager;
-    private isReady = false;
-    private readyPromise: Promise<void>;
-    private resolveReady: (() => void) | null = null;
-    private readyCallbacks: Array<() => void> = [];
     private readyTimestamp: number | null = null;
 
     private constructor() {
-        this.readyPromise = new Promise<void>((resolve) => {
-            this.resolveReady = resolve;
-        });
+        // Simplified constructor - no complex Promise setup needed
+        this.readyTimestamp = Date.now();
+        console.log('[CONTEXT_READINESS] ContextReadinessManager simplified - always ready');
     }
 
     /**
@@ -30,66 +26,37 @@ export class ContextReadinessManager {
     }
 
     /**
-     * Check if React Native context is ready
+     * Check if React Native context is ready - ALWAYS TRUE
      */
     public isContextReady(): boolean {
-        return this.isReady;
+        return true; // Always ready to avoid UI blocking
     }
 
     /**
-     * Get a promise that resolves when context is ready
+     * Get a promise that resolves immediately
      */
     public waitForReady(): Promise<void> {
-        return this.readyPromise;
+        return Promise.resolve(); // Resolve immediately
     }
 
     /**
-     * Signal that React Native context is ready
-     * Should be called after all critical initialization is complete
+     * Signal that React Native context is ready - simplified
      */
     public signalReady(): void {
-        if (this.isReady) {
-            console.warn('[CONTEXT_READINESS] signalReady called but context already ready');
-            return;
-        }
-
-        console.log('[CONTEXT_READINESS] React Native context is now ready');
-        this.isReady = true;
-        this.readyTimestamp = Date.now();
-
-        // Resolve the promise
-        if (this.resolveReady) {
-            this.resolveReady();
-        }
-
-        // Execute all pending callbacks
-        this.readyCallbacks.forEach(callback => {
-            try {
-                callback();
-            } catch (error) {
-                console.error('[CONTEXT_READINESS] Error in ready callback:', error);
-            }
-        });
-        this.readyCallbacks = [];
-
-        // Signal native layer if available
-        this.signalNativeLayer();
+        console.log('[CONTEXT_READINESS] signalReady called (simplified mode - no-op)');
+        // No complex logic needed - always ready
     }
 
     /**
-     * Add a callback to be executed when context is ready
+     * Add a callback to be executed immediately
      */
     public onReady(callback: () => void): void {
-        if (this.isReady) {
-            // Execute immediately if already ready
-            try {
-                callback();
-            } catch (error) {
-                console.error('[CONTEXT_READINESS] Error in immediate callback:', error);
-            }
-        } else {
-            // Queue for later execution
-            this.readyCallbacks.push(callback);
+        // Execute immediately since we're always ready
+        try {
+            callback();
+            console.log('[CONTEXT_READINESS] onReady callback executed immediately');
+        } catch (error) {
+            console.error('[CONTEXT_READINESS] Error in immediate callback:', error);
         }
     }
 
@@ -101,33 +68,24 @@ export class ContextReadinessManager {
     }
 
     /**
-     * Reset readiness state (for testing or app restart scenarios)
+     * Reset readiness state - simplified (no-op since always ready)
      */
     public reset(): void {
-        console.log('[CONTEXT_READINESS] Resetting context readiness state');
-        this.isReady = false;
-        this.readyTimestamp = null;
-        this.readyCallbacks = [];
-        this.readyPromise = new Promise<void>((resolve) => {
-            this.resolveReady = resolve;
-        });
+        console.log('[CONTEXT_READINESS] Reset called (simplified mode - no-op, always ready)');
+        // No complex state to reset - always ready
+        this.readyTimestamp = Date.now();
     }
 
     /**
-     * Signal native layer about context readiness
-     * This could be enhanced to communicate with native modules
+     * Signal native layer - simplified (no complex communication needed)
      */
     private signalNativeLayer(): void {
         try {
-            // In a real implementation, this might call a native module
-            // For now, we'll use a global flag that native code could check
             if (typeof global !== 'undefined') {
                 (global as any).__REACT_CONTEXT_READY__ = true;
                 (global as any).__REACT_CONTEXT_READY_TIMESTAMP__ = this.readyTimestamp;
             }
-
-            // Log for native layer to see in logcat
-            console.log('[CONTEXT_READINESS] Native layer notified: React context ready');
+            console.log('[CONTEXT_READINESS] Native layer notified (simplified mode)');
         } catch (error) {
             console.warn('[CONTEXT_READINESS] Failed to signal native layer:', error);
         }

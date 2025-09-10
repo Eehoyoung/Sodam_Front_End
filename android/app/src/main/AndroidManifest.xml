@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+package="com.sodam_front_end">
 
     <!-- 네트워크 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -21,6 +22,12 @@
 
     <!-- 알림 권한 (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- 정확한 알람 권한 (Android 15 호환) - 근태관리 핵심 기능 -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SET_ALARM" />
 
     <!-- 진동 권한 (UX 향상) -->
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -64,5 +71,8 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <property
+                android:name="android.window.PROPERTY_COMPAT_ALLOW_MIN_ASPECT_RATIO_OVERRIDE"
+                android:value="true" />
     </application>
 </manifest>

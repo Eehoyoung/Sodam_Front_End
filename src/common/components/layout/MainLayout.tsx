@@ -1,5 +1,5 @@
 import React, {ReactNode, useMemo, useRef} from 'react';
-import {Dimensions, ScrollView, StyleSheet, View} from 'react-native';
+import {Dimensions, NativeSyntheticEvent, NativeScrollEvent, ScrollView, StyleSheet, View} from 'react-native';
 import Header from './Header'; // 같은 디렉토리에 있으므로 경로 수정
 import Footer from './Footer'; // 같은 디렉토리에 있으므로 경로 수정
 import {useResponsiveStyles} from '../../../utils/responsive';
@@ -55,8 +55,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({children, title}) => {
 
     // 스크롤 이벤트 핸들러 (애니메이션 활성화 시에만)
     const scrollHandler = shouldUseAnimations && scrollY ? useAnimatedScrollHandler({
-        onScroll: (event) => {
-            scrollY.value = event.contentOffset.y;
+        onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+            scrollY.value = event.nativeEvent.contentOffset.y;
         },
     }) : undefined;
 

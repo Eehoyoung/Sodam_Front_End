@@ -1,6 +1,6 @@
 /**
- * 출퇴근 관리 관련 서비스
- * 출퇴근 기록 조회, 출근, 퇴근, 수정 및 통계 기능을 제공합니다.
+ * 출퇴�?관�?관???�비??
+ * 출퇴�?기록 조회, 출근, ?�근, ?�정 �??�계 기능???�공?�니??
  */
 
 import api from '../../../common/utils/api';
@@ -14,135 +14,136 @@ import {
     UpdateAttendanceRequest
 } from '../types';
 import {NFCVerifyResponse, verifyCheckInByNFC, verifyCheckOutByNFC} from './nfcAttendanceService';
+import {logger} from '../../../utils/logger';
 
-// 출퇴근 관리 서비스 객체
+// 출퇴�?관�??�비??객체
 const attendanceService = {
     /**
-     * 출퇴근 기록 목록 조회
-     * @param filter 필터 조건
-     * @returns 출퇴근 기록 목록
+     * 출퇴�?기록 목록 조회
+     * @param filter ?�터 조건
+     * @returns 출퇴�?기록 목록
      */
     getAttendanceRecords: async (filter: AttendanceFilter): Promise<AttendanceRecord[]> => {
         try {
             const response = await api.get<AttendanceRecord[]>('/attendance', filter);
             return response.data;
         } catch (error) {
-            console.error('출퇴근 기록을 가져오는 중 오류가 발생했습니다:', error);
+            logger.error('출퇴�?기록??가?�오??�??�류가 발생?�습?�다', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 특정 출퇴근 기록 조회
-     * @param attendanceId 출퇴근 기록 ID
-     * @returns 출퇴근 기록
+     * ?�정 출퇴�?기록 조회
+     * @param attendanceId 출퇴�?기록 ID
+     * @returns 출퇴�?기록
      */
     getAttendanceById: async (attendanceId: string): Promise<AttendanceRecord> => {
         try {
             const response = await api.get<AttendanceRecord>(`/attendance/${attendanceId}`);
             return response.data;
         } catch (error) {
-            console.error('출퇴근 기록을 가져오는 중 오류가 발생했습니다:', error);
+            logger.error('?�정 출퇴�?기록??가?�오??�??�류가 발생?�습?�다', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
      * 출근 처리
-     * @param checkInData 출근 데이터
-     * @returns 생성된 출퇴근 기록
+     * @param checkInData 출근 ?�이??
+     * @returns ?�성??출퇴�?기록
      */
     checkIn: async (checkInData: CheckInRequest): Promise<AttendanceRecord> => {
         try {
             const response = await api.post<AttendanceRecord>('/attendance/check-in', checkInData);
             return response.data;
         } catch (error) {
-            console.error('출근 처리 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 퇴근 처리
-     * @param attendanceId 출퇴근 기록 ID
-     * @param checkOutData 퇴근 데이터
-     * @returns 업데이트된 출퇴근 기록
+     * ?�근 처리
+     * @param attendanceId 출퇴�?기록 ID
+     * @param checkOutData ?�근 ?�이??
+     * @returns ?�데?�트??출퇴�?기록
      */
     checkOut: async (attendanceId: string, checkOutData: CheckOutRequest): Promise<AttendanceRecord> => {
         try {
             const response = await api.post<AttendanceRecord>(`/attendance/${attendanceId}/check-out`, checkOutData);
             return response.data;
         } catch (error) {
-            console.error('퇴근 처리 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 출퇴근 기록 수정
-     * @param attendanceId 출퇴근 기록 ID
-     * @param updateData 수정 데이터
-     * @returns 업데이트된 출퇴근 기록
+     * 출퇴�?기록 ?�정
+     * @param attendanceId 출퇴�?기록 ID
+     * @param updateData ?�정 ?�이??
+     * @returns ?�데?�트??출퇴�?기록
      */
     updateAttendance: async (attendanceId: string, updateData: UpdateAttendanceRequest): Promise<AttendanceRecord> => {
         try {
             const response = await api.put<AttendanceRecord>(`/attendance/${attendanceId}`, updateData);
             return response.data;
         } catch (error) {
-            console.error('출퇴근 기록 수정 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 출퇴근 기록 삭제
-     * @param attendanceId 출퇴근 기록 ID
+     * 출퇴�?기록 ??��
+     * @param attendanceId 출퇴�?기록 ID
      */
     deleteAttendance: async (attendanceId: string): Promise<void> => {
         try {
             await api.delete(`/attendance/${attendanceId}`);
         } catch (error) {
-            console.error('출퇴근 기록 삭제 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 현재 근무 상태 조회
+     * ?�재 근무 ?�태 조회
      * @param workplaceId 근무지 ID
-     * @returns 현재 출퇴근 기록 (없으면 null)
+     * @returns ?�재 출퇴�?기록 (?�으�?null)
      */
     getCurrentAttendance: async (workplaceId: string): Promise<AttendanceRecord | null> => {
         try {
             const response = await api.get<AttendanceRecord | null>('/attendance/current', {workplaceId});
             return response.data;
         } catch (error) {
-            console.error('현재 근무 상태를 가져오는 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 출퇴근 통계 조회
-     * @param filter 필터 조건
-     * @returns 출퇴근 통계
+     * 출퇴�??�계 조회
+     * @param filter ?�터 조건
+     * @returns 출퇴�??�계
      */
     getAttendanceStatistics: async (filter: AttendanceFilter): Promise<AttendanceStatistics> => {
         try {
             const response = await api.get<AttendanceStatistics>('/attendance/statistics', filter);
             return response.data;
         } catch (error) {
-            console.error('출퇴근 통계를 가져오는 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 직원별 출퇴근 통계 조회
+     * 직원�?출퇴�??�계 조회
      * @param employeeId 직원 ID
-     * @param startDate 시작일
-     * @param endDate 종료일
-     * @returns 직원별 출퇴근 통계
+     * @param startDate ?�작??
+     * @param endDate 종료??
+     * @returns 직원�?출퇴�??�계
      */
     getEmployeeAttendanceStatistics: async (
         employeeId: string,
@@ -156,17 +157,17 @@ const attendanceService = {
             });
             return response.data;
         } catch (error) {
-            console.error('직원별 출퇴근 통계를 가져오는 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 근무지별 출퇴근 통계 조회
+     * 근무지�?출퇴�??�계 조회
      * @param workplaceId 근무지 ID
-     * @param startDate 시작일
-     * @param endDate 종료일
-     * @returns 근무지별 출퇴근 통계
+     * @param startDate ?�작??
+     * @param endDate 종료??
+     * @returns 근무지�?출퇴�??�계
      */
     getWorkplaceAttendanceStatistics: async (
         workplaceId: string,
@@ -180,16 +181,16 @@ const attendanceService = {
             });
             return response.data;
         } catch (error) {
-            console.error('근무지별 출퇴근 통계를 가져오는 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 일괄 출퇴근 상태 변경
-     * @param attendanceIds 출퇴근 기록 ID 배열
-     * @param status 변경할 상태
-     * @returns 업데이트된 출퇴근 기록 배열
+     * ?�괄 출퇴�??�태 변�?
+     * @param attendanceIds 출퇴�?기록 ID 배열
+     * @param status 변경할 ?�태
+     * @returns ?�데?�트??출퇴�?기록 배열
      */
     batchUpdateStatus: async (
         attendanceIds: string[],
@@ -202,18 +203,18 @@ const attendanceService = {
             });
             return response.data;
         } catch (error) {
-            console.error('일괄 출퇴근 상태 변경 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
 
     /**
-     * 위치 기반 출퇴근 인증
+     * ?�치 기반 출퇴�??�증
      * @param employeeId 직원 ID
      * @param workplaceId 근무지 ID
-     * @param latitude 위도
+     * @param latitude ?�도
      * @param longitude 경도
-     * @returns 인증 결과 (성공 여부 및 거리 정보)
+     * @returns ?�증 결과 (?�공 ?��? �?거리 ?�보)
      */
     verifyLocationAttendance: async (
         employeeId: string,
@@ -233,7 +234,7 @@ const attendanceService = {
             );
             return response.data;
         } catch (error) {
-            console.error('위치 기반 출퇴근 인증 중 오류가 발생했습니다:', error);
+            logger.error('', 'ATTENDANCE_SERVICE', error);
             throw error;
         }
     },
@@ -241,11 +242,11 @@ const attendanceService = {
 
 
     /**
-     * NFC 태그 기반 출퇴근 인증 (래퍼)
-     * @param employeeId 직원 ID (number 또는 string 허용)
-     * @param workplaceId 근무지 ID (number 또는 string 허용)
-     * @param nfcTagId NFC 태그 문자열
-     * @param isCheckOut 퇴근 여부 (기본 false = 출근)
+     * NFC ?�그 기반 출퇴�??�증 (?�퍼)
+     * @param employeeId 직원 ID (number ?�는 string ?�용)
+     * @param workplaceId 근무지 ID (number ?�는 string ?�용)
+     * @param nfcTagId NFC ?�그 문자??
+     * @param isCheckOut ?�근 ?��? (기본 false = 출근)
      */
     verifyNfcTagAttendance: async (
         employeeId: string | number,
@@ -256,7 +257,7 @@ const attendanceService = {
         const employeeIdNum = typeof employeeId === 'string' ? Number(employeeId) : employeeId;
         const storeIdNum = typeof workplaceId === 'string' ? Number(workplaceId) : workplaceId;
         if (!Number.isFinite(employeeIdNum) || !Number.isFinite(storeIdNum)) {
-            return {success: false, message: '유효하지 않은 ID입니다.'};
+            return {success: false, message: '?�효?��? ?��? ID?�니??'};
         }
 
         if (isCheckOut) {

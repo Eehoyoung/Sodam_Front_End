@@ -13,7 +13,7 @@ import {
     View,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 // 네비게이션 타입 정의
 type RootStackParamList = {
@@ -28,7 +28,7 @@ type RootStackParamList = {
     AddStore: undefined;
 };
 
-type MasterMyPageScreenNavigationProp = StackNavigationProp<RootStackParamList>;
+type MasterMyPageScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 // 매장 타입 정의
 interface Store {

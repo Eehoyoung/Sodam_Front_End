@@ -10,7 +10,7 @@ if (defaultConfig.server && defaultConfig.server.forwardClientLogs !== undefined
 if (defaultConfig.watcher) {
     delete defaultConfig.watcher.unstable_lazySha1;
     delete defaultConfig.watcher.unstable_workerThreads;
-    delete defaultConfig.watcher.unstable_autoSaveCache;
+    delete defaultConfig.watcher.unstable_autoSaveCache; // Metro v0.76.9 호환성을 위해 강제 삭제
 }
 
 const customConfig = {
@@ -20,7 +20,6 @@ const customConfig = {
         blockList: exclusionList([
             /out\/production\/.*/, // 🚫 out 폴더 무시
             /\.git\//,
-            /\.expo\//,
             /node_modules\/.*\/test\//,
         ]),
         unstable_enablePackageExports: false,
@@ -47,17 +46,10 @@ const customConfig = {
             interval: 30000,
             timeout: 10000,
         },
-        // 개발 성능 최적화
-        watchman: true,
+        // 개발 성능 최적화 (Windows 환경: Watchman 미지원이므로 비활성화)
+        watchman: false,
         additionalExts: ['ts', 'tsx'],
     },
-    // 개발 모드 캐싱 강화
-    cacheStores: [
-        {
-            type: 'FileStore',
-            root: require('path').join(__dirname, '.metro-cache'),
-        },
-    ],
 };
 
 module.exports = mergeConfig(defaultConfig, customConfig);

@@ -103,7 +103,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
             testimonialAnim2.value = withDelay(900, withTiming(0, {
                 duration: 800,
                 easing: Easing.out(Easing.cubic),
-            }, (finished) => {
+            }, (finished: boolean) => {
                 'worklet';
                 if (finished) {
                     // 후기 애니메이션 완료 후 CTA 버튼 펄스 시작

@@ -5,7 +5,7 @@ import {RouteProp} from '@react-navigation/native';
 export type RootStackParamList = {
     Welcome: undefined;  // 새로운 메인화면 (첫 방문자용)
     Auth: { screen?: keyof AuthStackParamList; params?: any };
-    Main: undefined;
+    HomeRoot: undefined;
     // 기타 루트 레벨 화면...
 };
 
@@ -23,6 +23,16 @@ export type HomeStackParamList = {
     WorkplaceDetail: { workplaceId: string };
     SalaryList: undefined;
     InfoMain: undefined;
+    LaborInfoDetail: { laborInfoId: number };
+    TaxInfoDetail: { taxInfoId: number };
+    TipsDetail: { tipId: number };
+    PolicyDetail: { policyId: number };
+    QnA: undefined;
+    EmployeeMyPageScreen: undefined;
+    ManagerMyPageScreen: undefined;
+    MasterMyPageScreen: undefined;
+    UserMyPageScreen: undefined;
+    Subscribe: undefined;
     // 기타 홈 스택 화면...
 };
 

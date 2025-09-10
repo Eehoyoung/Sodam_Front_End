@@ -11,11 +11,10 @@ plugins {
     id("com.facebook.react.settings")
 }
 
-// Ensure autolinking.json is generated from RN CLI output (includes project.android.packageName)
+// RN CLI autolinking.json 생성
 extensions.configure(com.facebook.react.ReactSettingsExtension) { ext ->
     ext.autolinkLibrariesFromCommand()
 }
-
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
@@ -30,9 +29,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'Sodam_Front_End'
-include ':app'
+rootProject.name = "Sodam_Front_End"
+include(":app")
 
-// Reanimated is now handled by autolinking - manual include removed to prevent conflicts
-
-// ReactAndroid project inclusion is managed by com.facebook.react.settings plugin and the RN Gradle plugin.
+// Reanimated 수동 include 제거 (autolink에 위임)

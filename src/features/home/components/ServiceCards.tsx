@@ -102,9 +102,9 @@ const ServiceCards = () => {
     // 서비스 카드 너비 계산 (반응형)
     const getCardWidth = () => {
         // 화면 너비에 따라 카드 너비 조정
-        if (width >= 1200) return '22%'; // 대형 화면
-        if (width >= 768) return '45%';  // 태블릿
-        return '90%';                    // 모바일
+        if (width >= 1200) { return '22%'; } // 대형 화면
+        if (width >= 768) { return '45%'; }  // 태블릿
+        return '90%';                        // 모바일
     };
 
     if (loading) {
@@ -139,7 +139,7 @@ const ServiceCards = () => {
                     // 서비스 화면으로 이동
                     const handlePress = () => {
                         if (service.screenName) {
-                            // @ts-ignore - 타입 오류 무시 (동적 네비게이션)
+                            // @ts-expect-error - 타입 오류 무시 (동적 네비게이션)
                             navigation.navigate(service.screenName);
                         } else {
                             // 기본 화면으로 이동
