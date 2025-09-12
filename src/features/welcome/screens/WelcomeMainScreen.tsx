@@ -1,113 +1,229 @@
-import React, {useRef} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {StyleSheet, View, Text, ScrollView, TouchableOpacity, NativeSyntheticEvent, NativeScrollEvent} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {RootNavigationProp} from '../../../navigation/types';
+import React from 'react';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    Dimensions,
+    StatusBar,
+    Animated,
+} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { NavigationProp } from '@react-navigation/native';
+import SodamLogo from '../../../common/components/logo/SodamLogo';
+import { COLORS } from '../../../common/components/logo/Colors';
+import LoginScreen from "../../auth/screens/LoginScreen.tsx";
+import signupScreen from "../../auth/screens/SignupScreen.tsx";
 
-/**
- * WelcomeMainScreen (Moderate plan mock)
- * - Purpose: Production-grade Welcome placeholder for initial user entry
- * - CTA: Go to Login / Signup via nested Auth navigator
- * - Notes: Not wired in AppNavigator yet (HybridMainScreen is still active).
- */
-const WelcomeMainScreen: React.FC = () => {
-  const navigation = useNavigation<RootNavigationProp>();
-  const scrollRef = useRef<ScrollView>(null);
+interface WelcomeMainScreenProps {
+    navigation: NavigationProp<any>;
+}
 
-  const handleStart = () => {
-    navigation.navigate('Auth', {screen: 'Login'});
-  };
+Dimensions.get('window');
 
-  const handleSignup = () => {
-    navigation.navigate('Auth', {screen: 'Signup'});
-  };
+export default function WelcomeMainScreen({ navigation }: WelcomeMainScreenProps) {
+    const fadeAnim = React.useRef(new Animated.Value(0)).current;
+    const slideAnim = React.useRef(new Animated.Value(50)).current;
 
-  const handleExplore = () => {
-    scrollRef.current?.scrollTo({y: 420, animated: true});
-  };
+    React.useEffect(() => {
+        Animated.parallel([
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 800,
+                useNativeDriver: true,
+            }),
+            Animated.timing(slideAnim, {
+                toValue: 0,
+                duration: 800,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, []);
 
-  const onScroll = (_e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    // reserved for future metrics
-  };
+    const handleLogin = () => {
+        navigation.navigate('Auth', {screen:LoginScreen});
+    };
 
-  return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView ref={scrollRef} style={styles.container} onScroll={onScroll} scrollEventThrottle={16}>
-        {/* Hero Section */}
-        <View style={styles.hero}>
-          <Text style={styles.brand}>SODAM</Text>
-          <Text style={styles.title}>알바 근태·급여, 한 곳에서 끝</Text>
-          <Text style={styles.subtitle}>NFC 출퇴근 · 자동 급여 계산 · 멀티 매장 관리</Text>
+    const handleSignup = () => {
+        navigation.navigate('Auth', {screen:signupScreen});
+    };
 
-          <View style={styles.ctaRow}>
-            <TouchableOpacity accessibilityRole="button" onPress={handleStart} style={[styles.button, styles.primary]}
-                              accessibilityLabel="시작하기 (로그인으로 이동)">
-              <Text style={styles.buttonText}>시작하기</Text>
-            </TouchableOpacity>
-            <TouchableOpacity accessibilityRole="button" onPress={handleSignup} style={[styles.button, styles.secondary]}
-                              accessibilityLabel="회원가입으로 이동">
-              <Text style={[styles.buttonText, styles.secondaryText]}>회원가입</Text>
-            </TouchableOpacity>
-          </View>
+    return (
+        <>
+            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+            <LinearGradient
+                colors={[COLORS.SODAM_ORANGE, '#FF8A65', '#42A5F5', COLORS.SODAM_BLUE]}
+                style={styles.container}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <SafeAreaView style={styles.safeArea}>
+                    <View style={styles.content}>
+                        {/* 로고 섹션 */}
+                        <Animated.View
+                            style={[
+                                styles.logoSection,
+                                {
+                                    opacity: fadeAnim,
+                                    transform: [{ translateY: slideAnim }]
+                                }
+                            ]}
+                        >
+                            <View style={styles.logoContainer}>
+                                <SodamLogo size={120} variant="white" />
+                            </View>
 
-          <TouchableOpacity accessibilityRole="button" onPress={handleExplore}
-                            style={styles.linkBtn} accessibilityLabel="기능 살펴보기로 이동">
-            <Text style={styles.linkText}>기능 살펴보기 ↓</Text>
-          </TouchableOpacity>
-        </View>
+                            <Text style={styles.brandName}>소담</Text>
+                            <Text style={styles.brandSubtitle}>소상공인을 담다</Text>
+                            <Text style={styles.brandDescription}>디지털과 연결하다</Text>
+                        </Animated.View>
 
-        {/* Highlights */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>왜 소담인가요?</Text>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>빠른 출퇴근</Text>
-            <Text style={styles.cardBody}>NFC 태그 한 번으로 출근/퇴근. 위치 기반 보안.</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>자동 급여 계산</Text>
-            <Text style={styles.cardBody}>근태 기록과 시급을 바탕으로 자동 합산.</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>멀티 매장 관리</Text>
-            <Text style={styles.cardBody}>여러 매장 직원과 근태를 한 눈에.</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>정보 서비스</Text>
-            <Text style={styles.cardBody}>정책/노동/세무 정보와 Q&A를 제공.</Text>
-          </View>
-        </View>
+                        {/* 버튼 섹션 */}
+                        <Animated.View
+                            style={[
+                                styles.buttonSection,
+                                {
+                                    opacity: fadeAnim,
+                                    transform: [{ translateY: slideAnim }]
+                                }
+                            ]}
+                        >
+                            <TouchableOpacity
+                                style={styles.loginButton}
+                                onPress={handleLogin}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={styles.loginButtonText}>로그인</Text>
+                            </TouchableOpacity>
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>로그인 없이도 둘러볼 수 있어요. 언제든 시작하기를 눌러 가입/로그인하세요.</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
+                            <TouchableOpacity
+                                style={styles.signupButton}
+                                onPress={handleSignup}
+                                activeOpacity={0.8}
+                            >
+                                <Text style={styles.signupButtonText}>회원가입</Text>
+                            </TouchableOpacity>
+                        </Animated.View>
+
+                        {/* 하단 텍스트 */}
+                        <Animated.View
+                            style={[
+                                styles.bottomSection,
+                                { opacity: fadeAnim }
+                            ]}
+                        >
+                            <Text style={styles.bottomText}>
+                                이미 계정이 있으신가요?{' '}
+                                <Text style={styles.bottomLink} onPress={handleLogin}>
+                                    로그인하기
+                                </Text>
+                            </Text>
+                        </Animated.View>
+                    </View>
+                </SafeAreaView>
+            </LinearGradient>
+        </>
+    );
+}
 
 const styles = StyleSheet.create({
-  safe: {flex: 1, backgroundColor: '#ffffff'},
-  container: {flex: 1},
-  hero: {paddingTop: 48, paddingHorizontal: 24, paddingBottom: 24, alignItems: 'center'},
-  brand: {fontSize: 18, fontWeight: '700', letterSpacing: 2, color: '#4F46E5', marginBottom: 8},
-  title: {fontSize: 24, fontWeight: '800', color: '#111827', textAlign: 'center'},
-  subtitle: {fontSize: 14, color: '#6B7280', marginTop: 8, textAlign: 'center'},
-  ctaRow: {flexDirection: 'row', marginTop: 20},
-  button: {paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, marginHorizontal: 6},
-  primary: {backgroundColor: '#4F46E5'},
-  secondary: {backgroundColor: '#EEF2FF'},
-  buttonText: {fontSize: 16, color: '#ffffff', fontWeight: '700'},
-  secondaryText: {color: '#4F46E5'},
-  linkBtn: {marginTop: 16, padding: 8},
-  linkText: {color: '#4F46E5', fontWeight: '600'},
-  section: {paddingHorizontal: 24, paddingBottom: 32},
-  sectionTitle: {fontSize: 18, fontWeight: '800', marginBottom: 12, color: '#111827'},
-  card: {backgroundColor: '#F9FAFB', borderRadius: 12, padding: 16, marginBottom: 10},
-  cardTitle: {fontSize: 16, fontWeight: '700', color: '#111827'},
-  cardBody: {fontSize: 13, color: '#4B5563', marginTop: 4},
-  footer: {paddingHorizontal: 24, paddingBottom: 48},
-  footerText: {fontSize: 12, color: '#6B7280', textAlign: 'center'},
+    container: {
+        flex: 1,
+    },
+    safeArea: {
+        flex: 1,
+    },
+    content: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 24,
+    },
+    logoSection: {
+        alignItems: 'center',
+        marginBottom: 60,
+    },
+    logoContainer: {
+        marginBottom: 24,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    brandName: {
+        fontSize: 48,
+        fontWeight: 'bold',
+        color: COLORS.WHITE,
+        marginBottom: 8,
+        textShadowColor: 'rgba(0, 0, 0, 0.3)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
+    },
+    brandSubtitle: {
+        fontSize: 20,
+        color: 'rgba(255, 255, 255, 0.9)',
+        marginBottom: 4,
+    },
+    brandDescription: {
+        fontSize: 16,
+        color: 'rgba(255, 255, 255, 0.8)',
+    },
+    buttonSection: {
+        width: '100%',
+        maxWidth: 320,
+    },
+    loginButton: {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        paddingVertical: 16,
+        paddingHorizontal: 24,
+        borderRadius: 16,
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    loginButtonText: {
+        color: COLORS.SODAM_ORANGE,
+        fontSize: 18,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    signupButton: {
+        borderWidth: 2,
+        borderColor: 'rgba(255, 255, 255, 0.8)',
+        paddingVertical: 16,
+        paddingHorizontal: 24,
+        borderRadius: 16,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    signupButtonText: {
+        color: COLORS.WHITE,
+        fontSize: 18,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    bottomSection: {
+        position: 'absolute',
+        bottom: 40,
+        alignItems: 'center',
+    },
+    bottomText: {
+        color: 'rgba(255, 255, 255, 0.7)',
+        fontSize: 14,
+    },
+    bottomLink: {
+        color: COLORS.WHITE,
+        fontWeight: '600',
+        textDecorationLine: 'underline',
+    },
 });
-
-export default WelcomeMainScreen;
