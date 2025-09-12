@@ -15,6 +15,7 @@ import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
 import com.oblador.vectoricons.VectorIconsPackage
 import com.swmansion.reanimated.ReanimatedPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 
 class MainApplication : Application(), ReactApplication {
 

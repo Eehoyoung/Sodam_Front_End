@@ -1,601 +1,315 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Image,
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
     View,
+    Text,
+    ScrollView,
+    TouchableOpacity,
+    StyleSheet,
+    Dimensions,
+    FlatList,
+    RefreshControl,
+    Alert,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import  LinearGradient  from 'react-native-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { NavigationProp } from '@react-navigation/native';
+import  Ionicons from 'react-native-vector-icons/Ionicons';
+import { COLORS } from '../../../common/components/logo/Colors';
 
-// 네비게이션 타입 정의
-type RootStackParamList = {
-    Home: undefined;
-    Login: undefined;
-    StoreDetail: { storeId: number };
-    EmployeeManagement: { storeId: number };
-    StoreSettings: { storeId: number };
-    PayrollManagement: { storeId: number };
-    TimeOffApprovals: { storeId: number };
-    ProfileEdit: undefined;
-    AddStore: undefined;
-};
+interface MasterMyPageScreenProps {
+    navigation: NavigationProp<any>;
+}
 
-type MasterMyPageScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
-// 매장 타입 정의
-interface Store {
+interface StoreInfo {
     id: number;
-    name: string;
-    address: string;
-    employeeCount: number;
+    storeName: string;
+    businessNumber: string;
+    storePhoneNumber: string;
+    businessType: string;
+    storeCode: string;
+    fullAddress: string;
+    storeStandardHourWage: number;
     monthlyLaborCost: number;
-    logoUrl?: string;
-}
-
-// 매장 통계 타입 정의
-interface StoreStats {
-    totalEmployees: number;
-    totalLaborCost: number;
-    averageHourlyWage: number;
-    pendingTimeOffRequests: number;
-    month: string;
-}
-
-// 직원 타입 정의
-interface Employee {
-    id: number;
-    name: string;
-    position: string;
-    hourlyWage: number;
-    workHours: number;
-    profileImageUrl?: string;
-}
-
-// 급여 내역 타입 정의
-interface Payroll {
-    id: number;
-    storeId: number;
-    storeName: string;
-    month: string;
-    totalAmount: number;
     employeeCount: number;
-    status: 'PENDING' | 'PROCESSED' | 'COMPLETED';
-    processedDate: string | null;
+    todayAttendance: number;
+    monthlyRevenue: number;
 }
 
-// 휴가 신청 타입
-interface TimeOff {
+interface PolicyInfo {
     id: number;
-    employeeId: number;
-    employeeName: string;
-    storeId: number;
-    storeName: string;
-    startDate: string;
-    endDate: string;
-    reason: string;
-    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    title: string;
+    category: string;
+    deadline: string;
+    description: string;
+    isNew: boolean;
 }
 
-// 매출 데이터 타입
-interface Revenue {
-    month: string;
-    amount: number;
+interface LaborInfo {
+    minimumWage: number;
+    year: number;
+    weeklyMaxHours: number;
+    overtimeRate: number;
 }
 
-// 인건비 데이터 타입
-interface LaborCost {
-    month: string;
-    amount: number;
-}
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.85;
 
-const MasterMyPageScreen = () => {
-    const navigation = useNavigation<MasterMyPageScreenNavigationProp>();
-
-    // 상태 관리
-    const [isLoading, setIsLoading] = useState(false);
+export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenProps) {
+    const [stores, setStores] = useState<StoreInfo[]>([]);
+    const [policies, setPolicies] = useState<PolicyInfo[]>([]);
+    const [laborInfo, setLaborInfo] = useState<LaborInfo | null>(null);
     const [refreshing, setRefreshing] = useState(false);
-    const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-    const [stores, setStores] = useState<Store[]>([]);
-    const [storeStats, setStoreStats] = useState<StoreStats | null>(null);
-    const [employees, setEmployees] = useState<Employee[]>([]);
-    const [payrolls, setPayrolls] = useState<Payroll[]>([]);
-    const [timeOffRequests, setTimeOffRequests] = useState<TimeOff[]>([]);
-    const [monthlyRevenue, setMonthlyRevenue] = useState<Revenue[]>([]);
-    const [monthlyLaborCost, setMonthlyLaborCost] = useState<LaborCost[]>([]);
-    const [selectedMonth, setSelectedMonth] = useState<string>(
-        new Date().toISOString().slice(0, 7), // 현재 연월(YYYY-MM)
-    );
-    const [showAddStoreModal, setShowAddStoreModal] = useState(false);
-    const [combinedStats, setCombinedStats] = useState({
+    const [masterInfo, setMasterInfo] = useState({
+        name: '김소상',
+        businessLicenseNumber: '123-45-67890',
         totalStores: 0,
         totalEmployees: 0,
-        totalLaborCost: 0,
-        pendingTimeOffRequests: 0,
+        monthlyTotalLaborCost: 0,
     });
 
-    // 이전 6개월 목록 생성
-    const getLastSixMonths = () => {
-        const months = [];
-        const currentDate = new Date();
+    const storeScrollRef = useRef<FlatList>(null);
 
-        for (let i = 0; i < 6; i++) {
-            const date = new Date(
-                currentDate.getFullYear(),
-                currentDate.getMonth() - i,
-                1,
-            );
-            const monthString = date.toISOString().slice(0, 7);
-            const displayText = `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
-            months.push({value: monthString, label: displayText});
-        }
-
-        return months;
-    };
-
-    const monthOptions = getLastSixMonths();
-
-    // 데이터 로딩 함수
-    const loadData = async () => {
-        setIsLoading(true);
-        try {
-            // 실제 구현에서는 API 호출
-            // 1. 소유한 매장 목록 조회
-            await fetchStores();
-
-            // 2. 선택된 매장이 있으면 해당 매장의 통계 로드
-            if (selectedStore) {
-                await fetchStoreStats();
-                await fetchEmployees();
-            }
-
-            // 3. 급여 내역 로드
-            await fetchPayrolls();
-
-            // 4. 휴가 신청 내역 로드
-            await fetchTimeOffRequests();
-
-            // 5. 월별 매출 및 인건비 추이 데이터 로드
-            await fetchMonthlyData();
-
-            // 6. 통합 통계 로드
-            await fetchCombinedStats();
-        } catch (error) {
-            Alert.alert('오류', '데이터를 불러오는 중 오류가 발생했습니다.');
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-            setRefreshing(false);
-        }
-    };
-
-    // 매장 목록 조회 (임시 데이터)
-    const fetchStores = async () => {
-        // 실제 API 호출 대신 임시 데이터
-        const storesData: Store[] = [
-            {
-                id: 1,
-                name: '소담 카페 강남점',
-                address: '서울시 강남구 역삼동 123-45',
-                employeeCount: 8,
-                monthlyLaborCost: 8500000,
-            },
-            {
-                id: 2,
-                name: '소담 레스토랑 홍대점',
-                address: '서울시 마포구 서교동 345-67',
-                employeeCount: 12,
-                monthlyLaborCost: 12000000,
-            },
-            {
-                id: 3,
-                name: '소담 베이커리 종로점',
-                address: '서울시 종로구 관철동 89-12',
-                employeeCount: 5,
-                monthlyLaborCost: 4500000,
-            },
-        ];
-
-        setStores(storesData);
-
-        // 아직 선택된 매장이 없으면 첫 번째 매장 선택
-        if (!selectedStore && storesData.length > 0) {
-            setSelectedStore(storesData[0]);
-        }
-    };
-
-    // 매장 통계 조회 (임시 데이터)
-    const fetchStoreStats = async () => {
-        if (!selectedStore) {
-            return;
-        }
-
-        // 실제 API 호출 대신 임시 데이터
-        setTimeout(() => {
-            const statsData: StoreStats = {
-                totalEmployees: selectedStore.employeeCount,
-                totalLaborCost: selectedStore.monthlyLaborCost,
-                averageHourlyWage: Math.round(
-                    selectedStore.monthlyLaborCost / (selectedStore.employeeCount * 160),
-                ),
-                pendingTimeOffRequests: 3,
-                month: selectedMonth,
-            };
-
-            setStoreStats(statsData);
-        }, 500);
-    };
-
-    // 직원 목록 조회 (임시 데이터)
-    const fetchEmployees = async () => {
-        if (!selectedStore) {
-            return;
-        }
-
-        // 실제 API 호출 대신 임시 데이터
-        setTimeout(() => {
-            const employeesData: Employee[] = [
-                {
-                    id: 101,
-                    name: '김소담',
-                    position: '매니저',
-                    hourlyWage: 12000,
-                    workHours: 160,
-                },
-                {
-                    id: 102,
-                    name: '이하늘',
-                    position: '바리스타',
-                    hourlyWage: 10000,
-                    workHours: 120,
-                },
-                {
-                    id: 103,
-                    name: '박별',
-                    position: '바리스타',
-                    hourlyWage: 10000,
-                    workHours: 80,
-                },
-                {
-                    id: 104,
-                    name: '최달',
-                    position: '주방 보조',
-                    hourlyWage: 9500,
-                    workHours: 100,
-                },
-            ];
-
-            setEmployees(employeesData);
-        }, 500);
-    };
-
-    // 급여 내역 조회 (임시 데이터)
-    const fetchPayrolls = async () => {
-        // 실제 API 호출 대신 임시 데이터
-        setTimeout(() => {
-            const payrollsData: Payroll[] = [
-                {
-                    id: 201,
-                    storeId: 1,
-                    storeName: '소담 카페 강남점',
-                    month: '2023-10',
-                    totalAmount: 8200000,
-                    employeeCount: 8,
-                    status: 'COMPLETED',
-                    processedDate: '2023-11-05',
-                },
-                {
-                    id: 202,
-                    storeId: 2,
-                    storeName: '소담 레스토랑 홍대점',
-                    month: '2023-10',
-                    totalAmount: 11800000,
-                    employeeCount: 12,
-                    status: 'COMPLETED',
-                    processedDate: '2023-11-05',
-                },
-                {
-                    id: 203,
-                    storeId: 3,
-                    storeName: '소담 베이커리 종로점',
-                    month: '2023-10',
-                    totalAmount: 4300000,
-                    employeeCount: 5,
-                    status: 'COMPLETED',
-                    processedDate: '2023-11-05',
-                },
-            ];
-
-            setPayrolls(payrollsData);
-        }, 500);
-    };
-
-    // 휴가 신청 내역 조회 (임시 데이터)
-    const fetchTimeOffRequests = async () => {
-        // 실제 API 호출 대신 임시 데이터
-        setTimeout(() => {
-            const timeOffData: TimeOff[] = [
-                {
-                    id: 301,
-                    employeeId: 102,
-                    employeeName: '이하늘',
-                    storeId: 1,
-                    storeName: '소담 카페 강남점',
-                    startDate: '2023-12-25',
-                    endDate: '2023-12-26',
-                    reason: '개인 사유',
-                    status: 'PENDING' as const,
-                },
-                {
-                    id: 302,
-                    employeeId: 103,
-                    employeeName: '박별',
-                    storeId: 1,
-                    storeName: '소담 카페 강남점',
-                    startDate: '2023-12-24',
-                    endDate: '2023-12-24',
-                    reason: '병가',
-                    status: 'PENDING' as const,
-                },
-                {
-                    id: 303,
-                    employeeId: 105,
-                    employeeName: '정해',
-                    storeId: 2,
-                    storeName: '소담 레스토랑 홍대점',
-                    startDate: '2023-12-31',
-                    endDate: '2024-01-01',
-                    reason: '가족 행사',
-                    status: 'PENDING' as const,
-                },
-            ];
-
-            setTimeOffRequests(timeOffData);
-        }, 500);
-    };
-
-    // 월별 매출 및 인건비 추이 데이터 조회 (임시 데이터)
-    const fetchMonthlyData = async () => {
-        // 실제 API 호출 대신 임시 데이터
-        setTimeout(() => {
-            // 6개월 간의 매출 데이터
-            const revenueData = [
-                {month: '2023-06', amount: 35000000},
-                {month: '2023-07', amount: 38000000},
-                {month: '2023-08', amount: 36500000},
-                {month: '2023-09', amount: 37200000},
-                {month: '2023-10', amount: 39500000},
-                {month: '2023-11', amount: 38700000},
-            ];
-
-            // 6개월 간의 인건비 데이터
-            const laborCostData = [
-                {month: '2023-06', amount: 23000000},
-                {month: '2023-07', amount: 24500000},
-                {month: '2023-08', amount: 24000000},
-                {month: '2023-09', amount: 24200000},
-                {month: '2023-10', amount: 25000000},
-                {month: '2023-11', amount: 25500000},
-            ];
-
-            setMonthlyRevenue(revenueData);
-            setMonthlyLaborCost(laborCostData);
-        }, 500);
-    };
-
-    // 통합 통계 조회 (임시 데이터)
-    const fetchCombinedStats = async () => {
-        // 실제 API 호출 대신 임시 데이터
-        setTimeout(() => {
-            const combinedData = {
-                totalStores: stores.length,
-                totalEmployees: stores.reduce(
-                    (sum, store) => sum + store.employeeCount,
-                    0,
-                ),
-                totalLaborCost: stores.reduce(
-                    (sum, store) => sum + store.monthlyLaborCost,
-                    0,
-                ),
-                pendingTimeOffRequests: timeOffRequests.filter(
-                    req => req.status === 'PENDING',
-                ).length,
-            };
-
-            setCombinedStats(combinedData);
-        }, 500);
-    };
-
-    // 화면 로드 시 데이터 로딩
     useEffect(() => {
         loadData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 매장 변경 시 해당 매장의 데이터 로딩
-    useEffect(() => {
-        if (selectedStore) {
-            fetchStoreStats();
-            fetchEmployees();
+    const loadData = async () => {
+        try {
+            // 실제 API 호출 시뮬레이션
+            const mockStores: StoreInfo[] = [
+                {
+                    id: 1,
+                    storeName: '소담 카페 강남점',
+                    businessNumber: '123-45-67890',
+                    storePhoneNumber: '02-1234-5678',
+                    businessType: '카페',
+                    storeCode: 'SODAM001',
+                    fullAddress: '서울시 강남구 테헤란로 123',
+                    storeStandardHourWage: 9620,
+                    monthlyLaborCost: 15420000,
+                    employeeCount: 8,
+                    todayAttendance: 6,
+                    monthlyRevenue: 45600000,
+                },
+                {
+                    id: 2,
+                    storeName: '소담 베이커리 홍대점',
+                    businessNumber: '123-45-67891',
+                    storePhoneNumber: '02-2345-6789',
+                    businessType: '베이커리',
+                    storeCode: 'SODAM002',
+                    fullAddress: '서울시 마포구 홍익로 456',
+                    storeStandardHourWage: 9620,
+                    monthlyLaborCost: 12800000,
+                    employeeCount: 6,
+                    todayAttendance: 5,
+                    monthlyRevenue: 32400000,
+                },
+                {
+                    id: 3,
+                    storeName: '소담 치킨 신촌점',
+                    businessNumber: '123-45-67892',
+                    storePhoneNumber: '02-3456-7890',
+                    businessType: '치킨전문점',
+                    storeCode: 'SODAM003',
+                    fullAddress: '서울시 서대문구 신촌로 789',
+                    storeStandardHourWage: 9620,
+                    monthlyLaborCost: 9600000,
+                    employeeCount: 5,
+                    todayAttendance: 4,
+                    monthlyRevenue: 28800000,
+                },
+            ];
+
+            const mockPolicies: PolicyInfo[] = [
+                {
+                    id: 1,
+                    title: '소상공인 전용 대출 지원사업',
+                    category: '금융지원',
+                    deadline: '2024-03-31',
+                    description: '연 2.5% 저금리로 최대 5천만원까지 지원',
+                    isNew: true,
+                },
+                {
+                    id: 2,
+                    title: '청년 고용 장려금',
+                    category: '고용지원',
+                    deadline: '2024-04-15',
+                    description: '청년 신규 채용시 월 80만원 × 6개월 지원',
+                    isNew: true,
+                },
+                {
+                    id: 3,
+                    title: '디지털 전환 지원금',
+                    category: '디지털화',
+                    deadline: '2024-05-30',
+                    description: 'POS, 키오스크 도입비용 최대 200만원 지원',
+                    isNew: false,
+                },
+            ];
+
+            const mockLaborInfo: LaborInfo = {
+                minimumWage: 9620,
+                year: 2024,
+                weeklyMaxHours: 40,
+                overtimeRate: 1.5,
+            };
+
+            setStores(mockStores);
+            setPolicies(mockPolicies);
+            setLaborInfo(mockLaborInfo);
+
+            // 마스터 정보 업데이트
+            const totalEmployees = mockStores.reduce((sum, store) => sum + store.employeeCount, 0);
+            const totalLaborCost = mockStores.reduce((sum, store) => sum + store.monthlyLaborCost, 0);
+
+            setMasterInfo(prev => ({
+                ...prev,
+                totalStores: mockStores.length,
+                totalEmployees,
+                monthlyTotalLaborCost: totalLaborCost,
+            }));
+
+        } catch (error) {
+            Alert.alert('오류', '데이터를 불러오는데 실패했습니다.');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedStore, selectedMonth]);
+    };
 
-    // 새로고침 처리
-    const handleRefresh = () => {
+    const onRefresh = async () => {
         setRefreshing(true);
-        loadData();
+        await loadData();
+        setRefreshing(false);
     };
 
-    // 매장 선택 처리
-    const handleStoreSelect = (store: Store) => {
-        setSelectedStore(store);
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('ko-KR').format(amount);
     };
 
-    // 휴가 승인 처리
-    const handleApproveTimeOff = (timeOffId: number) => {
-        // 실제 API 호출 구현 필요
-        const updatedRequests: TimeOff[] = timeOffRequests.map(req =>
-            req.id === timeOffId ? {...req, status: 'APPROVED' as const} : req,
-        );
-        setTimeOffRequests(updatedRequests);
-        Alert.alert('성공', '휴가 신청이 승인되었습니다.');
+    const handleStorePress = (store: StoreInfo) => {
+        navigation.navigate('StoreDetailScreen', { storeId: store.id });
     };
 
-    // 휴가 거부 처리
-    const handleRejectTimeOff = (timeOffId: number) => {
-        // 실제 API 호출 구현 필요
-        const updatedRequests: TimeOff[] = timeOffRequests.map(req =>
-            req.id === timeOffId ? {...req, status: 'REJECTED' as const} : req,
-        );
-        setTimeOffRequests(updatedRequests);
-        Alert.alert('성공', '휴가 신청이 거부되었습니다.');
+    const handlePolicyPress = (policy: PolicyInfo) => {
+        navigation.navigate('PolicyDetailScreen', { policyId: policy.id });
     };
 
-    // 매장 카드 렌더링
-    const renderStoreCard = ({item}: { item: Store }) => {
-        const isSelected = selectedStore?.id === item.id;
+    const renderStoreCard = ({ item: store }: { item: StoreInfo }) => (
+        <TouchableOpacity
+            style={styles.storeCard}
+            onPress={() => handleStorePress(store)}
+            activeOpacity={0.8}
+        >
+            <LinearGradient
+                colors={['#FF6B35', '#FF8A65']}
+                style={styles.storeCardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <View style={styles.storeCardHeader}>
+                    <Text style={styles.storeName}>{store.storeName}</Text>
+                    <View style={styles.storeTypeTag}>
+                        <Text style={styles.storeTypeText}>{store.businessType}</Text>
+                    </View>
+                </View>
 
-        return (
-            <TouchableOpacity
-                style={[styles.storeCard, isSelected && styles.selectedStoreCard]}
-                onPress={() => handleStoreSelect(item)}>
-                <View style={styles.storeLogoContainer}>
-                    {item.logoUrl ? (
-                        <Image source={{uri: item.logoUrl}} style={styles.storeLogo}/>
-                    ) : (
-                        <View style={styles.storeLogoPlaceholder}>
-                            <Text style={styles.storeLogoText}>{item.name.charAt(0)}</Text>
+                <View style={styles.storeStats}>
+                    <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>이번달 인건비</Text>
+                        <Text style={styles.statValue}>{formatCurrency(store.monthlyLaborCost)}원</Text>
+                    </View>
+
+                    <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>직원 수</Text>
+                        <Text style={styles.statValue}>{store.employeeCount}명</Text>
+                    </View>
+                </View>
+
+                <View style={styles.storeStats}>
+                    <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>오늘 출근</Text>
+                        <Text style={styles.statValue}>{store.todayAttendance}명</Text>
+                    </View>
+
+                    <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>이번달 매출</Text>
+                        <Text style={styles.statValue}>{formatCurrency(store.monthlyRevenue)}원</Text>
+                    </View>
+                </View>
+
+                <View style={styles.storeFooter}>
+                    <Text style={styles.storeAddress}>{store.fullAddress}</Text>
+                    <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.8)" />
+                </View>
+            </LinearGradient>
+        </TouchableOpacity>
+    );
+
+    const renderPolicyCard = (policy: PolicyInfo) => (
+        <TouchableOpacity
+            key={policy.id}
+            style={styles.policyCard}
+            onPress={() => handlePolicyPress(policy)}
+            activeOpacity={0.8}
+        >
+            <View style={styles.policyHeader}>
+                <View style={styles.policyTitleRow}>
+                    <Text style={styles.policyTitle}>{policy.title}</Text>
+                    {policy.isNew && (
+                        <View style={styles.newBadge}>
+                            <Text style={styles.newBadgeText}>NEW</Text>
                         </View>
                     )}
                 </View>
-                <View style={styles.storeInfo}>
-                    <Text style={styles.storeName}>{item.name}</Text>
-                    <Text style={styles.storeAddress} numberOfLines={1}>
-                        {item.address}
-                    </Text>
-                    <Text style={styles.storeEmployeeCount}>
-                        직원 수: {item.employeeCount}명
-                    </Text>
+                <View style={styles.policyCategoryTag}>
+                    <Text style={styles.policyCategoryText}>{policy.category}</Text>
                 </View>
-                {isSelected && (
-                    <View style={styles.selectedIndicator}>
-                        <Text style={styles.selectedIndicatorText}>✓</Text>
-                    </View>
-                )}
-            </TouchableOpacity>
-        );
-    };
-
-    // 휴가 신청 아이템 렌더링
-    const renderTimeOffItem = ({item}: { item: TimeOff }) => {
-        const startDate = new Date(item.startDate).toLocaleDateString('ko-KR');
-        const endDate = new Date(item.endDate).toLocaleDateString('ko-KR');
-
-        return (
-            <View style={styles.timeOffItem}>
-                <View style={styles.timeOffHeader}>
-                    <Text style={styles.timeOffPeriod}>
-                        {startDate} ~ {endDate}
-                    </Text>
-                    <View style={styles.timeOffStatus}>
-                        <Text style={styles.timeOffStatusText}>
-                            {item.status === 'PENDING'
-                                ? '검토 중'
-                                : item.status === 'APPROVED'
-                                    ? '승인됨'
-                                    : '반려됨'}
-                        </Text>
-                    </View>
-                </View>
-                <View style={styles.timeOffEmployee}>
-                    <Text style={styles.timeOffEmployeeName}>{item.employeeName}</Text>
-                    <Text style={styles.timeOffStoreName}>{item.storeName}</Text>
-                </View>
-                <View style={styles.timeOffReason}>
-                    <Text style={styles.timeOffReasonLabel}>사유:</Text>
-                    <Text style={styles.timeOffReasonText}>{item.reason}</Text>
-                </View>
-                {item.status === 'PENDING' && (
-                    <View style={styles.timeOffActions}>
-                        <TouchableOpacity
-                            style={[styles.timeOffActionButton, styles.timeOffApproveButton]}
-                            onPress={() => handleApproveTimeOff(item.id)}>
-                            <Text style={styles.timeOffActionButtonText}>승인</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.timeOffActionButton, styles.timeOffRejectButton]}
-                            onPress={() => handleRejectTimeOff(item.id)}>
-                            <Text style={styles.timeOffActionButtonText}>거부</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
             </View>
-        );
-    };
+
+            <Text style={styles.policyDescription}>{policy.description}</Text>
+
+            <View style={styles.policyFooter}>
+                <Text style={styles.policyDeadline}>마감: {policy.deadline}</Text>
+                <Ionicons name="chevron-forward" size={16} color={COLORS.GRAY_400} />
+            </View>
+        </TouchableOpacity>
+    );
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={styles.container}>
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
+                style={styles.scrollView}
                 refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh}/>
-                }>
-                {/* 사용자 프로필 */}
-                <View style={styles.profileSection}>
-                    <View style={styles.profileHeader}>
-                        <View style={styles.profileInfo}>
-                            <View style={styles.profileImageContainer}>
-                                <Image
-                                    // source={require('../../assets/profile-placeholder.png')}
-                                    style={styles.profileImage}
-                                />
-                            </View>
-                            <View style={styles.profileDetails}>
-                                <Text style={styles.profileName}>김사장</Text>
-                                <Text style={styles.profileEmail}>master.kim@example.com</Text>
-                                <TouchableOpacity
-                                    style={styles.editProfileButton}
-                                    onPress={() => navigation.navigate('ProfileEdit')}>
-                                    <Text style={styles.editProfileText}>프로필 수정</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+                showsVerticalScrollIndicator={false}
+            >
+                {/* 헤더 */}
+                <View style={styles.header}>
+                    <View style={styles.headerContent}>
+                        <Text style={styles.greeting}>안녕하세요, {masterInfo.name}님</Text>
+                        <Text style={styles.subGreeting}>오늘도 화이팅하세요! 💪</Text>
                     </View>
+
+                    <TouchableOpacity style={styles.notificationButton}>
+                        <Ionicons name="notifications-outline" size={24} color={COLORS.GRAY_600} />
+                    </TouchableOpacity>
                 </View>
 
-                {/* 통합 통계 */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>통합 통계</Text>
-                    </View>
-                    <View style={styles.statsContainer}>
-                        <View style={styles.statItem}>
-                            <Text style={styles.statValue}>
-                                {combinedStats.totalStores}개
-                            </Text>
-                            <Text style={styles.statLabel}>매장 수</Text>
+                {/* 전체 현황 카드 */}
+                <View style={styles.summaryCard}>
+                    <Text style={styles.summaryTitle}>전체 현황</Text>
+                    <View style={styles.summaryGrid}>
+                        <View style={styles.summaryItem}>
+                            <Text style={styles.summaryLabel}>운영 매장</Text>
+                            <Text style={styles.summaryValue}>{masterInfo.totalStores}개</Text>
                         </View>
-                        <View style={styles.statDivider}/>
-                        <View style={styles.statItem}>
-                            <Text style={styles.statValue}>
-                                {combinedStats.totalEmployees}명
-                            </Text>
-                            <Text style={styles.statLabel}>총 직원 수</Text>
+                        <View style={styles.summaryItem}>
+                            <Text style={styles.summaryLabel}>전체 직원</Text>
+                            <Text style={styles.summaryValue}>{masterInfo.totalEmployees}명</Text>
                         </View>
-                        <View style={styles.statDivider}/>
-                        <View style={styles.statItem}>
-                            <Text style={styles.statValue}>
-                                {combinedStats.totalLaborCost.toLocaleString()}원
-                            </Text>
-                            <Text style={styles.statLabel}>총 인건비</Text>
+                        <View style={styles.summaryItemFull}>
+                            <Text style={styles.summaryLabel}>이번달 총 인건비</Text>
+                            <Text style={styles.summaryValueLarge}>{formatCurrency(masterInfo.monthlyTotalLaborCost)}원</Text>
                         </View>
                     </View>
                 </View>
@@ -604,380 +318,427 @@ const MasterMyPageScreen = () => {
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>내 매장</Text>
-                        <TouchableOpacity onPress={() => setShowAddStoreModal(true)}>
-                            <Text style={styles.viewAllLink}>매장 추가</Text>
+                        <TouchableOpacity>
+                            <Text style={styles.sectionMore}>전체보기</Text>
                         </TouchableOpacity>
                     </View>
+
                     <FlatList
+                        ref={storeScrollRef}
                         data={stores}
                         renderItem={renderStoreCard}
-                        keyExtractor={item => item.id.toString()}
+                        keyExtractor={(item) => item.id.toString()}
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.storeListContainer}
+                        snapToInterval={CARD_WIDTH + 16}
+                        decelerationRate="fast"
+                        contentContainerStyle={styles.storeList}
                     />
                 </View>
 
-                {/* 매장 통계 */}
-                {selectedStore && storeStats && (
-                    <View style={styles.section}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>{selectedStore.name} 통계</Text>
-                        </View>
+                {/* 빠른 메뉴 */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>매장 관리</Text>
+                    <View style={styles.quickMenuGrid}>
+                        <TouchableOpacity style={styles.quickMenuItem}>
+                            <View style={[styles.quickMenuIcon, { backgroundColor: '#E3F2FD' }]}>
+                                <Ionicons name="people-outline" size={24} color={COLORS.SODAM_BLUE} />
+                            </View>
+                            <Text style={styles.quickMenuText}>직원 관리</Text>
+                        </TouchableOpacity>
 
-                        <View style={styles.statsContainer}>
-                            <View style={styles.statItem}>
-                                <Text style={styles.statValue}>
-                                    {storeStats.totalEmployees}명
-                                </Text>
-                                <Text style={styles.statLabel}>직원 수</Text>
+                        <TouchableOpacity style={styles.quickMenuItem}>
+                            <View style={[styles.quickMenuIcon, { backgroundColor: '#E8F5E8' }]}>
+                                <Ionicons name="time-outline" size={24} color={COLORS.SODAM_GREEN} />
                             </View>
-                            <View style={styles.statDivider}/>
-                            <View style={styles.statItem}>
-                                <Text style={styles.statValue}>
-                                    {storeStats.totalLaborCost.toLocaleString()}원
-                                </Text>
-                                <Text style={styles.statLabel}>인건비</Text>
+                            <Text style={styles.quickMenuText}>근태 관리</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.quickMenuItem}>
+                            <View style={[styles.quickMenuIcon, { backgroundColor: '#FFF3E0' }]}>
+                                <Ionicons name="card-outline" size={24} color={COLORS.SODAM_ORANGE} />
                             </View>
-                            <View style={styles.statDivider}/>
-                            <View style={styles.statItem}>
-                                <Text style={styles.statValue}>
-                                    {storeStats.averageHourlyWage.toLocaleString()}원
-                                </Text>
-                                <Text style={styles.statLabel}>평균 시급</Text>
+                            <Text style={styles.quickMenuText}>급여 관리</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.quickMenuItem}>
+                            <View style={[styles.quickMenuIcon, { backgroundColor: '#F3E5F5' }]}>
+                                <Ionicons name="bar-chart-outline" size={24} color="#9C27B0" />
                             </View>
+                            <Text style={styles.quickMenuText}>매출 분석</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                {/* 정부 정책 정보 */}
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>정부 지원 정책</Text>
+                        <TouchableOpacity>
+                            <Text style={styles.sectionMore}>더보기</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.policyList}>
+                        {policies.map(renderPolicyCard)}
+                    </View>
+                </View>
+
+                {/* 노무 정보 */}
+                {laborInfo && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>{laborInfo.year}년 노무 정보</Text>
+                        <View style={styles.laborInfoCard}>
+                            <View style={styles.laborInfoGrid}>
+                                <View style={styles.laborInfoItem}>
+                                    <Text style={styles.laborInfoLabel}>최저임금</Text>
+                                    <Text style={styles.laborInfoValue}>{formatCurrency(laborInfo.minimumWage)}원</Text>
+                                </View>
+                                <View style={styles.laborInfoItem}>
+                                    <Text style={styles.laborInfoLabel}>주 최대 근무시간</Text>
+                                    <Text style={styles.laborInfoValue}>{laborInfo.weeklyMaxHours}시간</Text>
+                                </View>
+                                <View style={styles.laborInfoItem}>
+                                    <Text style={styles.laborInfoLabel}>연장근무 수당</Text>
+                                    <Text style={styles.laborInfoValue}>{laborInfo.overtimeRate}배</Text>
+                                </View>
+                            </View>
+
+                            <TouchableOpacity style={styles.laborInfoButton}>
+                                <Text style={styles.laborInfoButtonText}>근로기준법 자세히 보기</Text>
+                                <Ionicons name="chevron-forward" size={16} color={COLORS.SODAM_BLUE} />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 )}
 
-                {/* 휴가 신청 내역 */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>휴가 신청 내역</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.viewAllLink}>전체보기</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {timeOffRequests.length > 0 ? (
-                        <FlatList
-                            data={timeOffRequests.filter(req => req.status === 'PENDING')}
-                            renderItem={renderTimeOffItem}
-                            keyExtractor={item => item.id.toString()}
-                            scrollEnabled={false}
-                            contentContainerStyle={styles.timeOffListContainer}
-                        />
-                    ) : (
-                        <Text style={styles.emptyListText}>
-                            대기 중인 휴가 신청이 없습니다.
-                        </Text>
-                    )}
-                </View>
+                {/* 하단 여백 */}
+                <View style={styles.bottomSpacing} />
             </ScrollView>
-
-            {/* 로딩 인디케이터 */}
-            {isLoading && (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#0000ff"/>
-                </View>
-            )}
         </SafeAreaView>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    safeArea: {
+    container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: COLORS.GRAY_50,
     },
-    scrollContent: {
-        paddingBottom: 30,
+    scrollView: {
+        flex: 1,
     },
-    loadingContainer: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'center',
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        backgroundColor: COLORS.WHITE,
+    },
+    headerContent: {
+        flex: 1,
+    },
+    greeting: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: COLORS.GRAY_800,
+        marginBottom: 4,
+    },
+    subGreeting: {
+        fontSize: 14,
+        color: COLORS.GRAY_600,
+    },
+    notificationButton: {
+        padding: 8,
+    },
+    summaryCard: {
+        backgroundColor: COLORS.WHITE,
+        margin: 20,
+        padding: 20,
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    summaryTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.GRAY_800,
+        marginBottom: 16,
+    },
+    summaryGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+    summaryItem: {
+        width: '48%',
+        marginBottom: 16,
+    },
+    summaryItemFull: {
+        width: '100%',
+        alignItems: 'center',
+        paddingTop: 16,
+        borderTopWidth: 1,
+        borderTopColor: COLORS.GRAY_200,
+    },
+    summaryLabel: {
+        fontSize: 14,
+        color: COLORS.GRAY_600,
+        marginBottom: 4,
+    },
+    summaryValue: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.GRAY_800,
+    },
+    summaryValueLarge: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: COLORS.SODAM_ORANGE,
     },
     section: {
-        backgroundColor: '#ffffff',
-        borderRadius: 10,
-        marginHorizontal: 15,
-        marginTop: 15,
-        padding: 15,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+        marginBottom: 24,
     },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 15,
+        paddingHorizontal: 20,
+        marginBottom: 16,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: COLORS.GRAY_800,
     },
-    viewAllLink: {
+    sectionMore: {
         fontSize: 14,
-        color: '#007bff',
+        color: COLORS.SODAM_BLUE,
+        fontWeight: '500',
     },
-    profileSection: {
-        backgroundColor: '#ffffff',
-        paddingVertical: 20,
-        paddingHorizontal: 15,
-        marginBottom: 10,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+    storeList: {
+        paddingLeft: 20,
     },
-    profileHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    profileInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    profileImageContainer: {
-        width: 70,
-        height: 70,
-        borderRadius: 35,
+    storeCard: {
+        width: CARD_WIDTH,
+        marginRight: 16,
+        borderRadius: 16,
         overflow: 'hidden',
-        backgroundColor: '#f0f0f0',
-        justifyContent: 'center',
-        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 8,
     },
-    profileImage: {
-        width: 70,
-        height: 70,
+    storeCardGradient: {
+        padding: 20,
     },
-    profileDetails: {
-        marginLeft: 15,
-    },
-    profileName: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
-    },
-    profileEmail: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 10,
-    },
-    editProfileButton: {
-        backgroundColor: '#f0f0f0',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-    },
-    editProfileText: {
-        fontSize: 12,
-        color: '#333',
-    },
-    statsContainer: {
+    storeCardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 10,
+        marginBottom: 16,
+    },
+    storeName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.WHITE,
+        flex: 1,
+    },
+    storeTypeTag: {
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+    storeTypeText: {
+        fontSize: 12,
+        color: COLORS.WHITE,
+        fontWeight: '500',
+    },
+    storeStats: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 12,
     },
     statItem: {
         flex: 1,
-        alignItems: 'center',
-    },
-    statValue: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
     },
     statLabel: {
         fontSize: 12,
-        color: '#666',
+        color: 'rgba(255, 255, 255, 0.8)',
+        marginBottom: 4,
     },
-    statDivider: {
-        width: 1,
-        height: 40,
-        backgroundColor: '#e0e0e0',
-    },
-    storeListContainer: {
-        paddingVertical: 10,
-    },
-    storeCard: {
-        width: 200,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 10,
-        padding: 15,
-        marginRight: 10,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
-    },
-    selectedStoreCard: {
-        backgroundColor: '#e6f7ff',
-        borderColor: '#1890ff',
-        borderWidth: 1,
-    },
-    storeLogoContainer: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: '#e0e0e0',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    storeLogo: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-    },
-    storeLogoPlaceholder: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: '#1890ff',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    storeLogoText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#fff',
-    },
-    storeInfo: {
-        flex: 1,
-    },
-    storeName: {
+    statValue: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
+        color: COLORS.WHITE,
     },
-    storeAddress: {
-        fontSize: 12,
-        color: '#666',
-        marginBottom: 5,
-    },
-    storeEmployeeCount: {
-        fontSize: 12,
-        color: '#666',
-    },
-    selectedIndicator: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-        width: 20,
-        height: 20,
-        borderRadius: 10,
-        backgroundColor: '#1890ff',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    selectedIndicatorText: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    timeOffListContainer: {
-        paddingTop: 10,
-    },
-    timeOffItem: {
-        backgroundColor: '#f9f9f9',
-        borderRadius: 10,
-        padding: 15,
-        marginBottom: 10,
-    },
-    timeOffHeader: {
+    storeFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
+        marginTop: 8,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.2)',
     },
-    timeOffPeriod: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    timeOffStatus: {
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-        borderRadius: 4,
-        backgroundColor: '#ffa502',
-    },
-    timeOffStatusText: {
+    storeAddress: {
         fontSize: 12,
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-    timeOffEmployee: {
-        marginBottom: 10,
-    },
-    timeOffEmployeeName: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 2,
-    },
-    timeOffStoreName: {
-        fontSize: 12,
-        color: '#666',
-    },
-    timeOffReason: {
-        flexDirection: 'row',
-        marginBottom: 10,
-    },
-    timeOffReasonLabel: {
-        fontSize: 14,
-        color: '#666',
-        marginRight: 5,
-    },
-    timeOffReasonText: {
-        fontSize: 14,
-        color: '#333',
+        color: 'rgba(255, 255, 255, 0.8)',
         flex: 1,
     },
-    timeOffActions: {
+    quickMenuGrid: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        flexWrap: 'wrap',
+        paddingHorizontal: 20,
     },
-    timeOffActionButton: {
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 4,
-        marginLeft: 10,
+    quickMenuItem: {
+        width: '25%',
+        alignItems: 'center',
+        marginBottom: 20,
     },
-    timeOffApproveButton: {
-        backgroundColor: '#2ed573',
+    quickMenuIcon: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
     },
-    timeOffRejectButton: {
-        backgroundColor: '#ff4757',
-    },
-    timeOffActionButtonText: {
+    quickMenuText: {
         fontSize: 12,
-        color: '#fff',
+        color: COLORS.GRAY_700,
+        textAlign: 'center',
+    },
+    policyList: {
+        paddingHorizontal: 20,
+    },
+    policyCard: {
+        backgroundColor: COLORS.WHITE,
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 12,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    policyHeader: {
+        marginBottom: 8,
+    },
+    policyTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    policyTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: COLORS.GRAY_800,
+        flex: 1,
+    },
+    newBadge: {
+        backgroundColor: COLORS.SODAM_ORANGE,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+        marginLeft: 8,
+    },
+    newBadgeText: {
+        fontSize: 10,
+        color: COLORS.WHITE,
         fontWeight: 'bold',
     },
-    emptyListText: {
+    policyCategoryTag: {
+        alignSelf: 'flex-start',
+        backgroundColor: COLORS.GRAY_100,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
+    policyCategoryText: {
+        fontSize: 12,
+        color: COLORS.GRAY_600,
+        fontWeight: '500',
+    },
+    policyDescription: {
         fontSize: 14,
-        color: '#666',
+        color: COLORS.GRAY_600,
+        marginBottom: 12,
+        lineHeight: 20,
+    },
+    policyFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    policyDeadline: {
+        fontSize: 12,
+        color: COLORS.GRAY_500,
+    },
+    laborInfoCard: {
+        backgroundColor: COLORS.WHITE,
+        margin: 20,
+        padding: 20,
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    laborInfoGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    laborInfoItem: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    laborInfoLabel: {
+        fontSize: 12,
+        color: COLORS.GRAY_600,
+        marginBottom: 4,
         textAlign: 'center',
-        paddingVertical: 20,
+    },
+    laborInfoValue: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: COLORS.GRAY_800,
+    },
+    laborInfoButton: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingTop: 16,
+        borderTopWidth: 1,
+        borderTopColor: COLORS.GRAY_200,
+    },
+    laborInfoButtonText: {
+        fontSize: 14,
+        color: COLORS.SODAM_BLUE,
+        fontWeight: '500',
+        marginRight: 4,
+    },
+    bottomSpacing: {
+        height: 40,
     },
 });
-
-export default MasterMyPageScreen;

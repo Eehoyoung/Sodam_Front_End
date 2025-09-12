@@ -5,7 +5,7 @@ import {RouteProp} from '@react-navigation/native';
 export type RootStackParamList = {
     Welcome: undefined;  // 새로운 메인화면 (첫 방문자용)
     Auth: { screen?: keyof AuthStackParamList; params?: any };
-    HomeRoot: undefined;
+    HomeRoot: { screen?: keyof HomeStackParamList; params?: any } | undefined;
     // 기타 루트 레벨 화면...
 };
 
@@ -33,6 +33,8 @@ export type HomeStackParamList = {
     MasterMyPageScreen: undefined;
     UserMyPageScreen: undefined;
     Subscribe: undefined;
+    Settings: undefined;
+    Profile: undefined;
     // 기타 홈 스택 화면...
 };
 

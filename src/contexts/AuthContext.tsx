@@ -3,6 +3,7 @@ import {User} from '../features/auth/services/authService';
 import {useAuthState, useKakaoLogin, useLogin, useLogout} from '../features/auth/hooks/useAuthQueries';
 import {unifiedStorage} from '../common/utils/unifiedStorage';
 import {safeLogger} from '../utils/safeLogger';
+import { setOnUnauthorized } from '../common/utils/api';
 
 /**
  * 인증 컨텍스트 타입 정의
@@ -12,7 +13,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     user: User | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<User>;
     logout: () => Promise<void>;
     kakaoLogin: (code: string) => Promise<void>;
 }
@@ -117,15 +118,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         initializeStorage();
     }, [refetchAuth]);
 
+    // 전역 401(리프레시 실패 등) 발생 시 인증 상태 재확인 및 UI 업데이트
+    useEffect(() => {
+        setOnUnauthorized(() => {
+            refetchAuth();
+        });
+        return () => setOnUnauthorized(null);
+    }, [refetchAuth]);
+
     /**
      * 로그인 함수
      * TanStack Query 뮤테이션을 사용하여 로그인 처리
      */
-    const login = async (email: string, password: string): Promise<void> => {
+    const login = async (email: string, password: string): Promise<User> => {
         try {
             console.log('[AuthProvider] 로그인 시도:', email);
-            await loginMutation.mutateAsync({email, password});
+            const result = await loginMutation.mutateAsync({email, password});
             console.log('[AuthProvider] 로그인 성공');
+            return result.user;
         } catch (error) {
             console.error('[AuthProvider] 로그인 실패:', error);
             safeLogger.error('Login failed', error);
@@ -289,8 +299,8 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({
     }
 
     // 특정 역할이 필요한 경우 역할 확인
-    if (roles.length > 0 && !roles.includes(user.role)) {
-        console.warn('[RequireAuth] 권한 부족:', {userRole: user.role, requiredRoles: roles});
+    if (roles.length > 0 && (!user.role || !roles.includes(user.role))) {
+        console.warn('[RequireAuth] 권한 부족:', { userRole: user.role, requiredRoles: roles });
         return <>{fallback}</>;
     }
 

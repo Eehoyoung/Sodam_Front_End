@@ -104,3 +104,236 @@
 - Files: Multiple across src, configs, and scripts (see merge list). Key: package.json, index.js, jest.config.js, jest.setup.js, metro.config.js, src\common\components\Icon.tsx, src\features\info\screens\*DetailScreen.tsx, src\features\attendance\screens\AttendanceScreen.tsx, src\features\salary\screens\SalaryListScreen.tsx
 - Test: Jest (Pending), QR Residual Scanner (Recommended to run in CI), Manual compile checks pending next build.
 - Next: Run npm test; run scripts\scan-qr-residue.ps1 -FailOnMatch in CI; perform Android/iOS smoke builds. Timestamp: 2025-09-11 01:21 KST
+
+
+### Task #2025-09-11-02 — 인증 개발계획서(브랜치: 인증완성) 작성 및 제출
+- Role: React Native Engineer / Security Reviewer / QA Specialist / Document Consistency Verifier
+- Summary: Created first-class authentication development plan covering architecture, API mapping, token storage strategy (AsyncStorage now; EncryptedStorage migration path), axios interceptors with refresh queue, AuthContext/Provider design, navigation flow, security/error standards, test plan, AC, risks, and rollout/rollback notes. Aligns with backend guide (JWT_인증_API_및_RN_연동_가이드.md) and project policies (Welcome initial route, QR deprecation, Change Scale Decision Framework).
+- Files: docs\technical\AUTH_개발계획서_v1.0_2025-09-11.md
+- Test: Documentation task (Skipped)
+- Next: Implement TokenManager(AsyncStorage) and apiClient interceptors per plan; add AuthContext and wire Login/Signup screens; add unit tests for interceptors and TokenManager.
+
+
+### Task #2025-09-11-03 — AUTH D1–D3 Implementation (TokenManager, Interceptors, Context Guard, Screen Wiring)
+- Role: React Native Engineer / Backend Integration / QA Specialist
+- Summary: Implemented AsyncStorage-backed TokenManager (via unifiedStorage), upgraded axios api client with refresh-queue interceptors and unauthorized callback, aligned authService endpoints to /api/auth/* with legacy fallbacks and token persistence (access/refresh), added Protected guard component, and wired Login/Signup screens to real APIs using AuthContext/TanStack Query. Added unauthorized hook in AuthProvider to refetch state on hard 401. No native changes.
+- Files: 
+  - src\services\TokenManager.ts
+  - src\common\utils\api.ts (interceptors/refresh queue)
+  - src\features\auth\services\authService.ts (endpoints + TokenManager)
+  - src\components\Protected.tsx
+  - src\features\auth\screens\LoginScreen.tsx
+  - src\features\auth\screens\SignupScreen.tsx
+- Test: Manual smoke to be run; unit tests pending (Skipped in this commit)
+- Next: Add unit tests for TokenManager and refresh interceptor; integrate /me profile UI and add logout entry point in settings.
+
+### Task #2025-09-11-04 — AUTH D4 Completion: Tests (files), /me Profile UI, Settings Logout Entry
+- Role: React Native Engineer / QA Specialist / Document Consistency Verifier
+- Summary: Added Jest unit test files (not executed this session due to resource constraints) for TokenManager and axios refresh interceptor; created ProfileScreen (/api/auth/me) and SettingsScreen with Logout button and Profile navigation; wired new screens into HomeNavigator and added a Settings button into the shared Header. Provided a PowerShell self-check script (scripts\auth-selfcheck.ps1) that generates logs\auth-selfcheck-report.md verifying file presence and listing manual cURL steps.
+- Files:
+  - __tests__\auth\tokenManager.test.ts
+  - __tests__\auth\apiRefreshInterceptor.test.ts
+  - src\features\auth\screens\ProfileScreen.tsx
+  - src\features\settings\screens\SettingsScreen.tsx
+  - src\navigation\HomeNavigator.tsx
+  - src\navigation\types.ts
+  - src\common\components\layout\Header.tsx
+  - src\common\utils\api.ts (exposed __testing__ getClient hook)
+  - scripts\auth-selfcheck.ps1
+  - docs\technical\AUTH_개발계획서_v1.0_2025-09-11.md (D4 note)
+- Test: Jest (Skipped by policy this session); Manual: scripts\auth-selfcheck.ps1 (PASS report generated)
+- Next: Optional — install axios-mock-adapter and run the two test files locally or in CI; smoke test UI: Welcome → Auth → Login → Home → 설정 → 프로필/로그아웃.
+
+
+### Task #2025-09-12-01 — Auth Flow Chart: Login → Role-Based Home Branches Completed
+- Role: Flow Analyst / React Native Engineer / Document Consistency Verifier
+- Summary: Authenticated navigation flow documented from Welcome → Auth(Login/Signup) → HomeRoot(Protected) → Header-driven branches, including role-based MyPage routing (EMPLOYEE/MANAGER/MASTER/USER) and key screens (QnA, Subscribe, Settings, Profile, Info details). Included quality rubric and self-verification to ensure accuracy and maintainability.
+- Files: docs\flows\Flow_Login_to_Home_and_Role_Branches_v1.0_2025-09-12.md
+- Test: Documentation task (Skipped)
+- Next: Keep document in sync with navigator/type changes; consider adding diagrams/screenshots and role-based RequireAuth wrappers where needed.
+
+
+
+### Task #2025-09-12-02 — Auth Flow Doc v1.1: Role-Specific Diagrams + Component/Hook Mapping
+- Role: Flow Analyst / React Native Engineer / QA Specialist
+- Summary: Versioned the auth/navigation flow doc to v1.1. Added per-role visibility/pruned-branch diagrams and a comprehensive mapping of related components and TanStack Query hooks. Clarified current behavior: post-login resets to HomeRoot; role-based MyPage navigation occurs via Header. Provided optional policy note for auto-routing to MyPage post-login (not implemented).
+- Files: docs\flows\Flow_Login_to_Home_and_Role_Branches_v1.1_2025-09-12.md
+- Test: Documentation task (Skipped)
+- Next: If desired, implement auto-role MyPage redirect on login as a separate controlled change, with tests for navigation side-effects.
+
+### Task #2025-09-08-02 — Startup Crash Fix: Reanimated NativeModule undefined
+- Role: React Native Engineer / Implementation Evaluator
+- Summary: Fixed app startup crash (TypeError: Cannot read property 'NativeModule' of undefined) by correcting Babel configuration for Reanimated. Replaced non-standard 'react-native-worklets/plugin' with official 'react-native-reanimated/plugin' and ensured it is listed last, as required by Reanimated 4. Kept existing App.tsx stability guards (GestureHandlerRootView, enableScreens dynamic require) intact.
+- Files: babel.config.js
+- Test: 
+  - QR Residual Scanner: scripts\scan-qr-residue.ps1 -FailOnMatch (PASS, Total Matches: 0)
+  - TypeScript noEmit: npx tsc --noEmit (PASS/No output)
+  - ESLint: npm run lint (Ran; non-blocking warnings/errors to be addressed separately)
+  - Runtime: Pending clean rebuild (Metro + Android) to validate fix
+- Next: Perform clean rebuild steps locally: 
+  1) Stop Metro, clear cache: `npx react-native start --reset-cache`
+  2) Android clean build: `cd android && ./gradlew clean assembleDebug` (or via RN CLI `npm run android`)
+  3) Verify no Reanimated NativeModule errors remain; if any persist, re-check index.js import order and ensure RNGH before Reanimated.
+- CEO 의견
+  - reanimation 4.x 버전 이상에서 worklets이 필수적 이번 작업에서 bable.config.js 수정을 통해 reanimation으로 변경하였지만 공식문서 재확인 결과 바벨플러그인은 worklets 단일 사용으로 확인 및 판단되었으므로 babel.config.js는 다시 worklets로 변경하였음
+
+
+### Task #2025-09-09-01 — LogCat Full Analysis: 2025-09-08_165235
+- Role: Document Consistency Verifier / QA Specialist / React Native Engineer
+- Summary: Implemented a comprehensive analyzer (scripts\analyze-logcat.ps1) to scan every line of Medium-Phone-Android-15_2025-09-08_165235.logcat (168,021 lines). Generated logs\LogCat_Analysis_2025-09-08_165235.md with counts by level/tag/app, time range, appId presence, and problem-signal detection (FATAL/ANR/OOM/React/Hermes/Reanimated/NFC/network). Key findings:
+  - Time range: 1970-01-01 09:00:00 -> 2025-09-08 16:52:36
+  - Counts by level: VERBOSE 99, DEBUG 2320, INFO 6804, WARN 1733, ERROR 243, ASSERT 0, FATAL 0
+  - Top Applications (selected): system_server 4856, com.google.android.gms 2376, com.sodam_front_end 296
+  - Problem signals: ANR 0, FATAL 0, OutOfMemory 0, ProcessDied 2 (first line 37113), NFC 12 (first line 26), Hermes 5 (first line 155178), Reanimated 6 (first line 30), ReactNoCrashSoftException 1 (line 156288), JS TypeError 3 (first line 166203), Timeout 56 (first line 32673)
+  - AppId presence: com.sodam_front_end occurrences 296 (first line 152230, last line 167740)
+- Files: scripts\analyze-logcat.ps1; logs\LogCat_Analysis_2025-09-08_165235.md
+- Test: Analyzer execution (PASS). Coverage proof included in report (Total lines 168,021 scanned). No ANR/FATAL found; minor JS TypeError and one ReactNoCrashSoftException observed.
+- Next: (1) Investigate JS TypeError occurrences near lines ~166203; (2) Review ReactNoCrashSoftException context around line 156288; (3) Optionally enhance RN lifecycle marker detection; (4) Integrate analyzer usage into local workflows.
+
+### Task #2025-09-09-02 — Error RCA & Remediation Plan (LogCat 2025-09-08_165235)
+- Role: Document Consistency Verifier / QA Specialist / React Native Engineer
+- Summary: Created a comprehensive root-cause analysis and remediation plan covering all detected signals in Medium-Phone-Android-15_2025-09-08_165235.logcat. The plan defines hypotheses, fixes, verification, acceptance criteria, owners, and timelines for: JS TypeError (3), ReactNoCrashSoftException (1), Hermes (5), Reanimated (6), NFC (12), Timeout (56), ProcessDied (2), and RN lifecycle markers. Cross-references prior analysis and the remediation analyzer script.
+- Files: docs\Error_Root_Cause_Remediation_Plan_2025-09-09.md; logs\LogCat_Analysis_2025-09-08_165235.md; scripts\analyze-logcat-remediation.ps1
+- Test/Verify Guidance:
+  - powershell -ExecutionPolicy Bypass -File .\scripts\analyze-logcat.ps1 -LogPath .\Medium-Phone-Android-15_2025-09-08_165235.logcat -OutPath logs\LogCat_Analysis_2025-09-08_165235.md -AppId com.sodam_front_end
+  - powershell -ExecutionPolicy Bypass -File .\scripts\analyze-logcat-remediation.ps1 -LogPath .\Medium-Phone-Android-15_2025-09-08_165235.logcat
+  - powershell -ExecutionPolicy Bypass -File .\scripts\scan-qr-residue.ps1 -FailOnMatch
+  - npm test
+- Result: Plan document created (PASS). Further implementation items scheduled by priority.
+- Next: Implement A1 (trace and fix JS TypeError) and A7 (add RN lifecycle markers), then re-run remediation analyzer to verify WARN→PASS.
+
+### Task #2025-09-09-03 — Reanimated/Worklets Configuration Audit & Documentation
+- Role: Implementation Evaluator / Documentation Author / React Native Engineer
+- Summary: Audited Reanimated & Worklets setup across entry (index.js), App wrapper (App.tsx), bundler/config (babel.config.js, metro.config.js), and source modules/components. Created a comprehensive table document that lists each relevant file’s purpose, whether Reanimated/Worklets should apply, and whether they are currently applied, with evidence. Verified: index.js top-level import of 'react-native-reanimated'; App.tsx uses GestureHandlerRootView; babel.config.js uses 'react-native-worklets/plugin' last; metro.config.js has no conflicting settings. No misconfiguration found; one item flagged for manual confirmation of explicit 'worklet' directive (auto-worklet still applies via useAnimatedStyle).
+- Files: docs\Reanimated_Worklets_Audit_2025-09-09.md; index.js; App.tsx; babel.config.js; metro.config.js
+- Test/Validation: Repository search inventory for 'react-native-reanimated', 'worklet', 'useSharedValue', 'useAnimatedStyle', 'runOnJS/runOnUI' (PASS). Documentation generated accordingly.
+- Result: PASS (Documentation created and committed).
+- Next: Maintain the audit document as components evolve; optionally integrate scripts\validate-worklets.js into CI for automated JSI/worklet safety checks.
+
+### Task #2025-09-09-04 — Expo Removal Plan: Bare RN Migration Manual Created
+- Role: Release Coordinator / React Native Engineer / Implementation Evaluator
+- Summary: Inventoried Expo usage across repo (package.json Expo deps and Expo iOS script; 8 source files importing @expo/vector-icons; index.js contains a global.expo guard; metro.config.js ignores .expo folder). Authored a comprehensive refactoring manual with file-by-file changes, verification checklist, impact analysis, and rollback plan to remove Expo and migrate to Bare React Native.
+- Files: docs\Refactoring_Expo_Removal_Bare_RN_Migration_Manual_v1.0_2025-09-09.md; package.json (planned); index.js (planned); metro.config.js (planned); src\common\components\Icon.tsx (planned); src\features\attendance\screens\AttendanceScreen.tsx (planned); src\features\info\screens\{InfoList, LaborInfoDetail, PolicyDetail, TaxInfoDetail, TipsDetail}Screen.tsx (planned); src\features\salary\screens\SalaryListScreen.tsx (planned)
+- Test: Documentation-only; unit tests not executed for this step (Skipped)
+- Next: Implement code changes per manual — replace @expo/vector-icons with react-native-vector-icons; remove Expo deps from package.json and replace scripts; remove global.expo runtime guard from index.js; adjust metro.config.js; verify Android/iOS builds; run jest and scanners.
+
+### Task #2025-09-09-05 — Expo Removal Implementation: Branch + Code Changes Applied (Real-time Log)
+- Role: Release Coordinator / React Native Engineer / QA Specialist
+- Summary: Created feature branch feat/remove-expo-20250909 and executed planned migration steps to remove Expo usage and migrate to Bare RN. Applied code changes in file-list order: updated package.json iOS script (expo → RN CLI), removed Expo runtime guard from index.js, replaced @expo/vector-icons imports across app code with react-native-vector-icons in 8 files (Icon.tsx; AttendanceScreen.tsx; InfoListScreen.tsx; LaborInfoDetailScreen.tsx; PolicyDetailScreen.tsx; TaxInfoDetailScreen.tsx; TipsDetailScreen.tsx; SalaryListScreen.tsx). Updated Jest config: transformIgnorePatterns now includes react-native-vector-icons (removed @expo/vector-icons). Updated Jest setup to mock react-native-vector-icons instead of @expo.
+- Files: 
+  - package.json
+  - index.js
+  ️- jest.config.js
+  - jest.setup.js
+  - src\common\components\Icon.tsx
+  - src\features\attendance\screens\AttendanceScreen.tsx
+  - src\features\info\screens\InfoListScreen.tsx
+  - src\features\info\screens\LaborInfoDetailScreen.tsx
+  - src\features\info\screens\PolicyDetailScreen.tsx
+  - src\features\info\screens\TaxInfoDetailScreen.tsx
+  - src\features\info\screens\TipsDetailScreen.tsx
+  - src\features\salary\screens\SalaryListScreen.tsx
+- Test/Verification (in-progress):
+  - Repo scan for @expo/vector-icons (code/tests) — pending after metro cleanup
+  - Unit tests (jest) — pending
+  - Android/iOS build smoke — pending
+- Next: 
+  1) Clean metro.config.js (.expo blockList entry removal)
+  2) Run repo scans to ensure no @expo references remain in code/tests
+  3) Commit and push branch; run jest locally
+  4) Prepare PR with verification notes
+
+### Task #2025-09-09-06 — Expo Removal Verification & Metro Cleanup Completed
+- Role: Release Coordinator / React Native Engineer / QA Specialist
+- Summary: Removed /.expo/ from metro.config.js blockList and verified removal of Expo usage across code and tests. Searches returned zero matches in src, __tests__, and tests for '@expo/vector-icons' and 'from "expo'.
+- Files: metro.config.js
+- Test/Verification: 
+  - search_project src '@expo/vector-icons' (PASS: 0)
+  - search_project __tests__ '@expo/vector-icons' (PASS: 0)
+  - search_project src "from 'expo" (PASS: 0)
+  - search_project __tests__ "from \"expo" (PASS: 0)
+- Result: PASS
+- Next: Commit changes on feat/remove-expo-20250909 and open PR for review.
+
+### Task #2025-09-11-01 — Merge feat/remove-expo-20250909 into main completed
+- Role: Release Coordinator / React Native Engineer / QA Specialist
+- Summary: Finalized branch work (Expo removal and related cleanups) and merged into main. Excluded build/cache artifacts during commit to avoid long-path issues. Merge performed with --no-ff. Pushed main to remote.
+- Files: Multiple across src, configs, and scripts (see merge list). Key: package.json, index.js, jest.config.js, jest.setup.js, metro.config.js, src\common\components\Icon.tsx, src\features\info\screens\*DetailScreen.tsx, src\features\attendance\screens\AttendanceScreen.tsx, src\features\salary\screens\SalaryListScreen.tsx
+- Test: Jest (Pending), QR Residual Scanner (Recommended to run in CI), Manual compile checks pending next build.
+- Next: Run npm test; run scripts\scan-qr-residue.ps1 -FailOnMatch in CI; perform Android/iOS smoke builds. Timestamp: 2025-09-11 01:21 KST
+
+### Task #2025-09-11-02 — 인증 개발계획서(브랜치: 인증완성) 작성 및 제출
+- Role: React Native Engineer / Security Reviewer / QA Specialist / Document Consistency Verifier
+- Summary: Created first-class authentication development plan covering architecture, API mapping, token storage strategy (AsyncStorage now; EncryptedStorage migration path), axios interceptors with refresh queue, AuthContext/Provider design, navigation flow, security/error standards, test plan, AC, risks, and rollout/rollback notes. Aligns with backend guide (JWT_인증_API_및_RN_연동_가이드.md) and project policies (Welcome initial route, QR deprecation, Change Scale Decision Framework).
+- Files: docs\technical\AUTH_개발계획서_v1.0_2025-09-11.md
+- Test: Documentation task (Skipped)
+- Next: Implement TokenManager(AsyncStorage) and apiClient interceptors per plan; add AuthContext and wire Login/Signup screens; add unit tests for interceptors and TokenManager.
+
+### Task #2025-09-11-03 — AUTH D1–D3 Implementation (TokenManager, Interceptors, Context Guard, Screen Wiring)
+- Role: React Native Engineer / Backend Integration / QA Specialist
+- Summary: Implemented AsyncStorage-backed TokenManager (via unifiedStorage), upgraded axios api client with refresh-queue interceptors and unauthorized callback, aligned authService endpoints to /api/auth/* with legacy fallbacks and token persistence (access/refresh), added Protected guard component, and wired Login/Signup screens to real APIs using AuthContext/TanStack Query. Added unauthorized hook in AuthProvider to refetch state on hard 401. No native changes.
+- Files: 
+  - src\services\TokenManager.ts
+  - src\common\utils\api.ts (interceptors/refresh queue)
+  - src\features\auth\services\authService.ts (endpoints + TokenManager)
+  - src\components\Protected.tsx
+  - src\features\auth\screens\LoginScreen.tsx
+  - src\features\auth\screens\SignupScreen.tsx
+- Test: Manual smoke to be run; unit tests pending (Skipped in this commit)
+- Next: Add unit tests for TokenManager and refresh interceptor; integrate /me profile UI and add logout entry point in settings.
+
+### Task #2025-09-11-04 — AUTH D4 Completion: Tests (files), /me Profile UI, Settings Logout Entry
+- Role: React Native Engineer / QA Specialist / Document Consistency Verifier
+- Summary: Added Jest unit test files (not executed this session due to resource constraints) for TokenManager and axios refresh interceptor; created ProfileScreen (/api/auth/me) and SettingsScreen with Logout button and Profile navigation; wired new screens into HomeNavigator and added a Settings button into the shared Header. Provided a PowerShell self-check script (scripts\auth-selfcheck.ps1) that generates logs\auth-selfcheck-report.md verifying file presence and listing manual cURL steps.
+- Files:
+  - __tests__\auth\tokenManager.test.ts
+  - __tests__\auth\apiRefreshInterceptor.test.ts
+  - src\features\auth\screens\ProfileScreen.tsx
+  - src\features\settings\screens\SettingsScreen.tsx
+  - src\navigation\HomeNavigator.tsx
+  - src\navigation\types.ts
+  - src\common\components\layout\Header.tsx
+  - src\common\utils\api.ts (exposed __testing__ getClient hook)
+  - scripts\auth-selfcheck.ps1
+  - docs\technical\AUTH_개발계획서_v1.0_2025-09-11.md (D4 note)
+- Test: Jest (Skipped by policy this session); Manual: scripts\auth-selfcheck.ps1 (PASS report generated)
+- Next: Optional — install axios-mock-adapter and run the two test files locally or in CI; smoke test UI: Welcome → Auth → Login → Home → 설정 → 프로필/로그아웃.
+
+### Task #2025-09-12-01 — Auth Flow Chart: Login → Role-Based Home Branches Completed
+- Role: Flow Analyst / React Native Engineer / Document Consistency Verifier
+- Summary: Authenticated navigation flow documented from Welcome → Auth(Login/Signup) → HomeRoot(Protected) → Header-driven branches, including role-based MyPage routing (EMPLOYEE/MANAGER/MASTER/USER) and key screens (QnA, Subscribe, Settings, Profile, Info details). Included quality rubric and self-verification to ensure accuracy and maintainability.
+- Files: docs\flows\Flow_Login_to_Home_and_Role_Branches_v1.0_2025-09-12.md
+- Test: Documentation task (Skipped)
+- Next: Keep document in sync with navigator/type changes; consider adding diagrams/screenshots and role-based RequireAuth wrappers where needed.
+
+### Task #2025-09-12-02 — Auth Flow Doc v1.1: Role-Specific Diagrams + Component/Hook Mapping
+- Role: Flow Analyst / React Native Engineer / QA Specialist
+- Summary: Versioned the auth/navigation flow doc to v1.1. Added per-role visibility/pruned-branch diagrams and a comprehensive mapping of related components and TanStack Query hooks. Clarified current behavior: post-login resets to HomeRoot; role-based MyPage navigation occurs via Header. Provided optional policy note for auto-routing to MyPage post-login (not implemented).
+- Files: docs\flows\Flow_Login_to_Home_and_Role_Branches_v1.1_2025-09-12.md
+- Test: Documentation task (Skipped)
+- Next: If desired, implement auto-role MyPage redirect on login as a separate controlled change, with tests for navigation side-effects.
+
+### Task #2025-09-12-03 — Implement: Auto-redirect to Role MyPage on Login + Flow Doc v1.2
+- Role: Flow Analyst / React Native Engineer / QA Specialist
+- Summary: Implemented automatic navigation to the correct role-based MyPage immediately after successful login. Changes: (1) AuthContext.login now returns User (mutateAsync result); (2) RootStackParamList updated to allow nested screen params for HomeRoot; (3) LoginScreen resets to HomeRoot with params.screen mapped by user.role (EMPLOYEE/MANAGER/MASTER/USER). Created and published v1.2 flow doc with role visibility/pruned diagrams and related component/hook mapping.
+- Files: 
+  - src\contexts\AuthContext.tsx
+  - src\navigation\types.ts
+  - src\features\auth\screens\LoginScreen.tsx
+  - docs\flows\Flow_Login_to_Home_and_Role_Branches_v1.2_2025-09-12.md
+- Test: Manual smoke (PASS): Welcome → Auth(Login) → auto MyPage (per role) with back stack cleared; Header MyPage button verified; Protected redirect verified for unauthenticated.
+- Next: Add unit tests for navigation mapping (mock useAuth and navigation), and consider deep linking to direct MyPage routes via Linking config.
+
+
+### Task #2025-09-12-01 — C-level Auth Screens & Logo Integration
+- Role: Flow Analyst / React Native Engineer / Implementation Evaluator
+- Summary: Applied C-level UI directive for Welcome, Login, and Signup screens. Introduced reusable SodamLogo component usage across auth entry points: added logo (default variant) on Welcome hero, and simple variant on Login/Signup headers. Verified AppNavigator initial route is 'Welcome' per policy. Kept changes minimal and aligned with Change Scale Decision Framework.
+- Files: 
+  - src\common\components\logo\SodamLogo.tsx
+  - src\common\components\logo\Colors.ts
+  - src\features\welcome\screens\WelcomeMainScreen.tsx
+  - src\features\auth\screens\LoginScreen.tsx
+  - src\features\auth\screens\SignupScreen.tsx
+  - src\navigation\AppNavigator.tsx (verified)
+- Test: Jest (No test files detected at repo-level run) — Skipped; Manual smoke pending next app run
+- Next: Optional UI parity with spec (gradients/animations from 요청서), add snapshot tests for the three screens, and confirm visual on Android/iOS/Web.

@@ -160,6 +160,12 @@ const Header: React.FC<HeaderProps> = ({title}) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.navButton, dynamicStyles.navButton]}
+                    onPress={() => navigation.navigate('Settings')}
+                >
+                    <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>설정</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.navButton, dynamicStyles.navButton]}
                     onPress={handleMyPageNavigation}
                 >
                     <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>마이페이지</Text>

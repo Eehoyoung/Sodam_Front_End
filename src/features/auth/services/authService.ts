@@ -1,180 +1,175 @@
 import api from '../../../common/utils/api';
-import {unifiedStorage} from '../../../common/utils/unifiedStorage';
+import TokenManager from '../../../services/TokenManager';
 import {logger} from '../../../utils/logger';
 
 /**
- * ?�증 관???�비??
- * 로그?? ?�원가?? ?�큰 관�??�의 기능???�공?�니??
+ * 인증 서비스
+ * 로그인/회원가입/토큰 관리/사용자 조회를 담당
  */
 
-// ?�용???�???�의
+// 사용자 타입
 export interface User {
-    id: string;
+    id:  number;
     name: string;
     email: string;
-    phone: string;
-    role: 'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER';
+    phone?: string;
+    roles?: string[];
+    role?: 'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER';
 }
 
-// 로그???�청 ?�??
+// 로그인 요청 타입
 export interface LoginRequest {
     email: string;
     password: string;
 }
 
-// ?�원가???�청 ?�??
+// 회원가입 요청 타입
 export interface SignupRequest {
     name: string;
     email: string;
     password: string;
-    phone: string;
+    phone?: string;
     role?: 'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER';
 }
 
-// ?�증 ?�답 ?�??
+// 인증 응답 타입 (앱 내부 표준)
 export interface AuthResponse {
     user: User;
-    token: string;
+    token: string; // accessToken
 }
 
-// ?�큰 ?�???�수
-const saveToken = async (token: string): Promise<void> => {
+// 서버 응답을 내부 표준으로 변환
+const mapAuthResponse = async (data: any): Promise<AuthResponse> => {
+    const root = data?.data && data?.message !== undefined ? data.data : data; // ApiResponse 래핑 대비
+    const accessToken = root?.accessToken ?? root?.token ?? root?.jwtToken;
+    const refreshToken = root?.refreshToken;
+    const user: User = root?.user ?? {
+        id: root?.userId ?? 'unknown',
+        name: root?.name ?? root?.user?.name ?? '',
+        email: root?.email ?? root?.user?.email ?? '',
+        roles: root?.roles,
+        role: (root?.userGrade) || undefined,
+    };
+
+    if (!accessToken) {throw new Error('INVALID_LOGIN_RESPONSE');}
+    if (refreshToken) {
+        await TokenManager.setTokens({ accessToken, refreshToken });
+    } else {
+        await TokenManager.setAccess(accessToken);
+    }
+    return { user, token: accessToken };
+};
+
+// 엔드포인트 호출 헬퍼 (우선 /api/auth/*, 폴백 404/405 → 레거시)
+const postWithFallback = async <T>(primary: string, fallback: string, payload?: any) => {
     try {
-        logger.debug('', 'AUTH_SERVICE');
-        await unifiedStorage.setItem('userToken', token);
-    } catch (error) {
-        logger.error('', 'AUTH_SERVICE', error);
+        return await api.post<T>(primary, payload);
+    } catch (e: any) {
+        const code = e?.response?.status;
+        if (code === 404 || code === 405) {
+            return await api.post<T>(fallback, payload);
+        }
+        throw e;
     }
 };
 
-// ?�큰 가?�오�??�수
-const getToken = async (): Promise<string | null> => {
+const getWithFallback = async <T>(primary: string, fallback: string) => {
     try {
-        logger.debug('', 'AUTH_SERVICE');
-        return await unifiedStorage.getItem('userToken');
-    } catch (error) {
-        logger.error('', 'AUTH_SERVICE', error);
-        return null;
+        return await api.get<T>(primary);
+    } catch (e: any) {
+        const code = e?.response?.status;
+        if (code === 404 || code === 405) {
+            return await api.get<T>(fallback);
+        }
+        throw e;
     }
 };
 
-// ?�큰 ??�� ?�수
-const removeToken = async (): Promise<void> => {
-    try {
-        logger.debug('', 'AUTH_SERVICE');
-        await unifiedStorage.removeItem('userToken');
-    } catch (error) {
-        logger.error('', 'AUTH_SERVICE', error);
-    }
-};
-
-// ?�증 ?�비??객체
 const authService = {
-    /**
-     * 로그??
-     * @param loginRequest 로그???�청 ?�이??
-     * @returns ?�증 ?�답 (?�용???�보 �??�큰)
-     */
+    // 로그인
     login: async (loginRequest: LoginRequest): Promise<AuthResponse> => {
         try {
-            const response = await api.post<AuthResponse>('/auth/login', loginRequest);
-            const {token} = response.data;
-            await saveToken(token);
-            return response.data;
+            const res = await postWithFallback<any>('/api/login', '/api/login', loginRequest);
+            return await mapAuthResponse(res.data);
         } catch (error) {
-            logger.error('', 'AUTH_SERVICE', error);
+            logger.error('login failed', 'AUTH_SERVICE', error);
             throw error;
         }
     },
 
-    /**
-     * 카카??로그??
-     * @param code 카카???�증 코드
-     * @returns ?�증 ?�답 (?�용???�보 �??�큰)
-     */
+    // 카카오 로그인
     kakaoLogin: async (code: string): Promise<AuthResponse> => {
         try {
-            const response = await api.get<AuthResponse>(`/kakao/auth/proc?code=${code}`);
-            const {token} = response.data;
-            await saveToken(token);
-            return response.data;
+            const res = await api.get<any>(`/kakao/auth/proc?code=${encodeURIComponent(code)}`);
+            return await mapAuthResponse(res.data);
         } catch (error) {
-            logger.error('', 'AUTH_SERVICE', error);
+            logger.error('kakaoLogin failed', 'AUTH_SERVICE', error);
             throw error;
         }
     },
 
-    /**
-     * ?�원가??
-     * @param signupRequest ?�원가???�청 ?�이??
-     * @returns ?�증 ?�답 (?�용???�보 �??�큰)
-     */
+    // 회원가입
     signup: async (signupRequest: SignupRequest): Promise<AuthResponse> => {
         try {
-            const response = await api.post<AuthResponse>('/auth/signup', signupRequest);
-            const {token} = response.data;
-            await saveToken(token);
-            return response.data;
+            const res = await postWithFallback<any>('/api/join', '/api/join', signupRequest);
+            // 일부 서버는 회원가입 시 토큰을 반환하지 않을 수 있음 → 토큰 없으면 mapAuthResponse가 access만 저장
+            return await mapAuthResponse(res.data);
         } catch (error) {
-            logger.error('', 'AUTH_SERVICE', error);
+            logger.error('signup failed', 'AUTH_SERVICE', error);
             throw error;
         }
     },
 
-    /**
-     * 로그?�웃
-     */
+    // 로그아웃 (서버 통지 + 로컬 정리)
     logout: async (): Promise<void> => {
-        await removeToken();
+        try {
+            const refreshToken = await TokenManager.getRefresh();
+            if (refreshToken) {
+                try {
+                    await postWithFallback<any>('/api/auth/logout', '/api/logout', { refreshToken });
+                } catch (_) {
+                    // ignore network errors
+                }
+            }
+        } finally {
+            await TokenManager.clear();
+        }
     },
 
-    /**
-     * ?�재 ?�용???�보 가?�오�?
-     * @returns ?�용???�보
-     */
+    // 현재 사용자 정보
     getCurrentUser: async (): Promise<User> => {
         try {
-            const response = await api.get<User>('/auth/me');
-            return response.data;
+            const res = await getWithFallback<User>('/api/auth/me', '/api/me');
+            return (res.data as unknown) as User;
         } catch (error) {
-            logger.error('', 'AUTH_SERVICE', error);
+            logger.error('getCurrentUser failed', 'AUTH_SERVICE', error);
             throw error;
         }
     },
 
-    /**
-     * 비�?번호 ?�설???�청
-     * @param email ?�용???�메??
-     */
+    // 비밀번호 재설정 요청
     requestPasswordReset: async (email: string): Promise<void> => {
         try {
-            await api.post('/auth/password-reset-request', {email});
+            await postWithFallback('/api/auth/password/reset/request', '/api/password-reset-request', { email });
         } catch (error) {
-            logger.error('', 'AUTH_SERVICE', error);
+            logger.error('requestPasswordReset failed', 'AUTH_SERVICE', error);
             throw error;
         }
     },
 
-    /**
-     * 비�?번호 ?�설??
-     * @param token ?�설???�큰
-     * @param newPassword ??비�?번호
-     */
+    // 비밀번호 재설정
     resetPassword: async (token: string, newPassword: string): Promise<void> => {
         try {
-            await api.post('/auth/password-reset', {token, newPassword});
+            await postWithFallback('/api/auth/password/reset', '/api/password-reset', { token, newPassword });
         } catch (error) {
-            logger.error('', 'AUTH_SERVICE', error);
+            logger.error('resetPassword failed', 'AUTH_SERVICE', error);
             throw error;
         }
     },
 
-    /**
-     * ?�증 ?�태 ?�인
-     * @returns ?�증 ?��?
-     */
+    // 인증 상태 확인
     isAuthenticated: async (): Promise<boolean> => {
-        const token = await getToken();
+        const token = await TokenManager.getAccess();
         return !!token;
     },
 };

@@ -12,6 +12,8 @@ import MasterMyPageScreen from '../features/myPage/screens/MasterMyPageScreen';
 import ManagerMyPageScreen from '../features/myPage/screens/ManagerMyPageScreen';
 import UserMyPageScreen from '../features/myPage/screens/UserMyPageScreen';
 import Header from '../common/components/layout/Header';
+import ProfileScreen from '../features/auth/screens/ProfileScreen';
+import SettingsScreen from '../features/settings/screens/SettingsScreen';
 
 export type HomeStackParamList = {
     Home: undefined;
@@ -25,6 +27,8 @@ export type HomeStackParamList = {
     MasterMyPageScreen: undefined;
     ManagerMyPageScreen: undefined;
     UserMyPageScreen: undefined;
+    Settings: undefined;
+    Profile: undefined;
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -58,6 +62,17 @@ const HomeNavigator: React.FC = () => {
             <Stack.Screen name="PolicyDetail" component={PolicyDetailScreen}/>
             <Stack.Screen name="TaxInfoDetail" component={TaxInfoDetailScreen}/>
             <Stack.Screen name="TipsDetail" component={TipsDetailScreen}/>
+
+            <Stack.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={{headerShown: true, title: '설정'}}
+            />
+            <Stack.Screen
+                name="Profile"
+                component={ProfileScreen}
+                options={{headerShown: true, title: '내 프로필'}}
+            />
 
             <Stack.Screen
                 name="EmployeeMyPageScreen"

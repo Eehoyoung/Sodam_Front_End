@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {PermissionsAndroid, Platform, StyleSheet, Text, TextStyle, View, ViewStyle} from 'react-native';
+import {Platform, StyleSheet, Text, TextStyle, View, ViewStyle} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import {Button, Card, Toast} from '../../../common/components';
 import {colors, spacing} from '../../../common/styles/theme';
@@ -69,9 +69,11 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
                     getCurrentLocation();
                 } else {
                     setLocationStatus('denied');
-                    if (onError) onError('위치 권한이 거부되었습니다.');
+                    onError?.('위치 권한이 거부되었습니다.');
                 }
             } else {
+                // ✅ Android 전용 API 동적 import
+                const { PermissionsAndroid } = await import('react-native');
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
                     {
@@ -87,15 +89,16 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
                     getCurrentLocation();
                 } else {
                     setLocationStatus('denied');
-                    if (onError) onError('위치 권한이 거부되었습니다.');
+                    onError?.('위치 권한이 거부되었습니다.');
                 }
             }
         } catch (err) {
             console.warn(err);
             setLocationStatus('denied');
-            if (onError) onError('위치 권한 요청 중 오류가 발생했습니다.');
+            onError?.('위치 권한 요청 중 오류가 발생했습니다.');
         }
     };
+
 
     // 현재 위치 가져오기
     const getCurrentLocation = () => {
@@ -140,7 +143,7 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
 
                 console.error('LocationAttendance: Location error:', error);
                 setLoading(false);
-                if (onError) onError('위치 정보를 가져오는데 실패했습니다.');
+                if (onError) {onError('위치 정보를 가져오는데 실패했습니다.');}
                 Toast.show({
                     type: 'error',
                     text1: '위치 오류',
@@ -153,13 +156,13 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
 
     // 위치 기반 출근 인증
     const handleCheckIn = async () => {
-        if (!user?.id || !location) return;
+        if (!user?.id || !location) {return;}
 
         setLoading(true);
 
         try {
             const response = await verifyCheckInByLocation({
-                employeeId: parseInt(user.id, 10),
+                employeeId: user.id,
                 storeId: parseInt(storeId, 10),
                 latitude: location.latitude,
                 longitude: location.longitude
@@ -173,14 +176,14 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
                     text1: '출근 인증 성공',
                     text2: '성공적으로 출근 처리되었습니다.'
                 });
-                if (onSuccess) onSuccess(true);
+                if (onSuccess) {onSuccess(true);}
             } else {
                 Toast.show({
                     type: 'error',
                     text1: '출근 인증 실패',
-                    text2: response.message || '출근 인증에 실패했습니다.'
+                    text2: response.message ?? '출근 인증에 실패했습니다.'
                 });
-                if (onError) onError(response.message || '출근 인증에 실패했습니다.');
+                if (onError) {onError(response.message ?? '출근 인증에 실패했습니다.');}
             }
         } catch (error) {
             setLoading(false);
@@ -189,19 +192,19 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
                 text1: '출근 인증 오류',
                 text2: '서버 통신 중 오류가 발생했습니다.'
             });
-            if (onError) onError('서버 통신 중 오류가 발생했습니다.');
+            if (onError) {onError('서버 통신 중 오류가 발생했습니다.');}
         }
     };
 
     // 위치 기반 퇴근 인증
     const handleCheckOut = async () => {
-        if (!user?.id || !location) return;
+        if (!user?.id || !location) {return;}
 
         setLoading(true);
 
         try {
             const response = await verifyCheckOutByLocation({
-                employeeId: parseInt(user.id, 10),
+                employeeId: user.id,
                 storeId: parseInt(storeId, 10),
                 latitude: location.latitude,
                 longitude: location.longitude
@@ -215,14 +218,14 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
                     text1: '퇴근 인증 성공',
                     text2: '성공적으로 퇴근 처리되었습니다.'
                 });
-                if (onSuccess) onSuccess(false);
+                if (onSuccess) {onSuccess(false);}
             } else {
                 Toast.show({
                     type: 'error',
                     text1: '퇴근 인증 실패',
-                    text2: response.message || '퇴근 인증에 실패했습니다.'
+                    text2: response.message ?? '퇴근 인증에 실패했습니다.'
                 });
-                if (onError) onError(response.message || '퇴근 인증에 실패했습니다.');
+                if (onError) {onError(response.message ?? '퇴근 인증에 실패했습니다.');}
             }
         } catch (error) {
             setLoading(false);
@@ -231,7 +234,7 @@ const LocationAttendance: React.FC<LocationAttendanceProps> = ({
                 text1: '퇴근 인증 오류',
                 text2: '서버 통신 중 오류가 발생했습니다.'
             });
-            if (onError) onError('서버 통신 중 오류가 발생했습니다.');
+            if (onError) {onError('서버 통신 중 오류가 발생했습니다.');}
         }
     };
 
