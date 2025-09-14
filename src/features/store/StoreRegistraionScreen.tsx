@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, StyleSheet, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 import SodamLogo from '../../common/components/logo/SodamLogo';
 import { COLORS } from '../../common/components/logo/Colors';
 import useStoreRegistration from './hooks/useStoreRegistration';
@@ -218,11 +219,16 @@ const StoreRegistrationScreen: React.FC = () => {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* 헤더 */}
-        <View style={styles.header}>
+        <LinearGradient
+          colors={[COLORS.SODAM_ORANGE, COLORS.SODAM_BLUE]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.header}
+        >
           <SodamLogo size={60} variant="simple" />
           <Text style={styles.headerTitle}>매장 등록</Text>
           <Text style={styles.headerSubtitle}>새로운 매장을 등록해보세요</Text>
-        </View>
+        </LinearGradient>
 
         {/* 폼 카드 */}
         <View style={styles.formCard}>
@@ -398,13 +404,20 @@ const StoreRegistrationScreen: React.FC = () => {
 
           {/* 등록 버튼 */}
           <TouchableOpacity
-            style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
             onPress={handleStoreRegistration}
             disabled={isLoading}
+            activeOpacity={0.8}
           >
-            <Text style={styles.registerButtonText}>
-              {isLoading ? '등록 중...' : '매장 등록하기'}
-            </Text>
+            <LinearGradient
+              colors={[COLORS.SODAM_ORANGE, COLORS.SODAM_BLUE]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
+            >
+              <Text style={styles.registerButtonText}>
+                {isLoading ? '등록 중...' : '매장 등록하기'}
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -471,11 +484,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-      backgroundColor: `linear-gradient(135deg, ${COLORS.SODAM_ORANGE} 0%, ${COLORS.SODAM_BLUE} 100%)`,
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 20,
     alignItems: 'center',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   headerTitle: {
     fontSize: 28,
@@ -617,7 +631,6 @@ const styles = StyleSheet.create({
     color: COLORS.ERROR,
   },
   registerButton: {
-      backgroundColor: `linear-gradient(135deg, ${COLORS.SODAM_ORANGE} 0%, ${COLORS.SODAM_BLUE} 100%)`,
     borderRadius: 15,
     padding: 18,
     alignItems: 'center',

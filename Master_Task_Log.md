@@ -47,3 +47,19 @@
 - Test: scripts\generate-navigation-dfs.ps1 (PASS)
 - Next: UsageSelectionScreen에서 역할 파라미터 전달 로직 반영, AuthNavigator에서 역할 기반 초기 홈 라우팅 분기 추가, CI에 DFS 스크립트 연동하여 그래프 무결성 검사
 
+
+
+### Task #2025-09-15-01 — 디자인 오버홀: StoreRegistration + MasterMyPage 스크린 계획/적용(1차)
+- Role: React Native Engineer / Flow Analyst / QA Specialist
+- Summary: 
+  - 브랜치 생성(feat/ui-overhaul-screens-20250915).
+  - StoreRegistraionScreen.tsx의 잘못된 CSS gradient 문자열을 react-native-linear-gradient로 교체(헤더/CTA 버튼), 스타일 경고 제거.
+  - C-Level 검토용 스크린별 상세 작업계획 수립 및 문서 버전업(기능목록 v1.2, 화면목록 v1.1) 반영.
+- Files:
+  - src\features\store\StoreRegistraionScreen.tsx
+  - src\features\myPage\screens\MasterMyPageScreen.tsx (분석/계획 중심, 코드 변경은 다음 단계)
+  - docs\overview\소담_프론트엔드_기능목록_with_백엔드매핑_v1.0.md (v1.2)
+  - docs\overview\소담_프론트엔드_화면목록_v1.0.md (v1.1)
+  - Master_Task_Log.md
+- Test: Skipped (UI-only, 회귀 위험 낮음). 다음 단계에서 스냅샷/렌더 스모크 테스트 추가 예정.
+- Next: MasterMyPageScreen 그라디언트 테마 정합성 및 CARD_WIDTH 반응형 개선(D1~D2), 동일 패턴을 타 화면으로 확산(D3+).
