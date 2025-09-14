@@ -23,9 +23,9 @@ import {InfoArticle, InfoCategory} from '../types';
 type InfoStackParamList = {
     InfoList: undefined;
     LaborInfoDetail: { infoId: string };
-    TaxInfoDetail: { infoId: string };
-    PolicyDetail: { infoId: string };
-    TipsDetail: { infoId: string };
+    TaxInfoDetail: { taxInfoId: number };
+    PolicyDetail: { policyId: number };
+    TipsDetail: { tipId: number };
 };
 
 type InfoListScreenNavigationProp = NativeStackNavigationProp<InfoStackParamList, 'InfoList'>;
@@ -131,16 +131,16 @@ const InfoListScreen = () => {
     const navigateToDetail = (article: InfoArticle) => {
         switch (selectedType) {
             case 'LABOR':
-                navigation.navigate('LaborInfoDetail', {infoId: article.id});
+                navigation.navigate('LaborInfoDetail', { infoId: article.id });
                 break;
             case 'TAX':
-                navigation.navigate('TaxInfoDetail', {infoId: article.id});
+                navigation.navigate('TaxInfoDetail', { taxInfoId: Number(article.id) });
                 break;
             case 'POLICY':
-                navigation.navigate('PolicyDetail', {infoId: article.id});
+                navigation.navigate('PolicyDetail', { policyId: Number(article.id) });
                 break;
             case 'TIPS':
-                navigation.navigate('TipsDetail', {infoId: article.id});
+                navigation.navigate('TipsDetail', { tipId: Number(article.id) });
                 break;
         }
     };

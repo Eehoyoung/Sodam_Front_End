@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp } from '@react-navigation/native';
 import  Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../../../common/components/logo/Colors';
+import policyService from '../../info/services/policyService';
 
 interface MasterMyPageScreenProps {
     navigation: NavigationProp<any>;
@@ -121,32 +122,29 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
                 },
             ];
 
-            const mockPolicies: PolicyInfo[] = [
-                {
-                    id: 1,
-                    title: '소상공인 전용 대출 지원사업',
-                    category: '금융지원',
-                    deadline: '2024-03-31',
-                    description: '연 2.5% 저금리로 최대 5천만원까지 지원',
-                    isNew: true,
-                },
-                {
-                    id: 2,
-                    title: '청년 고용 장려금',
-                    category: '고용지원',
-                    deadline: '2024-04-15',
-                    description: '청년 신규 채용시 월 80만원 × 6개월 지원',
-                    isNew: true,
-                },
-                {
-                    id: 3,
-                    title: '디지털 전환 지원금',
-                    category: '디지털화',
-                    deadline: '2024-05-30',
-                    description: 'POS, 키오스크 도입비용 최대 200만원 지원',
-                    isNew: false,
-                },
-            ];
+            // 정책 정보: info 서비스 연동 (상위 3개 노출)
+            const policyDtos: any[] = await policyService.getPoliciesByCategory('ALL');
+            const mockPolicies: PolicyInfo[] = (policyDtos || []).slice(0, 3).map((dto: any) => {
+                const createdAt = dto.publishDate || dto.createdAt || new Date().toISOString();
+                const updatedAt = dto.updatedAt || createdAt;
+                const isNew = (() => {
+                    try {
+                        const created = new Date(createdAt).getTime();
+                        return Date.now() - created < 7 * 24 * 60 * 60 * 1000; // 7일 이내
+                    } catch {
+                        return false;
+                    }
+                })();
+                const deadline = (updatedAt || '').toString().slice(0, 10);
+                return {
+                    id: Number(dto.id),
+                    title: dto.title || '',
+                    category: '국가정책',
+                    deadline,
+                    description: (dto.content ? String(dto.content).slice(0, 80) : '').trim(),
+                    isNew,
+                } as PolicyInfo;
+            });
 
             const mockLaborInfo: LaborInfo = {
                 minimumWage: 9620,
@@ -190,7 +188,12 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
     };
 
     const handlePolicyPress = (policy: PolicyInfo) => {
-        navigation.navigate('PolicyDetailScreen', { policyId: policy.id });
+        navigation.navigate('PolicyDetail', { policyId: policy.id });
+    };
+
+    const handleAddStore = () => {
+        // HomeNavigator에 등록된 라우트로 이동
+        navigation.navigate('StoreRegistration' as never);
     };
 
     const renderStoreCard = ({ item: store }: { item: StoreInfo }) => (
@@ -318,22 +321,33 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>내 매장</Text>
-                        <TouchableOpacity>
-                            <Text style={styles.sectionMore}>전체보기</Text>
+                        <TouchableOpacity onPress={handleAddStore}>
+                            <Text style={styles.sectionMore}>매장 추가</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <FlatList
-                        ref={storeScrollRef}
-                        data={stores}
-                        renderItem={renderStoreCard}
-                        keyExtractor={(item) => item.id.toString()}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        snapToInterval={CARD_WIDTH + 16}
-                        decelerationRate="fast"
-                        contentContainerStyle={styles.storeList}
-                    />
+                    {stores.length === 0 ? (
+                        <View style={styles.emptyStateCard}>
+                            <Ionicons name="storefront-outline" size={40} color={COLORS.GRAY_400} />
+                            <Text style={styles.emptyStateTitle}>등록된 매장이 없습니다</Text>
+                            <Text style={styles.emptyStateDesc}>매장을 추가하고 직원과 급여를 관리해보세요</Text>
+                            <TouchableOpacity style={styles.addStoreButton} onPress={handleAddStore}>
+                                <Text style={styles.addStoreButtonText}>매장 추가하기</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : (
+                        <FlatList
+                            ref={storeScrollRef}
+                            data={stores}
+                            renderItem={renderStoreCard}
+                            keyExtractor={(item) => item.id.toString()}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            snapToInterval={CARD_WIDTH + 16}
+                            decelerationRate="fast"
+                            contentContainerStyle={styles.storeList}
+                        />
+                    )}
                 </View>
 
                 {/* 빠른 메뉴 */}
@@ -374,7 +388,7 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>정부 지원 정책</Text>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('InfoList')}>
                             <Text style={styles.sectionMore}>더보기</Text>
                         </TouchableOpacity>
                     </View>
@@ -404,7 +418,7 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
                                 </View>
                             </View>
 
-                            <TouchableOpacity style={styles.laborInfoButton}>
+                            <TouchableOpacity style={styles.laborInfoButton} onPress={() => navigation.navigate('InfoList')}>
                                 <Text style={styles.laborInfoButtonText}>근로기준법 자세히 보기</Text>
                                 <Ionicons name="chevron-forward" size={16} color={COLORS.SODAM_BLUE} />
                             </TouchableOpacity>
@@ -619,6 +633,47 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: COLORS.GRAY_700,
         textAlign: 'center',
+    },
+    emptyStateCard: {
+        backgroundColor: COLORS.WHITE,
+        marginHorizontal: 20,
+        padding: 24,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 3,
+    },
+    emptyStateTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: COLORS.GRAY_800,
+        marginTop: 12,
+        marginBottom: 6,
+        textAlign: 'center',
+    },
+    emptyStateDesc: {
+        fontSize: 14,
+        color: COLORS.GRAY_600,
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+    addStoreButton: {
+        backgroundColor: COLORS.SODAM_ORANGE,
+        borderRadius: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 140,
+    },
+    addStoreButtonText: {
+        color: COLORS.WHITE,
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     policyList: {
         paddingHorizontal: 20,

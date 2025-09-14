@@ -6,106 +6,86 @@
 import api from '../../../common/utils/api';
 import {TaxInfo, InfoCategory} from '../types';
 
+// 공통 DTO -> UI 타입 매퍼
+const mapToTaxInfo = (dto: any): TaxInfo => ({
+    id: String(dto.id),
+    categoryId: 'TAX',
+    title: dto.title ?? '',
+    summary: dto.content ? String(dto.content).slice(0, 100) : '',
+    content: dto.content ?? '',
+    publishDate: dto.createdAt ?? new Date().toISOString(),
+    author: '소담 세무팀',
+    tags: [],
+    imageUrl: dto.imagePath || undefined,
+    taxYear: undefined,
+    applicableGroups: [],
+});
+
 // 세금 정보 서비스 객체
 const taxInfoService = {
-    /**
-     * 모든 세금 정보 카테고리 조회
-     * @returns 세금 정보 카테고리 목록
-     */
+    /** 카테고리(임시) */
     getCategories: async (): Promise<InfoCategory[]> => {
-        try {
-            const response = await api.get<InfoCategory[]>('/tax-info/categories');
-            return response.data;
-        } catch (error) {
-            console.error('세금 정보 카테고리를 가져오는 중 오류가 발생했습니다:', error);
-            throw error;
-        }
+        return [ { id: 'ALL', name: '전체', description: '전체 보기' } ];
     },
 
-    /**
-     * 특정 카테고리의 세금 정보 목록 조회
-     * @param categoryId 카테고리 ID
-     * @returns 세금 정보 목록
-     */
-    getTaxInfosByCategory: async (categoryId: string): Promise<TaxInfo[]> => {
+    /** 카테고리별(임시) 목록 */
+    getTaxInfosByCategory: async (_categoryId: string): Promise<TaxInfo[]> => {
         try {
-            const response = await api.get<TaxInfo[]>(`/tax-info/category/${categoryId}`);
-            return response.data;
+            const res = await api.get<any[]>(`/api/tax-info`);
+            return (res.data || []).map(mapToTaxInfo);
         } catch (error) {
             console.error('카테고리별 세금 정보를 가져오는 중 오류가 발생했습니다:', error);
             throw error;
         }
     },
 
-    /**
-     * 특정 세금 정보 상세 조회
-     * @param infoId 세금 정보 ID
-     * @returns 세금 정보 상세
-     */
+    /** 상세 */
     getTaxInfoById: async (infoId: string): Promise<TaxInfo> => {
         try {
-            const response = await api.get<TaxInfo>(`/tax-info/${infoId}`);
-            return response.data;
+            const res = await api.get<any>(`/api/tax-info/${infoId}`);
+            return mapToTaxInfo(res.data);
         } catch (error) {
             console.error('세금 정보 상세를 가져오는 중 오류가 발생했습니다:', error);
             throw error;
         }
     },
 
-    /**
-     * 세금 정보 검색
-     * @param searchTerm 검색어
-     * @returns 검색 결과 세금 정보 목록
-     */
+    /** 검색 (임의 경로) */
     searchTaxInfo: async (searchTerm: string): Promise<TaxInfo[]> => {
         try {
-            const response = await api.get<TaxInfo[]>('/tax-info/search', {query: searchTerm});
-            return response.data;
+            const res = await api.get<any[]>(`/api/tax-info/search/title`, { keyword: searchTerm });
+            return (res.data || []).map(mapToTaxInfo);
         } catch (error) {
             console.error('세금 정보 검색 중 오류가 발생했습니다:', error);
             throw error;
         }
     },
 
-    /**
-     * 최근 업데이트된 세금 정보 조회
-     * @param limit 조회할 항목 수
-     * @returns 최근 업데이트된 세금 정보 목록
-     */
+    /** 최근 (임의 경로) */
     getRecentTaxInfo: async (limit: number = 5): Promise<TaxInfo[]> => {
         try {
-            const response = await api.get<TaxInfo[]>('/tax-info/recent', {limit});
-            return response.data;
+            const res = await api.get<any[]>(`/api/tax-info/recent`, { limit });
+            return (res.data || []).map(mapToTaxInfo);
         } catch (error) {
             console.error('최근 세금 정보를 가져오는 중 오류가 발생했습니다:', error);
             throw error;
         }
     },
 
-    /**
-     * 특정 연도의 세금 정보 조회
-     * @param year 연도
-     * @returns 해당 연도의 세금 정보 목록
-     */
+    /** 연도/그룹 (임의 경로, 현재 미사용) */
     getTaxInfoByYear: async (year: string): Promise<TaxInfo[]> => {
         try {
-            const response = await api.get<TaxInfo[]>('/tax-info/year', {year});
-            return response.data;
+            const res = await api.get<any[]>(`/api/tax-info/year`, { year });
+            return (res.data || []).map(mapToTaxInfo);
         } catch (error) {
             console.error('연도별 세금 정보를 가져오는 중 오류가 발생했습니다:', error);
             throw error;
         }
     },
-
-    /**
-     * 특정 그룹에 적용되는 세금 정보 조회
-     * @param group 적용 그룹 (예: 'EMPLOYEE', 'SELF_EMPLOYED')
-     * @returns 해당 그룹에 적용되는 세금 정보 목록
-     */
     getTaxInfoByGroup: async (group: string): Promise<TaxInfo[]> => {
         try {
-            const response = await api.get<TaxInfo[]>('/tax-info/group', {group});
-            return response.data;
+            const res = await api.get<any[]>(`/api/tax-info/group`, { group });
+            return (res.data || []).map(mapToTaxInfo);
         } catch (error) {
             console.error('그룹별 세금 정보를 가져오는 중 오류가 발생했습니다:', error);
             throw error;

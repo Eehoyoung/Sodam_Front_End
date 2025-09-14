@@ -17,6 +17,7 @@ import { NavigationProp } from '@react-navigation/native';
 import  Ionicons from 'react-native-vector-icons/Ionicons';
 import SodamLogo from '../../../common/components/logo/SodamLogo';
 import { COLORS } from '../../../common/components/logo/Colors';
+import SignupScreen from "./SignupScreen.tsx";
 
 interface LoginScreenProps {
     navigation: NavigationProp<any>;
@@ -206,7 +207,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                     계정이 없으신가요?{' '}
                                     <Text
                                         style={styles.signupLink}
-                                        onPress={() => navigation.navigate('SignupScreen')}
+                                        onPress={() => navigation.navigate('SignupScreen', {screen:SignupScreen})}
                                     >
                                         회원가입
                                     </Text>

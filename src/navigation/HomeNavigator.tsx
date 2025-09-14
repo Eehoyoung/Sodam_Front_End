@@ -14,6 +14,7 @@ import UserMyPageScreen from '../features/myPage/screens/UserMyPageScreen';
 import Header from '../common/components/layout/Header';
 import ProfileScreen from '../features/auth/screens/ProfileScreen';
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
+import StoreRegistrationScreen from '../features/store/StoreRegistraionScreen';
 
 export type HomeStackParamList = {
     Home: undefined;
@@ -29,6 +30,7 @@ export type HomeStackParamList = {
     UserMyPageScreen: undefined;
     Settings: undefined;
     Profile: undefined;
+    StoreRegistration: undefined;
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -93,6 +95,11 @@ const HomeNavigator: React.FC = () => {
                 name="UserMyPageScreen"
                 component={UserMyPageScreen}
                 options={{headerShown: true}}
+            />
+            <Stack.Screen
+                name="StoreRegistration"
+                component={StoreRegistrationScreen}
+                options={{headerShown: true, title: '매장 등록'}}
             />
         </Stack.Navigator>
     );

@@ -46,7 +46,7 @@ export default function WelcomeMainScreen({ navigation }: WelcomeMainScreenProps
     };
 
     const handleSignup = () => {
-        navigation.navigate('Auth', {screen:signupScreen});
+        navigation.navigate('Auth', {screen: signupScreen});
     };
 
     return (

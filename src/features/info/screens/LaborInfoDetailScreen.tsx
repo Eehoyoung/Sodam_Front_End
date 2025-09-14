@@ -4,6 +4,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {Button, MainLayout, Toast} from '../../../common/components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import laborInfoService from '../services/laborInfoService';
 
 export type RootStackParamList = {
     LaborInfoDetail: { infoId: string };
@@ -41,53 +42,25 @@ const LaborInfoDetailScreen = () => {
     useEffect(() => {
         const fetchLaborInfo = async () => {
             try {
-                // TODO: API 연결 필요 - 노무 정보를 가져오는 API 호출로 대체해야 함
-                // 실제 구현에서는 API 호출로 대체
-                // const response = await fetch(`https://sodam-api.com/api/labor-info/${infoId}`);
-                // const data = await response.json();
-                // setLaborInfo(data);
-
-                // 임시 데이터 (API 연동 전까지 사용)
-                setTimeout(() => {
-                    const mockData: LaborInfoDetail = {
-                        id: parseInt(infoId),
-                        title: '2024년 최저임금 변경에 따른 급여 계산 방법',
-                        date: '2024-05-15',
-                        content: `# 2024년 최저임금 변경 안내
-
-2024년 최저임금이 시간당 9,860원으로 인상되었습니다. 이는 2023년 대비 약 2.5% 인상된 금액입니다.
-
-## 급여 계산 방법
-
-1. **시급 계산**: 시간당 9,860원
-2. **일급 계산**: 8시간 기준 78,880원 (9,860원 × 8시간)
-3. **월급 계산**: 주 40시간 기준 2,064,140원 (9,860원 × 209시간)
-
-## 주요 변경사항
-
-- 최저임금 인상에 따른 사업장 영향 분석
-- 소상공인 지원 정책 안내
-- 급여 명세서 작성 가이드
-
-## 소상공인 대응 방안
-
-1. 인건비 관리 효율화
-2. 정부 지원 제도 활용
-3. 근무 시간 최적화
-
-자세한 내용은 고용노동부 홈페이지를 참조하시기 바랍니다.`,
-                        author: '소담 노무팀',
-                        views: 1245,
-                        category: '노무 정보',
-                    };
-                    setLaborInfo(mockData);
-                    setLoading(false);
-                }, 1000);
+                setLoading(true);
+                // 서비스 통해 백엔드 연동 (http://10.0.2.2:8080 기반)
+                const detail = await laborInfoService.getLaborInfoById(infoId);
+                const mapped: LaborInfoDetail = {
+                    id: parseInt(detail.id, 10),
+                    title: detail.title,
+                    date: new Date(detail.publishDate).toISOString().slice(0, 10),
+                    content: detail.content,
+                    author: detail.author || '소담 노무팀',
+                    views: 0,
+                    category: '노무 정보',
+                };
+                setLaborInfo(mapped);
             } catch (error) {
                 console.error('노무 정보를 불러오는 중 오류가 발생했습니다:', error);
                 setToastMessage('정보를 불러오는 중 오류가 발생했습니다.');
                 setToastType('error');
                 setShowToast(true);
+            } finally {
                 setLoading(false);
             }
         };

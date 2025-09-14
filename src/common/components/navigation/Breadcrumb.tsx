@@ -45,7 +45,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
         <View style={[styles.container, style]}>
             {items.map((item, index) => {
                 const isLast = index === items.length - 1;
-                const isActive = item.active || isLast;
+                const isActive = item.active ?? isLast;
 
                 return (
                     <React.Fragment key={`breadcrumb-item-${index}`}>
@@ -72,7 +72,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
                             </Text>
                         </TouchableOpacity>
 
-                        {!isLast && (separator || defaultSeparator)}
+                        {!isLast && (separator ?? defaultSeparator)}
                     </React.Fragment>
                 );
             })}

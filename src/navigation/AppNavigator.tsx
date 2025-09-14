@@ -1,10 +1,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import WelcomeMainScreen from '../features/welcome/screens/WelcomeMainScreen';
 import AuthNavigator from './AuthNavigator';
 import HomeNavigator from './HomeNavigator';
 import Protected from '../components/Protected';
+import UsageSelectionScreen from "../features/welcome/screens/UsageSelectionScreen.tsx";
+import WelcomeMainScreen from "../features/welcome/screens/WelcomeMainScreen.tsx";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,9 +27,10 @@ const AppNavigator: React.FC<Props> = ({ appReady = true }) => {
         initialRouteName="Welcome"
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="Welcome" component={WelcomeMainScreen} />
+        <Stack.Screen name="Welcome" component={UsageSelectionScreen} />
         <Stack.Screen name="Auth" component={AuthNavigator} />
         <Stack.Screen name="HomeRoot" component={HomeProtectedWrapper} />
+        <Stack.Screen name="WelcomeMain" component={WelcomeMainScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
