@@ -1,5 +1,5 @@
 param(
-  [string[]] $Keywords = @("qrcode","qr-code","/qr-verify","QRCode","qr code"),
+  [string[]] $Keywords = @("qrcode","qr-code","/qr-verify","QRCode","qr code","/location-verify","/nfc-verify"),
   [string] $Out = "logs\qr-scan-report.md",
   [string[]] $ExcludeDirs = @("node_modules","android\build","android\app\build","android\logs","ios\build","out\production",".git",".idea",".junie","logs","tests","__tests__","docs"),
   [string[]] $ExcludeFiles = @("docs\QR_Residual_Removal_Guide_2025-08-28.md","scripts\scan-qr-residue.ps1","package-lock.json","yarn.lock","android\app\src\main\assets\index.android.bundle",".output.txt"),

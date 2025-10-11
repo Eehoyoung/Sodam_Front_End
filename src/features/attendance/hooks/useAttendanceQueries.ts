@@ -275,27 +275,18 @@ export const useCheckOut = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({attendanceId, checkOutData}: {
-            attendanceId: string;
-            checkOutData: CheckOutRequest
-        }): Promise<AttendanceRecord> => {
+        mutationFn: async ({ checkOutData }: { checkOutData: CheckOutRequest }): Promise<AttendanceRecord> => {
             try {
-                return await attendanceService.checkOut(attendanceId, checkOutData);
+                return await attendanceService.checkOutStandard(checkOutData);
             } catch (error) {
                 handleQueryError(error, 'checkOut');
                 throw error;
             }
         },
-        onSuccess: (data: AttendanceRecord, variables) => {
+        onSuccess: (data: AttendanceRecord, variables: { checkOutData: CheckOutRequest }) => {
             // 현재 출퇴근 상태 캐시 업데이트
             queryClient.setQueryData(
                 [...queryKeys.attendance.all, 'current', String(variables.checkOutData.workplaceId)],
-                data
-            );
-
-            // 특정 출퇴근 기록 캐시 업데이트
-            queryClient.setQueryData(
-                [...queryKeys.attendance.all, 'record', variables.attendanceId],
                 data
             );
 

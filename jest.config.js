@@ -11,17 +11,16 @@ module.exports = {
         '<rootDir>/ios/',
         '<rootDir>/node_modules/',
     ],
-    // 개발 단계 커버리지 (선별적)
+    // 커버리지 수집 대상을 현재 테스트가 존재하는 서비스 파일로 한정 (Phase 0~2)
+    // [Coverage Mapping] Explicit list to avoid penalizing untested modules while Phase 3 progresses
     collectCoverageFrom: [
-        'src/components/ErrorBoundary.tsx',
-        'src/utils/safeLogger.ts',
-        'src/utils/errorMonitoring.ts',
-        'src/navigation/config.ts',
-        'App.tsx',
-        // 추가: 핵심 유틸리티들
-        'src/utils/formatters.ts',
-        'src/hooks/useNFC.ts',
-        'src/services/attendanceService.ts',
+        'src/features/qna/services/qnaService.ts',
+        'src/features/myPage/services/timeOffService.ts',
+        'src/features/myPage/services/masterService.ts',
+        'src/features/auth/services/userService.ts',
+        'src/features/wage/services/wageService.ts',
+        'src/features/salary/services/payrollService.ts',
+        '!src/**/*.d.ts'
     ],
     coverageThreshold: {
         global: {

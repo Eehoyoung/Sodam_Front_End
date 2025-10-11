@@ -91,3 +91,8 @@ report
 
 *.log
 *.logcat
+
+.gradle-user-home/
+.gradle/
+node_modules/
+.jest-cache/

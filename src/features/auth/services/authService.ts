@@ -14,7 +14,7 @@ export interface User {
     email: string;
     phone?: string;
     roles?: string[];
-    role?: 'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER';
+    role?: 'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER' | 'PERSONAL';
 }
 
 // 로그인 요청 타입
@@ -29,7 +29,7 @@ export interface SignupRequest {
     email: string;
     password: string;
     phone?: string;
-    role?: 'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER';
+    role?: 'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER' | 'PERSONAL';
 }
 
 // 인증 응답 타입 (앱 내부 표준)

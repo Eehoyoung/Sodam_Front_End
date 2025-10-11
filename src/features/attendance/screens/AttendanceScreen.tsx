@@ -23,6 +23,8 @@ import attendanceService from '../services/attendanceService';
 import {AttendanceRecord, AttendanceStatus} from '../types';
 import {format} from 'date-fns';
 import {ko} from 'date-fns/locale';
+import { COLORS } from '../../../common/components/logo/Colors';
+import LinearGradient from 'react-native-linear-gradient';
 
 // 네비게이션 타입 정의
 type AttendanceStackParamList = {
@@ -103,6 +105,7 @@ const AttendanceScreen = () => {
     const openNFCReader = async () => {
         const isNFCAvailable = await checkNFCSupport();
         if (isNFCAvailable) {
+            // TODO(NFC): 실제 태그 스캔 로직(NFCAttendanceService.readTag 등) 연동
             setShowNFCReader(true);
         }
     };
@@ -120,11 +123,13 @@ const AttendanceScreen = () => {
                 workplaceId: selectedWorkplaceId || undefined
             };
 
+            // TODO(API): 출퇴근 기록 조회 API 연동 및 응답 스키마 반영
             const data = await attendanceService.getAttendanceRecords(filter);
             setAttendanceRecords(data);
 
             // 현재 근무 상태 조회
             if (selectedWorkplaceId) {
+                // TODO(API): 현재 근무 상태 조회 API 연동
                 const currentData = await attendanceService.getCurrentAttendance(selectedWorkplaceId);
                 setCurrentAttendance(currentData);
             }
@@ -140,7 +145,7 @@ const AttendanceScreen = () => {
     // 근무지 목록 조회 (실제 구현에서는 API 호출)
     const fetchWorkplaces = async () => {
         try {
-            // 임시 데이터 (실제 구현에서는 API 호출)
+            // TODO(API): 근무지 목록 API 연동 (현재 임시 데이터 사용 중)
             const data = [
                 {id: '1', name: '카페 소담'},
                 {id: '2', name: '레스토랑 소담'}
@@ -212,6 +217,7 @@ const AttendanceScreen = () => {
     };
 
     // NFC 태그 스캔 처리
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleNFCTagScanned = (scannedNFCTag: string) => {
         setNfcTagId(scannedNFCTag);
         setShowNFCReader(false);
@@ -275,6 +281,7 @@ const AttendanceScreen = () => {
                 workplaceId: selectedWorkplaceId
             };
 
+            // TODO(API): 출근 처리(checkIn) 엔드포인트 연동
             const response = await attendanceService.checkIn(checkInData);
             Alert.alert('성공', '출근 처리되었습니다.');
             setCurrentAttendance(response);
@@ -287,6 +294,8 @@ const AttendanceScreen = () => {
 
     // 위치 기반 출근 처리
     const handleCheckInWithLocation = async () => {
+        // TODO(API): 위치 인증/출근 처리 API 연동
+        // TODO(AUTH): 'employeeId' 임시값을 로그인 사용자 ID로 대체
         if (!selectedWorkplaceId) {
             Alert.alert('알림', '근무지를 선택해주세요.');
             return;
@@ -313,7 +322,7 @@ const AttendanceScreen = () => {
             );
 
             if (!verifyResult.success) {
-                Alert.alert('알림', verifyResult.message || '위치 인증에 실패했습니다. 매장 반경 내에서 다시 시도해주세요.');
+                Alert.alert('알림', verifyResult.message ?? '위치 인증에 실패했습니다. 매장 반경 내에서 다시 시도해주세요.');
                 return;
             }
 
@@ -324,6 +333,7 @@ const AttendanceScreen = () => {
                 longitude: currentLocation.longitude
             };
 
+            // TODO(API): 출근 처리(checkIn) 엔드포인트 연동
             const response = await attendanceService.checkIn(checkInData);
             Alert.alert('성공', '위치 기반 출근 처리되었습니다.');
             setCurrentAttendance(response);
@@ -336,6 +346,8 @@ const AttendanceScreen = () => {
 
     // NFC 태그 기반 출근 처리
     const handleCheckInWithNFC = async (scannedNFCTag: string) => {
+        // TODO(API): NFC 태그 인증/출근 처리 API 연동
+        // TODO(NFC): 실제 태그값 파싱/검증 로직 연동
         if (!selectedWorkplaceId) {
             Alert.alert('알림', '근무지를 선택해주세요.');
             return;
@@ -350,7 +362,7 @@ const AttendanceScreen = () => {
             );
 
             if (!verifyResult.success) {
-                Alert.alert('알림', verifyResult.message || 'NFC 태그 인증에 실패했습니다. 다시 시도해주세요.');
+                Alert.alert('알림', verifyResult.message ?? 'NFC 태그 인증에 실패했습니다. 다시 시도해주세요.');
                 return;
             }
 
@@ -359,6 +371,7 @@ const AttendanceScreen = () => {
                 workplaceId: selectedWorkplaceId
             };
 
+            // TODO(API): 출근 처리(checkIn) 엔드포인트 연동
             const response = await attendanceService.checkIn(checkInData);
             Alert.alert('성공', 'NFC 태그 기반 출근 처리되었습니다.');
             setCurrentAttendance(response);
@@ -381,6 +394,7 @@ const AttendanceScreen = () => {
                 workplaceId: selectedWorkplaceId
             };
 
+            // TODO(API): 퇴근 처리(checkOut) 엔드포인트 연동
             await attendanceService.checkOut(currentAttendance.id, checkOutData);
             Alert.alert('성공', '퇴근 처리되었습니다.');
             setCurrentAttendance(null);
@@ -393,6 +407,8 @@ const AttendanceScreen = () => {
 
     // 위치 기반 퇴근 처리
     const handleCheckOutWithLocation = async () => {
+        // TODO(API): 위치 인증/퇴근 처리 API 연동
+        // TODO(AUTH): 'employeeId' 임시값을 로그인 사용자 ID로 대체
         if (!currentAttendance) {
             Alert.alert('알림', '현재 출근 상태가 아닙니다.');
             return;
@@ -419,7 +435,7 @@ const AttendanceScreen = () => {
             );
 
             if (!verifyResult.success) {
-                Alert.alert('알림', verifyResult.message || '위치 인증에 실패했습니다. 매장 반경 내에서 다시 시도해주세요.');
+                Alert.alert('알림', verifyResult.message ?? '위치 인증에 실패했습니다. 매장 반경 내에서 다시 시도해주세요.');
                 return;
             }
 
@@ -430,6 +446,7 @@ const AttendanceScreen = () => {
                 longitude: currentLocation.longitude
             };
 
+            // TODO(API): 퇴근 처리(checkOut) 엔드포인트 연동
             await attendanceService.checkOut(currentAttendance.id, checkOutData);
             Alert.alert('성공', '위치 기반 퇴근 처리되었습니다.');
             setCurrentAttendance(null);
@@ -442,6 +459,8 @@ const AttendanceScreen = () => {
 
     // NFC 태그 기반 퇴근 처리
     const handleCheckOutWithNFC = async (scannedNFCTag: string) => {
+        // TODO(API): NFC 태그 인증/퇴근 처리 API 연동
+        // TODO(NFC): 실제 태그값 파싱/검증 로직 연동
         if (!currentAttendance) {
             Alert.alert('알림', '현재 출근 상태가 아닙니다.');
             return;
@@ -456,7 +475,7 @@ const AttendanceScreen = () => {
             );
 
             if (!verifyResult.success) {
-                Alert.alert('알림', verifyResult.message || 'NFC 태그 인증에 실패했습니다. 다시 시도해주세요.');
+                Alert.alert('알림', verifyResult.message ?? 'NFC 태그 인증에 실패했습니다. 다시 시도해주세요.');
                 return;
             }
 
@@ -465,6 +484,7 @@ const AttendanceScreen = () => {
                 workplaceId: selectedWorkplaceId
             };
 
+            // TODO(API): 퇴근 처리(checkOut) 엔드포인트 연동
             await attendanceService.checkOut(currentAttendance.id, checkOutData);
             Alert.alert('성공', 'NFC 태그 기반 퇴근 처리되었습니다.');
             setCurrentAttendance(null);
@@ -479,19 +499,19 @@ const AttendanceScreen = () => {
     const getStatusColor = (status: AttendanceStatus) => {
         switch (status) {
             case AttendanceStatus.CHECKED_IN:
-                return '#4CAF50'; // 출근 - 초록색
+                return COLORS.SUCCESS; // 출근
             case AttendanceStatus.CHECKED_OUT:
-                return '#2196F3'; // 퇴근 - 파란색
+                return COLORS.SODAM_BLUE; // 퇴근
             case AttendanceStatus.LATE:
-                return '#FF9800'; // 지각 - 주황색
+                return COLORS.WARNING; // 지각
             case AttendanceStatus.ABSENT:
-                return '#F44336'; // 결근 - 빨간색
+                return COLORS.ERROR; // 결근
             case AttendanceStatus.EARLY_LEAVE:
-                return '#FF5722'; // 조퇴 - 주황빨간색
+                return COLORS.SODAM_ORANGE; // 조퇴
             case AttendanceStatus.ON_LEAVE:
-                return '#9C27B0'; // 휴가 - 보라색
+                return COLORS.INFO; // 휴가/정보
             default:
-                return '#757575'; // 기본 - 회색
+                return COLORS.GRAY_500; // 기본
         }
     };
 
@@ -559,7 +579,7 @@ const AttendanceScreen = () => {
                         </View>
 
                         <View style={styles.workplaceContainer}>
-                            <Icon name="business" size={14} color="#757575"/>
+                            <Icon name="business" size={14} color={COLORS.GRAY_500}/>
                             <Text style={styles.workplaceName}>{item.workplaceName}</Text>
                         </View>
                     </View>
@@ -571,7 +591,7 @@ const AttendanceScreen = () => {
     // 빈 목록 표시
     const renderEmptyList = () => (
         <View style={styles.emptyContainer}>
-            <Icon name="event-busy" size={64} color="#bdc3c7"/>
+            <Icon name="event-busy" size={64} color={COLORS.GRAY_300}/>
             <Text style={styles.emptyText}>출퇴근 기록이 없습니다.</Text>
             <Text style={styles.emptySubText}>출근 버튼을 눌러 근무를 시작해보세요.</Text>
         </View>
@@ -597,7 +617,7 @@ const AttendanceScreen = () => {
 
                 <View style={styles.nfcReaderContainer}>
                     <View style={styles.nfcIconContainer}>
-                        <Icon name="nfc" size={80} color="#4CAF50"/>
+                        <Icon name="nfc" size={80} color={COLORS.SUCCESS}/>
                     </View>
 
                     <Text style={styles.nfcInstructions}>
@@ -609,7 +629,7 @@ const AttendanceScreen = () => {
                     </Text>
 
                     <View style={styles.nfcStatusContainer}>
-                        <ActivityIndicator size="large" color="#4CAF50"/>
+                        <ActivityIndicator size="large" color={COLORS.SUCCESS}/>
                         <Text style={styles.nfcStatusText}>NFC 태그를 기다리는 중...</Text>
                     </View>
                 </View>
@@ -630,9 +650,14 @@ const AttendanceScreen = () => {
         <MainLayout>
             <View style={styles.container}>
                 {renderNFCReader()}
-                <View style={styles.header}>
-                    <Text style={styles.title}>출퇴근 관리</Text>
-                </View>
+                <LinearGradient
+                    colors={COLORS.GRADIENT_PRIMARY}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.headerGradient}
+                >
+                    <Text style={styles.headerTitle}>출퇴근 관리</Text>
+                </LinearGradient>
 
                 <View style={styles.workplaceSelector}>
                     {workplaces.map(workplace => (
@@ -821,7 +846,7 @@ const AttendanceScreen = () => {
 
                     {loading ? (
                         <View style={styles.loadingContainer}>
-                            <ActivityIndicator size="large" color="#3498db"/>
+                            <ActivityIndicator size="large" color={COLORS.SODAM_BLUE}/>
                             <Text style={styles.loadingText}>출퇴근 기록을 불러오는 중...</Text>
                         </View>
                     ) : (
@@ -835,7 +860,7 @@ const AttendanceScreen = () => {
                                 <RefreshControl
                                     refreshing={refreshing}
                                     onRefresh={handleRefresh}
-                                    colors={['#3498db']}
+                                    colors={[COLORS.SODAM_BLUE]}
                                 />
                             }
                         />
@@ -849,42 +874,49 @@ const AttendanceScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: COLORS.GRAY_50,
+    },
+    headerGradient: {
+        paddingTop: 20,
+        paddingBottom: 16,
+        paddingHorizontal: 16,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+    },
+    headerTitle: {
+        padding: 16,
+        backgroundColor: COLORS.WHITE,
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.GRAY_200,
     },
     header: {
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-    },
-    title: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#333',
+        color: COLORS.WHITE,
     },
     workplaceSelector: {
         flexDirection: 'row',
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.WHITE,
         padding: 8,
         borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
+        borderBottomColor: COLORS.GRAY_200,
     },
     workplaceOption: {
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 20,
         marginRight: 8,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: COLORS.GRAY_100,
     },
     selectedWorkplace: {
-        backgroundColor: '#3498db',
+        backgroundColor: COLORS.SODAM_ORANGE,
     },
     workplaceOptionText: {
-        color: '#555',
+        color: COLORS.GRAY_600,
         fontWeight: '500',
     },
     selectedWorkplaceText: {
-        color: '#fff',
+        color: COLORS.WHITE,
     },
     currentStatusContainer: {
         padding: 16,
@@ -895,7 +927,7 @@ const styles = StyleSheet.create({
     currentStatusTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
+        color: COLORS.GRAY_800,
         marginBottom: 12,
     },
     statusInfo: {
@@ -908,16 +940,16 @@ const styles = StyleSheet.create({
     statusLabel: {
         width: 80,
         fontSize: 14,
-        color: '#666',
+        color: COLORS.GRAY_600,
     },
     statusValue: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#333',
+        color: COLORS.GRAY_800,
     },
     notWorkingText: {
         fontSize: 14,
-        color: '#666',
+        color: COLORS.GRAY_600,
         fontStyle: 'italic',
         textAlign: 'center',
         marginVertical: 8,
@@ -936,18 +968,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 20,
         marginHorizontal: 4,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: COLORS.GRAY_100,
     },
     selectedMethod: {
-        backgroundColor: '#3498db',
+        backgroundColor: COLORS.SODAM_ORANGE,
     },
     methodOptionText: {
-        color: '#555',
+        color: COLORS.GRAY_600,
         fontWeight: '500',
         marginLeft: 4,
     },
     selectedMethodText: {
-        color: '#fff',
+        color: COLORS.WHITE,
     },
     actionButtons: {
         marginTop: 8,
@@ -962,7 +994,7 @@ const styles = StyleSheet.create({
     recordsTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
+        color: COLORS.GRAY_800,
     },
     listContainer: {
         padding: 16,
@@ -981,7 +1013,7 @@ const styles = StyleSheet.create({
     attendanceDate: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#333',
+        color: COLORS.GRAY_800,
     },
     statusBadge: {
         paddingHorizontal: 8,
@@ -1007,17 +1039,17 @@ const styles = StyleSheet.create({
     },
     timeLabel: {
         fontSize: 12,
-        color: '#666',
+        color: COLORS.GRAY_600,
         marginBottom: 4,
     },
     timeValue: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#333',
+        color: COLORS.GRAY_800,
     },
     timeSeparator: {
         width: 1,
-        backgroundColor: '#e0e0e0',
+        backgroundColor: COLORS.GRAY_200,
         marginHorizontal: 8,
     },
     workplaceContainer: {
@@ -1026,7 +1058,7 @@ const styles = StyleSheet.create({
     },
     workplaceName: {
         fontSize: 12,
-        color: '#666',
+        color: COLORS.GRAY_600,
         marginLeft: 4,
     },
     loadingContainer: {
@@ -1038,7 +1070,7 @@ const styles = StyleSheet.create({
     loadingText: {
         marginTop: 12,
         fontSize: 14,
-        color: '#666',
+        color: COLORS.GRAY_600,
     },
     emptyContainer: {
         alignItems: 'center',
@@ -1048,19 +1080,19 @@ const styles = StyleSheet.create({
     emptyText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#555',
+        color: COLORS.GRAY_700,
         marginTop: 16,
     },
     emptySubText: {
         fontSize: 14,
-        color: '#7f8c8d',
+        color: COLORS.GRAY_500,
         marginTop: 8,
         textAlign: 'center',
     },
     // NFC 리더 관련 스타일
     nfcContainer: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: COLORS.GRAY_50,
     },
     nfcHeader: {
         flexDirection: 'row',
@@ -1068,14 +1100,14 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         paddingHorizontal: 20,
         paddingBottom: 20,
-        backgroundColor: '#4CAF50',
+        backgroundColor: COLORS.SUCCESS,
     },
     closeButton: {
         padding: 10,
     },
     nfcTitle: {
         flex: 1,
-        color: '#fff',
+        color: COLORS.WHITE,
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center',
@@ -1091,7 +1123,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         padding: 20,
         borderRadius: 50,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.WHITE,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -1104,13 +1136,13 @@ const styles = StyleSheet.create({
     nfcInstructions: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
+        color: COLORS.GRAY_800,
         textAlign: 'center',
         marginBottom: 10,
     },
     nfcSubInstructions: {
         fontSize: 14,
-        color: '#666',
+        color: COLORS.GRAY_600,
         textAlign: 'center',
         marginBottom: 30,
         lineHeight: 20,
@@ -1121,25 +1153,25 @@ const styles = StyleSheet.create({
     },
     nfcStatusText: {
         fontSize: 16,
-        color: '#4CAF50',
+        color: COLORS.SUCCESS,
         marginTop: 10,
         fontWeight: '500',
     },
     nfcFooter: {
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.WHITE,
         borderTopWidth: 1,
-        borderTopColor: '#e0e0e0',
+        borderTopColor: COLORS.GRAY_200,
     },
     cancelButton: {
-        backgroundColor: '#f44336',
+        backgroundColor: COLORS.ERROR,
         paddingVertical: 15,
         paddingHorizontal: 30,
         borderRadius: 8,
         alignItems: 'center',
     },
     cancelButtonText: {
-        color: '#fff',
+        color: COLORS.WHITE,
         fontSize: 16,
         fontWeight: 'bold',
     },

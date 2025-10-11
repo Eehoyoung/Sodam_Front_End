@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, StyleSheet } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import SodamLogo from '../../../common/components/logo/SodamLogo';
 import { COLORS } from '../../../common/components/logo/Colors';
+import { NavigationProp } from '@react-navigation/native';
+import authApi from '../services/authApi';
+import { unifiedStorage } from '../../../common/utils/unifiedStorage';
 
 interface UserType {
     id: 'personal' | 'boss' | 'employee';
@@ -12,7 +17,9 @@ interface UserType {
     backgroundColor: string;
 }
 
-const SignUpScreen: React.FC = () => {
+interface SignupScreenProps { navigation: NavigationProp<any>; }
+
+const SignUpScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -56,25 +63,30 @@ const SignUpScreen: React.FC = () => {
 
         setIsLoading(true);
 
-        // 실제 회원가입 로직 시뮬레이션
-        setTimeout(() => {
-            const userTypeText = userTypes.find(type => type.id === selectedUserType)?.title ?? '';
-            Alert.alert(
-                '회원가입 완료',
-                `회원가입이 완료되었습니다!\n\n이름: ${name}\n이메일: ${email}\n사용자 타입: ${userTypeText}`
-            );
+        try {
+            const userGrade = selectedUserType === 'boss' ? 'MASTER' : selectedUserType === 'employee' ? 'EMPLOYEE' : 'PERSONAL';
+            await authApi.join({ name, email, password }, { purpose: selectedUserType as any, userGrade: userGrade as any });
 
-            // 폼 초기화
+            // Persist selected purpose locally to suppress popup on first login
+            const purposeSlug = selectedUserType === 'boss' ? 'master' : selectedUserType === 'employee' ? 'employee' : 'user';
+            try { await unifiedStorage.setItem('pendingPurposeAfterSignup', purposeSlug); } catch (_) { /* no-op */ }
+
+            Alert.alert('회원가입 완료', '가입이 완료되었습니다. 로그인해 주세요.', [
+                { text: '확인', onPress: () => navigation.navigate('Login') }
+            ]);
             setName('');
             setEmail('');
             setPassword('');
             setSelectedUserType(null);
+        } catch (e) {
+            Alert.alert('오류', '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        } finally {
             setIsLoading(false);
-        }, 2000);
+        }
     };
 
     const handleLogin = () => {
-        Alert.alert('알림', '로그인 화면으로 이동합니다.');
+        navigation.navigate('Login');
     };
 
     const renderUserTypeCard = (userType: UserType) => {
@@ -111,11 +123,17 @@ const SignUpScreen: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <LinearGradient
+            colors={[COLORS.SODAM_BLUE, '#6A5ACD', COLORS.SODAM_GREEN]}
+            style={styles.container}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+        >
+            <SafeAreaView style={styles.safeArea}>
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* 헤더 */}
                 <View style={styles.header}>
-                    <SodamLogo size={80} variant="simple" />
+                    <SodamLogo size={100} variant="simple" />
                     <Text style={styles.headerTitle}>회원가입</Text>
                     <Text style={styles.headerSubtitle}>소담과 함께 시작해보세요</Text>
                 </View>
@@ -181,6 +199,7 @@ const SignUpScreen: React.FC = () => {
                             </Text>
                         </TouchableOpacity>
 
+
                         <TouchableOpacity style={styles.loginLink} onPress={handleLogin}>
                             <Text style={styles.loginLinkText}>
                                 이미 계정이 있으신가요? 로그인
@@ -189,24 +208,31 @@ const SignUpScreen: React.FC = () => {
                     </View>
                 </View>
             </ScrollView>
-        </View>
+            </SafeAreaView>
+        </LinearGradient>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.WHITE,
+    },
+    safeArea: {
+        flex: 1,
+    },
+    scrollContent: {
+        paddingHorizontal: 24,
+        paddingBottom: 24,
     },
     scrollView: {
         flex: 1,
     },
     header: {
-        backgroundColor: `linear-gradient(135deg, ${COLORS.SODAM_ORANGE} 0%, ${COLORS.SODAM_BLUE} 100%)`,
-        paddingTop: 60,
-        paddingBottom: 40,
+        paddingTop: 40,
+        paddingBottom: 24,
         paddingHorizontal: 20,
         alignItems: 'center',
+        backgroundColor: 'transparent',
     },
     headerTitle: {
         fontSize: 32,
@@ -312,7 +338,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     signupButton: {
-        backgroundColor: `linear-gradient(135deg, ${COLORS.SODAM_ORANGE} 0%, ${COLORS.SODAM_BLUE} 100%)`,
+        backgroundColor: COLORS.SODAM_ORANGE,
         borderRadius: 15,
         padding: 18,
         alignItems: 'center',

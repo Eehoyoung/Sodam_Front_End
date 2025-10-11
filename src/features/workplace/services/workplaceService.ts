@@ -35,7 +35,7 @@ export const getWorkplaces = async (userId?: string): Promise<Workplace[]> => {
         console.log('[DEBUG_LOG] 매장 목록 조회 API 호출 시작');
 
         // 실제 API 호출
-        const response = await api.get<Workplace[]>(`/api/stores/master/${userId || 'current'}`);
+        const response = await api.get<Workplace[]>(`/api/stores/master/${userId ?? 'current'}`);
 
         console.log('[DEBUG_LOG] 매장 목록 조회 성공:', response.data);
         return response.data;
@@ -89,7 +89,7 @@ export const createWorkplace = async (workplace: Omit<Workplace, 'id'>): Promise
     try {
         console.log('[DEBUG_LOG] 매장 등록 API 호출 시작:', workplace);
 
-        const response = await api.post<Workplace>('/api/stores', workplace);
+        const response = await api.post<Workplace>('/api/stores/registration', workplace);
 
         console.log('[DEBUG_LOG] 매장 등록 성공:', response.data);
         return response.data;

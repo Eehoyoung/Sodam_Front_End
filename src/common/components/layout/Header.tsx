@@ -8,6 +8,8 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList,HomeStackParamList} from '../../../navigation/types';
 import {useResponsiveStyles} from "../../../utils/responsive";
 import {useAuth} from '../../../contexts/AuthContext';
+import SodamLogo from '../logo/SodamLogo';
+import { COLORS } from '../logo/Colors';
 // 복합 네비게이션 타입 정의
 type HeaderNavigationProp = CompositeNavigationProp<
     NativeStackNavigationProp<RootStackParamList>,
@@ -121,6 +123,9 @@ const Header: React.FC<HeaderProps> = ({title}) => {
                     <TouchableOpacity
                         style={[styles.navButton, dynamicStyles.navButton]}
                         onPress={handleAuthAction}
+                        accessibilityRole="button"
+                        accessibilityLabel={isAuthenticated ? '로그아웃 버튼' : '로그인 버튼'}
+                        testID="btnAuth"
                     >
                         <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>
                             {isAuthenticated ? '로그아웃' : '로그인'}
@@ -129,6 +134,9 @@ const Header: React.FC<HeaderProps> = ({title}) => {
                     <TouchableOpacity
                         style={[styles.navButton, dynamicStyles.navButton]}
                         onPress={handleMyPageNavigation}
+                        accessibilityRole="button"
+                        accessibilityLabel="마이페이지 화면으로 이동"
+                        testID="btnMyPage"
                     >
                         <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>마이페이지</Text>
                     </TouchableOpacity>
@@ -141,6 +149,9 @@ const Header: React.FC<HeaderProps> = ({title}) => {
                 <TouchableOpacity
                     style={[styles.navButton, dynamicStyles.navButton]}
                     onPress={handleAuthAction}
+                    accessibilityRole="button"
+                    accessibilityLabel={isAuthenticated ? '로그아웃 버튼' : '로그인 버튼'}
+                    testID="btnAuth"
                 >
                     <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>
                         {isAuthenticated ? '로그아웃' : '로그인'}
@@ -149,24 +160,36 @@ const Header: React.FC<HeaderProps> = ({title}) => {
                 <TouchableOpacity
                     style={[styles.navButton, dynamicStyles.navButton]}
                     onPress={() => navigation.navigate('QnA')}
+                    accessibilityRole="button"
+                    accessibilityLabel="Q&A 화면으로 이동"
+                    testID="btnQnA"
                 >
                     <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>Q&A</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.navButton, dynamicStyles.navButton]}
                     onPress={() => navigation.navigate('Subscribe')}
+                    accessibilityRole="button"
+                    accessibilityLabel="구독하기 화면으로 이동"
+                    testID="btnSubscribe"
                 >
                     <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>구독하기</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.navButton, dynamicStyles.navButton]}
                     onPress={() => navigation.navigate('Settings')}
+                    accessibilityRole="button"
+                    accessibilityLabel="설정 화면으로 이동"
+                    testID="btnSettings"
                 >
                     <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>설정</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.navButton, dynamicStyles.navButton]}
                     onPress={handleMyPageNavigation}
+                    accessibilityRole="button"
+                    accessibilityLabel="마이페이지 화면으로 이동"
+                    testID="btnMyPage"
                 >
                     <Text style={[styles.navButtonText, dynamicStyles.navButtonText]}>마이페이지</Text>
                 </TouchableOpacity>
@@ -175,9 +198,9 @@ const Header: React.FC<HeaderProps> = ({title}) => {
     };
 
     return (
-        <View style={[styles.header, dynamicStyles.header]}>
+        <View style={[styles.header, dynamicStyles.header]} accessibilityRole="header" accessibilityLabel="소담 상단바" testID="sodamHeader">
             <View style={styles.leftContainer}>
-                <Text style={[styles.logo, dynamicStyles.logo]}>SOODAM</Text>
+                <SodamLogo size={isSmallScreen ? 20 : 24} variant="simple" />
                 {title && <Text style={styles.title}>{title}</Text>}
             </View>
             {renderNavButtons()}
@@ -190,7 +213,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#3498db',
+        backgroundColor: COLORS.SODAM_BLUE,
         width: '100%',
     },
     leftContainer: {

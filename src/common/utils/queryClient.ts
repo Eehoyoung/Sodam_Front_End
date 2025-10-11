@@ -129,9 +129,25 @@ export const invalidateQueries = {
 export const handleQueryError = (error: unknown, context?: string) => {
     console.error(`[TanStack Query Error]${context ? ` ${context}:` : ''}`, error);
 
-    // 에러 타입에 따른 처리
+    // 에러 타입에 따른 처리 및 표준화된 메시지 매핑(errorCode 우선)
     if (error && typeof error === 'object' && 'response' in error) {
         const apiError = error as { response: { status: number; data?: any } };
+        const errorCode: string | undefined = apiError.response?.data?.errorCode || apiError.response?.data?.code;
+
+        if (errorCode) {
+            // 표준 에러 메시지 매핑
+            const codeMessageMap: Record<string, string> = {
+                LOCATION_VERIFICATION_FAILED: '매장 반경 밖입니다.',
+                INVALID_TAG: '유효하지 않은 NFC 태그입니다.',
+                DUPLICATE_CHECK_IN: '이미 처리된 출근입니다.',
+                DUPLICATE_CHECK_OUT: '이미 처리된 퇴근입니다.',
+                PERMISSION_DENIED: '권한이 없습니다.',
+            };
+            const mapped = codeMessageMap[errorCode];
+            if (mapped) {
+                console.warn(`[TanStack Query] ${mapped}`);
+            }
+        }
 
         switch (apiError.response.status) {
             case 401:
@@ -141,6 +157,9 @@ export const handleQueryError = (error: unknown, context?: string) => {
             case 403:
                 // 권한 오류
                 console.warn('[TanStack Query] 권한이 없습니다.');
+                break;
+            case 400:
+                console.warn('[TanStack Query] 입력 데이터를 확인해주세요.');
                 break;
             case 500:
                 // 서버 오류

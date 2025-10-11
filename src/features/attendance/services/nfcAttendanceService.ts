@@ -1,5 +1,7 @@
 import {api} from '../../../common/utils/api';
 
+// [API Mapping] NFC verify standardized; legacy NFC verify endpoint fallback removed per Phase 0 AC (2025-10-02).
+
 export interface NFCVerifyRequest {
     employeeId: number;
     storeId: number;
@@ -22,12 +24,13 @@ export const verifyCheckInByNFC = async (
 ): Promise<NFCVerifyResponse> => {
     try {
         const response = await api.post<NFCVerifyResponse>(
-            '/api/attendance/nfc-verify',
+            '/api/attendance/verify/nfc',
             request
         );
         return response.data;
     } catch (error) {
         console.error('NFC 태그 기반 출근 인증 실패:', error);
+        // Legacy NFC verify endpoint fallback removed per Phase 0 AC (2025-10-02)
         return {
             success: false,
             message: 'NFC 태그 기반 출근 인증에 실패했습니다. 다시 시도해주세요.'
@@ -46,7 +49,7 @@ export const verifyCheckOutByNFC = async (
     try {
         // 출근과 동일한 엔드포인트를 사용하지만, 퇴근 플래그 추가
         const response = await api.post<NFCVerifyResponse>(
-            '/api/attendance/nfc-verify',
+            '/api/attendance/verify/nfc',
             {
                 ...request,
                 isCheckOut: true
@@ -55,6 +58,7 @@ export const verifyCheckOutByNFC = async (
         return response.data;
     } catch (error) {
         console.error('NFC 태그 기반 퇴근 인증 실패:', error);
+        // Legacy NFC verify endpoint fallback removed per Phase 0 AC (2025-10-02)
         return {
             success: false,
             message: 'NFC 태그 기반 퇴근 인증에 실패했습니다. 다시 시도해주세요.'

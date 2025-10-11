@@ -7,14 +7,16 @@ import LaborInfoDetailScreen from '../features/info/screens/LaborInfoDetailScree
 import PolicyDetailScreen from '../features/info/screens/PolicyDetailScreen';
 import TaxInfoDetailScreen from '../features/info/screens/TaxInfoDetailScreen';
 import TipsDetailScreen from '../features/info/screens/TipsDetailScreen';
-import EmployeeMyPageScreen from '../features/myPage/screens/EmployeeMyPageScreen';
+import EmployeeMyPageRNScreen from '../features/myPage/screens/EmployeeMyPageRNScreen';
 import MasterMyPageScreen from '../features/myPage/screens/MasterMyPageScreen';
 import ManagerMyPageScreen from '../features/myPage/screens/ManagerMyPageScreen';
-import UserMyPageScreen from '../features/myPage/screens/UserMyPageScreen';
+import UserMyPageScreen from '../features/myPage/screens/PersonalUserScreen';
 import Header from '../common/components/layout/Header';
 import ProfileScreen from '../features/auth/screens/ProfileScreen';
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
 import StoreRegistrationScreen from '../features/store/StoreRegistraionScreen';
+import AttendanceScreen from '../features/attendance/screens/AttendanceScreen';
+import appHeaderOptions from './appHeaderOptions';
 
 export type HomeStackParamList = {
     Home: undefined;
@@ -24,6 +26,7 @@ export type HomeStackParamList = {
     PolicyDetail: { policyId: number };
     TaxInfoDetail: { taxInfoId: number };
     TipsDetail: { tipId: number };
+    Attendance: undefined;
     EmployeeMyPageScreen: undefined;
     MasterMyPageScreen: undefined;
     ManagerMyPageScreen: undefined;
@@ -39,12 +42,16 @@ const Stack = createNativeStackNavigator<HomeStackParamList>();
  * 메인 앱 화면들을 위한 네비게이터
  * 홈, 정보 상세, 마이페이지 등의 화면을 포함
  */
-const HomeNavigator: React.FC = () => {
+interface HomeNavigatorProps {
+    initialScreen?: keyof HomeStackParamList;
+}
+
+const HomeNavigator: React.FC<HomeNavigatorProps> = ({ initialScreen }) => {
     return (
         <Stack.Navigator
-            initialRouteName="Home"
+            initialRouteName={initialScreen ?? 'Home'}
             screenOptions={{
-                headerShown: false,
+                ...appHeaderOptions,
                 presentation: 'card',
             }}
         >
@@ -57,13 +64,18 @@ const HomeNavigator: React.FC = () => {
                 }}
             />
 
-            <Stack.Screen name="Subscribe" component={SubscribeScreen}/>
-            <Stack.Screen name="QnA" component={QnAScreen}/>
+            <Stack.Screen name="Subscribe" component={SubscribeScreen} options={{ title: '구독하기' }} />
+            <Stack.Screen name="QnA" component={QnAScreen} options={{ title: 'Q&A' }} />
 
-            <Stack.Screen name="LaborInfoDetail" component={LaborInfoDetailScreen}/>
-            <Stack.Screen name="PolicyDetail" component={PolicyDetailScreen}/>
-            <Stack.Screen name="TaxInfoDetail" component={TaxInfoDetailScreen}/>
-            <Stack.Screen name="TipsDetail" component={TipsDetailScreen}/>
+            <Stack.Screen name="LaborInfoDetail" component={LaborInfoDetailScreen} options={{ title: '노동 정보 상세' }} />
+            <Stack.Screen name="PolicyDetail" component={PolicyDetailScreen} options={{ title: '정책 상세' }} />
+            <Stack.Screen name="TaxInfoDetail" component={TaxInfoDetailScreen} options={{ title: '세무 정보 상세' }} />
+            <Stack.Screen name="TipsDetail" component={TipsDetailScreen} options={{ title: '팁 상세' }} />
+            <Stack.Screen
+                name="Attendance"
+                component={AttendanceScreen}
+                options={{ headerShown: true, title: '출퇴근 관리' }}
+            />
 
             <Stack.Screen
                 name="Settings"
@@ -78,23 +90,23 @@ const HomeNavigator: React.FC = () => {
 
             <Stack.Screen
                 name="EmployeeMyPageScreen"
-                component={EmployeeMyPageScreen}
-                options={{headerShown: true}}
+                component={EmployeeMyPageRNScreen}
+                options={{headerShown: true, title: '사원 마이페이지'}}
             />
             <Stack.Screen
                 name="MasterMyPageScreen"
                 component={MasterMyPageScreen}
-                options={{headerShown: true}}
+                options={{headerShown: true, title: '사장 마이페이지'}}
             />
             <Stack.Screen
                 name="ManagerMyPageScreen"
                 component={ManagerMyPageScreen}
-                options={{headerShown: true}}
+                options={{headerShown: true, title: '매니저 마이페이지'}}
             />
             <Stack.Screen
                 name="UserMyPageScreen"
                 component={UserMyPageScreen}
-                options={{headerShown: true}}
+                options={{headerShown: true, title: '개인 마이페이지'}}
             />
             <Stack.Screen
                 name="StoreRegistration"

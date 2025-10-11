@@ -24,7 +24,7 @@ export const verifyCheckInByLocation = async (
 ): Promise<LocationVerifyResponse> => {
     try {
         const response = await api.post<LocationVerifyResponse>(
-            '/api/attendance/location-verify',
+            '/api/attendance/verify/location',
             request
         );
         return response.data;
@@ -48,7 +48,7 @@ export const verifyCheckOutByLocation = async (
     try {
         // 출근과 동일한 엔드포인트를 사용하지만, 퇴근 플래그 추가
         const response = await api.post<LocationVerifyResponse>(
-            '/api/attendance/location-verify',
+            '/api/attendance/verify/location',
             {
                 ...request,
                 isCheckOut: true

@@ -6,6 +6,10 @@ import HomeNavigator from './HomeNavigator';
 import Protected from '../components/Protected';
 import UsageSelectionScreen from "../features/welcome/screens/UsageSelectionScreen.tsx";
 import WelcomeMainScreen from "../features/welcome/screens/WelcomeMainScreen.tsx";
+import PersonalUserScreen from "../features/myPage/screens/PersonalUserScreen.tsx";
+import MasterMyPageScreen from "../features/myPage/screens/MasterMyPageScreen.tsx";
+import EmployeeMyPageRNScreen from "../features/myPage/screens/EmployeeMyPageRNScreen.tsx";
+import appHeaderOptions from './appHeaderOptions';
 
 const Stack = createNativeStackNavigator();
 
@@ -13,9 +17,10 @@ interface Props {
   appReady?: boolean;
 }
 
-const HomeProtectedWrapper: React.FC = () => (
+// Accept route params to forward initial screen into HomeNavigator
+const HomeProtectedWrapper: React.FC<any> = ({ route }) => (
   <Protected>
-    <HomeNavigator />
+    <HomeNavigator initialScreen={route?.params?.screen} />
   </Protected>
 );
 
@@ -25,12 +30,13 @@ const AppNavigator: React.FC<Props> = ({ appReady = true }) => {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Welcome"
-        screenOptions={{ headerShown: false }}
+        screenOptions={appHeaderOptions}
       >
-        <Stack.Screen name="Welcome" component={UsageSelectionScreen} />
-        <Stack.Screen name="Auth" component={AuthNavigator} />
-        <Stack.Screen name="HomeRoot" component={HomeProtectedWrapper} />
-        <Stack.Screen name="WelcomeMain" component={WelcomeMainScreen} />
+        <Stack.Screen name="Welcome" component={UsageSelectionScreen} options={{ title: '소담' }} />
+        {/*<Stack.Screen name="Welcome" component={EmployeeMyPageRNScreen} />*/}
+        <Stack.Screen name="Auth" component={AuthNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="HomeRoot" component={HomeProtectedWrapper} options={{ headerShown: false }} />
+        <Stack.Screen name="WelcomeMain" component={WelcomeMainScreen} options={{ title: '웰컴' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

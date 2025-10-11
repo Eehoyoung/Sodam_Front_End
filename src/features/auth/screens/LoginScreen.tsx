@@ -17,7 +17,12 @@ import { NavigationProp } from '@react-navigation/native';
 import  Ionicons from 'react-native-vector-icons/Ionicons';
 import SodamLogo from '../../../common/components/logo/SodamLogo';
 import { COLORS } from '../../../common/components/logo/Colors';
-import SignupScreen from "./SignupScreen.tsx";
+import authApi from '../services/authApi';
+import TokenManager from '../../../services/TokenManager';
+import { useAuth } from '../../../contexts/AuthContext';
+import PurposeSelectModal, { Purpose } from '../components/PurposeSelectModal';
+import { unifiedStorage } from '../../../common/utils/unifiedStorage';
+import { normalizeUserGrade } from '../utils/grade';
 
 interface LoginScreenProps {
     navigation: NavigationProp<any>;
@@ -29,6 +34,11 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [purposeModalVisible, setPurposeModalVisible] = useState(false);
+    const [pendingUserId, setPendingUserId] = useState<number | null>(null);
+
+    // Use AuthContext to ensure user state is set for Protected wrapper
+    const { login: authLogin } = useAuth();
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -44,15 +54,41 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         setIsLoading(true);
 
         try {
-            // 실제 API 호출 시뮬레이션
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Perform login via AuthContext so Protected sees authenticated user
+            const loggedInUser = await authLogin(email, password);
+            const grade = normalizeUserGrade((loggedInUser?.role as any) ?? undefined);
+            let targetScreen: 'UserMyPageScreen' | 'EmployeeMyPageScreen' | 'MasterMyPageScreen' = 'UserMyPageScreen';
+            if (grade === 'EMPLOYEE') { targetScreen = 'EmployeeMyPageScreen'; }
+            else if (grade === 'MASTER') { targetScreen = 'MasterMyPageScreen'; }
 
-            Alert.alert('성공', `로그인 성공!\n이메일: ${email}`, [
+            const userId = (loggedInUser?.id as unknown as number) ?? null;
+
+            // 1) Auto-apply purpose chosen during signup (email/password flow)
+            try {
+                const pending = await unifiedStorage.getItem('pendingPurposeAfterSignup');
+                if (pending && userId) {
+                    // Map stored slug to Purpose type for setPurpose
+                    const mappedPurpose: Purpose = pending === 'master' ? 'boss' : pending === 'employee' ? 'employee' : 'personal';
+                    try { await authApi.setPurpose(userId, mappedPurpose); } catch (_) { /* backend may not be ready */ }
+                    try { await unifiedStorage.removeItem('pendingPurposeAfterSignup'); } catch (_) { /* ignore */ }
+
+                    const target: 'UserMyPageScreen' | 'EmployeeMyPageScreen' | 'MasterMyPageScreen' =
+                        mappedPurpose === 'boss' ? 'MasterMyPageScreen' : mappedPurpose === 'employee' ? 'EmployeeMyPageScreen' : 'UserMyPageScreen';
+
+                    Alert.alert('성공', '로그인 성공!', [
+                        { text: '확인', onPress: () => navigation.reset({ index: 0, routes: [{ name: 'HomeRoot' as never, params: { screen: target } as never }] as any }) }
+                    ]);
+                    return;
+                }
+            } catch (_) { /* ignore */ }
+
+            // 2) Email/password login should NEVER open popup. Always route by grade.
+            //    Kakao login popup will be handled in Kakao flow where isKakaoUser === true and no server grade.
+            Alert.alert('성공', '로그인 성공!', [
                 {
                     text: '확인',
                     onPress: () => {
-                        // 실제 앱에서는 메인 화면으로 이동
-                        navigation.navigate('MainTabs');
+                        navigation.reset({ index: 0, routes: [{ name: 'HomeRoot' as never, params: { screen: targetScreen } as never }] as any });
                     }
                 }
             ]);
@@ -63,8 +99,47 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         }
     };
 
-    const handleSocialLogin = (provider: string) => {
+    const handleSocialLogin = async (provider: string) => {
+        if (provider === '카카오') {
+            try {
+                await authApi.openKakaoLogin();
+            } catch (e) {
+                Alert.alert('오류', '카카오 로그인 페이지를 여는 데 실패했습니다.');
+            }
+            return;
+        }
         Alert.alert('소셜 로그인', `${provider} 로그인 기능을 구현해주세요.`);
+    };
+
+    const handlePurposeSelect = async (purpose: Purpose) => {
+        try {
+            const userId = pendingUserId;
+            const chosenGrade = purpose === 'boss' ? 'MASTER' : purpose === 'employee' ? 'EMPLOYEE' : 'NORMAL';
+
+            if (userId) {
+                try {
+                    await authApi.setPurpose(userId, purpose);
+                } catch (_) {
+                    // 서버 미구현일 수 있으므로 조용히 통과
+                }
+                try {
+                    await unifiedStorage.setItem(`purpose_selected_${userId}`, 'true');
+                } catch (_) { /* ignore */ }
+            }
+
+            const target: 'UserMyPageScreen' | 'EmployeeMyPageScreen' | 'MasterMyPageScreen' =
+                chosenGrade === 'MASTER' ? 'MasterMyPageScreen' : chosenGrade === 'EMPLOYEE' ? 'EmployeeMyPageScreen' : 'UserMyPageScreen';
+
+            setPurposeModalVisible(false);
+            Alert.alert('완료', '사용 목적이 설정되었습니다.', [
+                {
+                    text: '확인',
+                    onPress: () => navigation.reset({ index: 0, routes: [{ name: 'HomeRoot' as never, params: { screen: target } as never }] as any })
+                }
+            ]);
+        } finally {
+            // no-op
+        }
     };
 
     const isValidEmail = (email: string) => {
@@ -207,7 +282,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                                     계정이 없으신가요?{' '}
                                     <Text
                                         style={styles.signupLink}
-                                        onPress={() => navigation.navigate('SignupScreen', {screen:SignupScreen})}
+                                        onPress={() => navigation.navigate('Signup')}
                                     >
                                         회원가입
                                     </Text>
@@ -216,6 +291,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                         </View>
                     </ScrollView>
                 </KeyboardAvoidingView>
+
+                <PurposeSelectModal
+                    visible={purposeModalVisible}
+                    onClose={() => setPurposeModalVisible(false)}
+                    onSelectPurpose={handlePurposeSelect}
+                />
             </SafeAreaView>
         </LinearGradient>
     );

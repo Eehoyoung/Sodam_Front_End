@@ -16,6 +16,9 @@ import { NavigationProp } from '@react-navigation/native';
 import  Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../../../common/components/logo/Colors';
 import policyService from '../../info/services/policyService';
+import SectionCard from '../../../common/components/sections/SectionCard';
+import SectionHeader from '../../../common/components/sections/SectionHeader';
+import { InfoSlot } from '../components/RoleSlots';
 
 interface MasterMyPageScreenProps {
     navigation: NavigationProp<any>;
@@ -385,24 +388,28 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
                 </View>
 
                 {/* 정부 정책 정보 */}
+                <InfoSlot testID="slotInfoPolicies">
                 <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>정부 지원 정책</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate('InfoList')}>
-                            <Text style={styles.sectionMore}>더보기</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.policyList}>
-                        {policies.map(renderPolicyCard)}
-                    </View>
+                    <SectionCard>
+                        <SectionHeader
+                          title="정부 지원 정책"
+                          onPressAction={() => navigation.navigate('InfoList')}
+                          actionLabel="더보기"
+                        />
+                        <View style={styles.policyList}>
+                            {policies.map(renderPolicyCard)}
+                        </View>
+                    </SectionCard>
                 </View>
+                </InfoSlot>
 
                 {/* 노무 정보 */}
                 {laborInfo && (
+                    <InfoSlot testID="slotInfoLabor">
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>{laborInfo.year}년 노무 정보</Text>
-                        <View style={styles.laborInfoCard}>
+                        <SectionCard>
+                            <SectionHeader title={`${laborInfo.year}년 노무 정보`} onPressAction={() => navigation.navigate('InfoList')} actionLabel="자세히" />
+                            <View style={styles.laborInfoCard}>
                             <View style={styles.laborInfoGrid}>
                                 <View style={styles.laborInfoItem}>
                                     <Text style={styles.laborInfoLabel}>최저임금</Text>
@@ -423,7 +430,9 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
                                 <Ionicons name="chevron-forward" size={16} color={COLORS.SODAM_BLUE} />
                             </TouchableOpacity>
                         </View>
+                        </SectionCard>
                     </View>
+                    </InfoSlot>
                 )}
 
                 {/* 하단 여백 */}
