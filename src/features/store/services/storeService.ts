@@ -29,6 +29,23 @@ export interface StoreSummaryDto {
   monthlyRevenue?: number;
 }
 
+export interface StoreDetailDto {
+  id: number;
+  storeName: string;
+  businessNumber?: string;
+  storePhoneNumber?: string;
+  businessType: string;
+  storeCode: string;
+  fullAddress: string;
+  latitude?: number;
+  longitude?: number;
+  radius?: number;
+  storeStandardHourWage: number;
+  employeeCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 const getMasterStores = async (userId: number): Promise<StoreSummaryDto[]> => {
   const res = await api.get<StoreSummaryDto[]>(`/api/stores/master/${userId}`);
   // 일부 백엔드가 {data: T} 래핑일 수 있어 방어적 파싱
@@ -36,6 +53,16 @@ const getMasterStores = async (userId: number): Promise<StoreSummaryDto[]> => {
   if (Array.isArray(data)) {return data as StoreSummaryDto[];}
   if (Array.isArray(data?.data)) {return data.data as StoreSummaryDto[];}
   return [];
+};
+
+// [API Mapping] GET /api/stores/{storeId} — 매장 단건 조회
+const getStoreById = async (storeId: number): Promise<StoreDetailDto> => {
+  const res = await api.get<StoreDetailDto>(`/api/stores/${storeId}`);
+  const data: any = res.data as any;
+  // 방어적 파싱
+  if (data?.id) {return data as StoreDetailDto;}
+  if (data?.data?.id) {return data.data as StoreDetailDto;}
+  throw new Error('Invalid store data received');
 };
 
 async function createStore(payload: StoreRegistrationPayload): Promise<{ id: number }> {
@@ -87,6 +114,7 @@ async function changeOwner(storeId: number, newOwnerUserId: number): Promise<{ s
 const storeService = {
   // 조회류
   getMasterStores,
+  getStoreById,
   // 등록/설정류
   createStore,
   putLocation,

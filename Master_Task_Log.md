@@ -1,3 +1,28 @@
+### Task #2025-10-12-01 — FE-BE 통합 구현: Critical 기능 완성 및 API 연동
+- Role: React Native Engineer / Flow Analyst / Backend Integration Specialist
+- Summary:
+  - **Phase 1 완료**: StoreDetailScreen 라우트 추가 (HomeNavigator), ManagerMyPageScreen 복구
+  - **Phase 2 완료**: MasterMyPageScreen Store API 통합 (storeService.getMasterStores)
+  - **Phase 3 완료**: LaborInfo API 통합 (laborInfoService.getCurrentLaborInfo)
+  - StoreDetailScreen 신규 생성 (GET /api/stores/{storeId} 연동)
+  - ManagerMyPageScreen 재작성 (팀원 관리, 승인 대기, 매장 현황)
+  - Mock 데이터 완전 제거 및 실제 Backend API 연동
+- Files:
+  - src\navigation\HomeNavigator.tsx (StoreDetail 라우트 추가)
+  - src\features\store\screens\StoreDetailScreen.tsx (신규)
+  - src\features\store\services\storeService.ts (getStoreById 추가)
+  - src\features\myPage\screens\ManagerMyPageScreen.tsx (재작성)
+  - src\features\myPage\screens\MasterMyPageScreen.tsx (Store/LaborInfo API 통합)
+  - src\features\myPage\screens\EmployeeMyPageRNScreen.tsx (LaborInfo API 통합)
+  - src\services\laborInfoService.ts (신규)
+  - docs\project-management\작업계획서_FE_BE_통합_구현_v1.0_2025-10-12.md (작업 계획)
+- Test: Build verification pending (코드 변경 완료, 런타임 테스트는 수동 확인 필요)
+- Next:
+  - Attendance 엔드포인트 표준화 (/api/attendance/verify/* 패턴 통일)
+  - Salary UI 연동 (SalaryListScreen, useSalaryList 훅)
+  - InfoListScreen 네비게이션 통합
+  - 전체 테스트 스위트 안정화 및 CI 스캐너 통합
+
 ### Task #2025-09-13-01 — MasterMyPageScreen: Info 서비스 접목 및 상세 연동 (1차)
 - Role: React Native Engineer / Flow Analyst
 - Summary: 

@@ -16,6 +16,8 @@ import { NavigationProp } from '@react-navigation/native';
 import  Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../../../common/components/logo/Colors';
 import policyService from '../../info/services/policyService';
+import storeService from '../../store/services/storeService';
+import laborInfoService from '../../../services/laborInfoService';
 import SectionCard from '../../../common/components/sections/SectionCard';
 import SectionHeader from '../../../common/components/sections/SectionHeader';
 import { InfoSlot } from '../components/RoleSlots';
@@ -79,51 +81,27 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
 
     const loadData = async () => {
         try {
-            // 실제 API 호출 시뮬레이션
-            const mockStores: StoreInfo[] = [
-                {
-                    id: 1,
-                    storeName: '소담 카페 강남점',
-                    businessNumber: '123-45-67890',
-                    storePhoneNumber: '02-1234-5678',
-                    businessType: '카페',
-                    storeCode: 'SODAM001',
-                    fullAddress: '서울시 강남구 테헤란로 123',
-                    storeStandardHourWage: 9620,
-                    monthlyLaborCost: 15420000,
-                    employeeCount: 8,
-                    todayAttendance: 6,
-                    monthlyRevenue: 45600000,
-                },
-                {
-                    id: 2,
-                    storeName: '소담 베이커리 홍대점',
-                    businessNumber: '123-45-67891',
-                    storePhoneNumber: '02-2345-6789',
-                    businessType: '베이커리',
-                    storeCode: 'SODAM002',
-                    fullAddress: '서울시 마포구 홍익로 456',
-                    storeStandardHourWage: 9620,
-                    monthlyLaborCost: 12800000,
-                    employeeCount: 6,
-                    todayAttendance: 5,
-                    monthlyRevenue: 32400000,
-                },
-                {
-                    id: 3,
-                    storeName: '소담 치킨 신촌점',
-                    businessNumber: '123-45-67892',
-                    storePhoneNumber: '02-3456-7890',
-                    businessType: '치킨전문점',
-                    storeCode: 'SODAM003',
-                    fullAddress: '서울시 서대문구 신촌로 789',
-                    storeStandardHourWage: 9620,
-                    monthlyLaborCost: 9600000,
-                    employeeCount: 5,
-                    todayAttendance: 4,
-                    monthlyRevenue: 28800000,
-                },
-            ];
+            // TODO: AuthContext에서 실제 userId 가져오기
+            const userId = 1; // 임시 하드코딩
+
+            // Store API 호출
+            const storeData = await storeService.getMasterStores(userId);
+
+            // StoreSummaryDto를 StoreInfo 형식으로 매핑
+            const apiStores: StoreInfo[] = storeData.map(store => ({
+                id: store.id,
+                storeName: store.storeName,
+                businessNumber: store.businessNumber || '',
+                storePhoneNumber: store.storePhoneNumber || '',
+                businessType: store.businessType || '',
+                storeCode: store.storeCode || '',
+                fullAddress: store.fullAddress || '',
+                storeStandardHourWage: store.storeStandardHourWage || 9620,
+                monthlyLaborCost: store.monthlyLaborCost || 0,
+                employeeCount: store.employeeCount || 0,
+                todayAttendance: store.todayAttendance || 0,
+                monthlyRevenue: store.monthlyRevenue || 0,
+            }));
 
             // 정책 정보: info 서비스 연동 (상위 3개 노출)
             const policyDtos: any[] = await policyService.getPoliciesByCategory('ALL');
@@ -149,24 +127,26 @@ export default function MasterMyPageScreen({ navigation }: MasterMyPageScreenPro
                 } as PolicyInfo;
             });
 
-            const mockLaborInfo: LaborInfo = {
-                minimumWage: 9620,
-                year: 2024,
-                weeklyMaxHours: 40,
-                overtimeRate: 1.5,
+            // LaborInfo API 호출
+            const laborData = await laborInfoService.getCurrentLaborInfo();
+            const apiLaborInfo: LaborInfo = {
+                minimumWage: laborData.minimumWage,
+                year: laborData.year,
+                weeklyMaxHours: laborData.weeklyMaxHours,
+                overtimeRate: laborData.overtimeRate,
             };
 
-            setStores(mockStores);
+            setStores(apiStores);
             setPolicies(mockPolicies);
-            setLaborInfo(mockLaborInfo);
+            setLaborInfo(apiLaborInfo);
 
             // 마스터 정보 업데이트
-            const totalEmployees = mockStores.reduce((sum, store) => sum + store.employeeCount, 0);
-            const totalLaborCost = mockStores.reduce((sum, store) => sum + store.monthlyLaborCost, 0);
+            const totalEmployees = apiStores.reduce((sum, store) => sum + store.employeeCount, 0);
+            const totalLaborCost = apiStores.reduce((sum, store) => sum + store.monthlyLaborCost, 0);
 
             setMasterInfo(prev => ({
                 ...prev,
-                totalStores: mockStores.length,
+                totalStores: apiStores.length,
                 totalEmployees,
                 monthlyTotalLaborCost: totalLaborCost,
             }));

@@ -15,6 +15,7 @@ import Header from '../common/components/layout/Header';
 import ProfileScreen from '../features/auth/screens/ProfileScreen';
 import SettingsScreen from '../features/settings/screens/SettingsScreen';
 import StoreRegistrationScreen from '../features/store/StoreRegistraionScreen';
+import StoreDetailScreen from '../features/store/screens/StoreDetailScreen';
 import AttendanceScreen from '../features/attendance/screens/AttendanceScreen';
 import appHeaderOptions from './appHeaderOptions';
 
@@ -34,6 +35,7 @@ export type HomeStackParamList = {
     Settings: undefined;
     Profile: undefined;
     StoreRegistration: undefined;
+    StoreDetail: { storeId: number };
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -112,6 +114,11 @@ const HomeNavigator: React.FC<HomeNavigatorProps> = ({ initialScreen }) => {
                 name="StoreRegistration"
                 component={StoreRegistrationScreen}
                 options={{headerShown: true, title: '매장 등록'}}
+            />
+            <Stack.Screen
+                name="StoreDetail"
+                component={StoreDetailScreen}
+                options={{headerShown: true, title: '매장 상세'}}
             />
         </Stack.Navigator>
     );

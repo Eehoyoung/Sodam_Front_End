@@ -6,6 +6,7 @@ import { COLORS } from '../../../common/components/logo/Colors';
 import AttendanceSummaryPanel from '../../attendance/components/AttendanceSummaryPanel';
 import type { HomeStackParamList } from '../../../navigation/HomeNavigator';
 import policyService from '../../info/services/policyService';
+import laborInfoService from '../../../services/laborInfoService';
 import SectionCard from '../../../common/components/sections/SectionCard';
 import SectionHeader from '../../../common/components/sections/SectionHeader';
 import PrimaryButton from '../../../common/components/buttons/PrimaryButton';
@@ -55,8 +56,15 @@ const EmployeeMyPageRNScreen: React.FC = () => {
         });
         setPolicies(mapped);
 
-        const mockLabor: LaborInfo = { minimumWage: 9620, year: 2024, weeklyMaxHours: 40, overtimeRate: 1.5 };
-        setLaborInfo(mockLabor);
+        // LaborInfo API 호출
+        const laborData = await laborInfoService.getCurrentLaborInfo();
+        const laborInfo: LaborInfo = {
+          minimumWage: laborData.minimumWage,
+          year: laborData.year,
+          weeklyMaxHours: laborData.weeklyMaxHours,
+          overtimeRate: laborData.overtimeRate,
+        };
+        setLaborInfo(laborInfo);
       } catch (e) {
         Alert.alert('오류', '정보를 불러오는 데 실패했습니다.');
       } finally {
