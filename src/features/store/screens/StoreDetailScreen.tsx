@@ -56,7 +56,7 @@ export default function StoreDetailScreen({ route, navigation }: StoreDetailScre
         return (
             <SafeAreaView style={styles.container}>
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={COLORS.primary} />
+                    <ActivityIndicator size="large" color={COLORS.SODAM_BLUE} />
                     <Text style={styles.loadingText}>매장 정보 로딩 중...</Text>
                 </View>
             </SafeAreaView>
@@ -67,7 +67,7 @@ export default function StoreDetailScreen({ route, navigation }: StoreDetailScre
         return (
             <SafeAreaView style={styles.container}>
                 <View style={styles.errorContainer}>
-                    <Ionicons name="alert-circle-outline" size={60} color={COLORS.error} />
+                    <Ionicons name="alert-circle-outline" size={60} color={COLORS.ERROR} />
                     <Text style={styles.errorText}>{error || '매장 정보를 찾을 수 없습니다.'}</Text>
                     <TouchableOpacity style={styles.retryButton} onPress={loadStoreDetail}>
                         <Text style={styles.retryButtonText}>다시 시도</Text>
@@ -82,7 +82,7 @@ export default function StoreDetailScreen({ route, navigation }: StoreDetailScre
             <ScrollView style={styles.scrollView}>
                 {/* 헤더 카드 */}
                 <LinearGradient
-                    colors={[COLORS.primary, COLORS.secondary]}
+                    colors={[COLORS.SODAM_BLUE, COLORS.SODAM_GREEN]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.headerCard}
@@ -182,7 +182,7 @@ function InfoRow({ icon, label, value }: InfoRowProps) {
     return (
         <View style={styles.infoRow}>
             <View style={styles.infoLabelContainer}>
-                <Ionicons name={icon} size={20} color={COLORS.primary} />
+                <Ionicons name={icon} size={20} color={COLORS.SODAM_BLUE} />
                 <Text style={styles.infoLabel}>{label}</Text>
             </View>
             <Text style={styles.infoValue}>{value}</Text>
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     loadingText: {
         marginTop: 12,
         fontSize: 16,
-        color: COLORS.textSecondary,
+        color: COLORS.GRAY_600,
     },
     errorContainer: {
         flex: 1,
@@ -217,14 +217,14 @@ const styles = StyleSheet.create({
     errorText: {
         marginTop: 16,
         fontSize: 16,
-        color: COLORS.textSecondary,
+        color: COLORS.GRAY_600,
         textAlign: 'center',
     },
     retryButton: {
         marginTop: 24,
         paddingHorizontal: 24,
         paddingVertical: 12,
-        backgroundColor: COLORS.primary,
+        backgroundColor: COLORS.SODAM_BLUE,
         borderRadius: 8,
     },
     retryButtonText: {
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: COLORS.textPrimary,
+        color: COLORS.GRAY_900,
         marginBottom: 12,
     },
     infoCard: {
@@ -297,12 +297,12 @@ const styles = StyleSheet.create({
     },
     infoLabel: {
         fontSize: 15,
-        color: COLORS.textSecondary,
+        color: COLORS.GRAY_600,
         marginLeft: 8,
     },
     infoValue: {
         fontSize: 15,
-        color: COLORS.textPrimary,
+        color: COLORS.GRAY_900,
         fontWeight: '500',
         marginLeft: 16,
         textAlign: 'right',

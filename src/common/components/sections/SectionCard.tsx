@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { COLORS } from '../../logo/Colors';
+import { COLORS } from '../logo/Colors';
 
 interface SectionCardProps {
   children: React.ReactNode;

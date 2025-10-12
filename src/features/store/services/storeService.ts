@@ -101,13 +101,17 @@ async function createStore(payload: StoreRegistrationPayload): Promise<{ id: num
 
 // [API Mapping] PUT /api/stores/{storeId}/location — 매장 위치/반경 설정 업데이트
 async function putLocation(storeId: number, coords: { latitude: number; longitude: number; radius?: number }): Promise<{ success: boolean }>{
-  const res = await api.put<{ success: boolean }>(`/api/stores/${storeId}/location`, coords);
+  const res = await api.put<{
+      data: { success: boolean; }; success: boolean
+  }>(`/api/stores/${storeId}/location`, coords);
   return res.data?.data || res.data || { success: true };
 }
 
 // [API Mapping] POST /api/stores/change/master — 매장 소유자 변경(사장 권한 이양)
 async function changeOwner(storeId: number, newOwnerUserId: number): Promise<{ success: boolean }>{
-  const res = await api.post<{ success: boolean }>(`/api/stores/change/master`, { storeId, newOwnerUserId });
+  const res = await api.post<{
+      data: { success: boolean; }; success: boolean
+  }>(`/api/stores/change/master`, { storeId, newOwnerUserId });
   return res.data?.data || res.data || { success: true };
 }
 

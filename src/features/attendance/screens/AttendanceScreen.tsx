@@ -651,7 +651,7 @@ const AttendanceScreen = () => {
             <View style={styles.container}>
                 {renderNFCReader()}
                 <LinearGradient
-                    colors={COLORS.GRADIENT_PRIMARY}
+                    colors={[...COLORS.GRADIENT_PRIMARY]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.headerGradient}

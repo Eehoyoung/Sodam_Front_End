@@ -278,7 +278,7 @@ export const useAuthCheck = () => {
 interface RequireAuthProps {
     children: ReactNode;
     fallback?: ReactNode;
-    roles?: Array<'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER'>;
+    roles?: Array<'EMPLOYEE' | 'MANAGER' | 'MASTER' | 'USER' | 'PERSONAL'>;
 }
 
 export const RequireAuth: React.FC<RequireAuthProps> = ({

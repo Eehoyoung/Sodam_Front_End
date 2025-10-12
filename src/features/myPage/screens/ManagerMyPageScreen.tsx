@@ -92,11 +92,11 @@ const ManagerMyPageScreen: React.FC = () => {
   const getStatusBadge = (status: TeamMember['todayStatus']) => {
     switch (status) {
       case 'working':
-        return { label: '근무중', color: COLORS.success };
+        return { label: '근무중', color: COLORS.SUCCESS };
       case 'off':
-        return { label: '퇴근', color: COLORS.textSecondary };
+        return { label: '퇴근', color: COLORS.GRAY_600 };
       case 'pending':
-        return { label: '승인대기', color: COLORS.warning };
+        return { label: '승인대기', color: COLORS.WARNING };
     }
   };
 
@@ -114,7 +114,7 @@ const ManagerMyPageScreen: React.FC = () => {
         {/* 매장 요약 */}
         <SummarySlot testID="slotSummary">
           <LinearGradient
-            colors={[COLORS.primary, COLORS.secondary]}
+            colors={[COLORS.SODAM_BLUE, COLORS.SODAM_GREEN]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.summaryCard}
@@ -161,7 +161,7 @@ const ManagerMyPageScreen: React.FC = () => {
                       {new Date(approval.timestamp).toLocaleString('ko-KR')}
                     </Text>
                   </View>
-                  <Ionicons name="checkmark-circle-outline" size={28} color={COLORS.success} />
+                  <Ionicons name="checkmark-circle-outline" size={28} color={COLORS.SUCCESS} />
                 </TouchableOpacity>
               ))}
             </SectionCard>
@@ -233,12 +233,12 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: COLORS.textPrimary,
+    color: COLORS.GRAY_900,
     marginBottom: 4,
   },
   subGreeting: {
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.GRAY_600,
   },
   summaryCard: {
     marginHorizontal: 16,
@@ -292,17 +292,17 @@ const styles = StyleSheet.create({
   approvalName: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.GRAY_900,
     marginBottom: 4,
   },
   approvalType: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.GRAY_600,
     marginBottom: 2,
   },
   approvalTime: {
     fontSize: 12,
-    color: COLORS.textSecondary,
+    color: COLORS.GRAY_600,
   },
   teamMemberItem: {
     flexDirection: 'row',
@@ -318,12 +318,12 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.textPrimary,
+    color: COLORS.GRAY_900,
     marginBottom: 4,
   },
   memberPosition: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.GRAY_600,
   },
   statusBadge: {
     paddingHorizontal: 12,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.GRAY_600,
     lineHeight: 22,
   },
 });

@@ -1,3 +1,33 @@
+### Task #2025-10-13-01 — Week 1-2 나머지 작업 완료: Attendance 표준화, PersonalUser/Info/Salary 통합
+- Role: React Native Engineer / QA Specialist / Backend Integration Specialist
+- Summary:
+  - **[F-001] 완료**: Attendance 엔드포인트 표준화 (/api/attendance/verify/nfc, /api/attendance/verify/location)
+  - **[CRITICAL-003] 완료**: PersonalUserScreen API 연동 (storeService.getMasterStores, attendanceService CRUD)
+  - **[S-001] 완료**: InfoListScreen 네비게이션 통합 (HomeNavigator 라우트 추가)
+  - **[S-002] 완료**: SalaryListScreen 기본 연결 (HomeNavigator 라우트 추가, 화면 확인)
+  - Mock 데이터 제거 및 실제 Backend API 연동 완료
+  - TypeScript 컴파일 에러 해결 (Week 1-2 작업 범위 내)
+- Files:
+  - src\features\attendance\services\attendanceService.ts (verify 엔드포인트 표준화)
+  - src\features\attendance\services\nfcAttendanceService.ts (verify 엔드포인트 표준화)
+  - src\features\myPage\screens\PersonalUserScreen.tsx (Store/Attendance API 통합, Mock 제거)
+  - src\navigation\HomeNavigator.tsx (InfoList, SalaryList 라우트 확인)
+  - src\features\info\screens\InfoListScreen.tsx (laborInfoService 연동 확인)
+  - src\features\salary\screens\SalaryListScreen.tsx (payrollService 연동 확인)
+  - src\common\components\logo\Colors.ts (GRADIENT_PRIMARY 추가)
+  - src\common\components\buttons\PrimaryButton.tsx (타입 안정성 개선)
+  - src\common\components\sections\SectionCard.tsx (타입 안정성 개선)
+  - src\common\components\sections\SectionHeader.tsx (accessibility 개선)
+  - src\features\myPage\screens\EmployeeMyPageRNScreen.tsx (navigation 타입 수정)
+  - src\contexts\AuthContext.tsx (role "PERSONAL" 타입 추가)
+  - common-docs\작업계획서_FE_BE_Week1-2_완료_v1.0_2025-10-13.md
+- Test: TypeScript compilation (Week 1-2 scope PASS), Manual navigation flow verification pending
+- Next:
+  - 런타임 테스트 (실제 디바이스/시뮬레이터에서 각 화면 동작 확인)
+  - [T-001] CI 스캐너 통합 (scan-qr-residue.ps1 -FailOnMatch)
+  - [T-002] Jest 스위트 핵심 안정화 (Attendance, Wage, Store, Auth)
+  - Week 3-4 작업 착수 (Salary 상세 화면, Workplace 관리)
+
 ### Task #2025-10-12-01 — FE-BE 통합 구현: Critical 기능 완성 및 API 연동
 - Role: React Native Engineer / Flow Analyst / Backend Integration Specialist
 - Summary:

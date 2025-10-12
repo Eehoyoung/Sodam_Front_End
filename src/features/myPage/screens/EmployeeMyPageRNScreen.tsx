@@ -77,7 +77,7 @@ const EmployeeMyPageRNScreen: React.FC = () => {
   const handlePolicyPress = (policy: PolicyItem) => {
     // 정책 상세로 이동 (정책 ID가 숫자일 경우 문자열 변환)
     try {
-      navigation.navigate('PolicyDetail' as never, { policyId: Number(policy.id) } as never);
+      navigation.navigate('PolicyDetail', { policyId: Number(policy.id) });
     } catch (_) {
       // 안전 장치: 네비게이션 라우트가 없을 경우 무시
     }

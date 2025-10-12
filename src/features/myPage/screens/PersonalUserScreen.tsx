@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import {
     View,
     Text,
@@ -12,11 +12,15 @@ import {
     StatusBar,
     Dimensions,
     FlatList,
+    ActivityIndicator,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import SectionCard from '../../../common/components/sections/SectionCard';
 import SectionHeader from '../../../common/components/sections/SectionHeader';
 import PrimaryButton from '../../../common/components/buttons/PrimaryButton';
+import AuthContext from '../../../contexts/AuthContext';
+import storeService from '../../store/services/storeService';
+import attendanceService from '../../attendance/services/attendanceService';
 
 Dimensions.get('window');
 
@@ -79,18 +83,16 @@ interface MonthlyStats {
 }
 
 const MultiStoreWorkScreen: React.FC = () => {
-    // 매장 데이터
-    /* todo API 연동 필수*/
-    const [stores] = useState<Store[]>([
-        { id: '1', name: '스타벅스 강남점', color: '#00704A', hourlyWage: 12000 },
-        { id: '2', name: '맥도날드 홍대점', color: '#FFC72C', hourlyWage: 11000 },
-        { id: '3', name: '올리브영 명동점', color: '#8B4513', hourlyWage: 10500 },
-        { id: '4', name: '편의점 GS25', color: '#0066CC', hourlyWage: 9860 },
-    ]);
+    // AuthContext에서 사용자 정보 가져오기
+    const { user } = useContext(AuthContext);
+
+    // 매장 데이터 - API 연동
+    const [stores, setStores] = useState<Store[]>([]);
+    const [loadingStores, setLoadingStores] = useState<boolean>(true);
 
     // 상태 관리
     const [currentTime, setCurrentTime] = useState<string>('');
-    const [selectedStoreId, setSelectedStoreId] = useState<string>(stores[0].id);
+    const [selectedStoreId, setSelectedStoreId] = useState<string>('');
     const [workSessions, setWorkSessions] = useState<{ [storeId: string]: WorkSession }>({});
     const [allRecords, setAllRecords] = useState<WorkRecord[]>([]);
     const [showStoreSelector, setShowStoreSelector] = useState<boolean>(false);
@@ -102,14 +104,16 @@ const MultiStoreWorkScreen: React.FC = () => {
         type: '출근' as WorkRecord['type'],
         hour: '',
         minute: '',
-        storeId: stores[0].id,
+        storeId: '',
     });
 
     // 현재 선택된 매장 정보
-    const currentStore = useMemo(() =>
-            stores.find(store => store.id === selectedStoreId) ?? stores[0],
-        [selectedStoreId, stores]
-    );
+    const currentStore = useMemo(() => {
+        if (stores.length === 0) {
+            return { id: '', name: '매장 없음', color: '#999999', hourlyWage: 0 };
+        }
+        return stores.find(store => store.id === selectedStoreId) ?? stores[0];
+    }, [selectedStoreId, stores]);
 
     // 현재 매장의 작업 세션
     const currentSession = useMemo(() =>
@@ -321,6 +325,45 @@ const MultiStoreWorkScreen: React.FC = () => {
 
         return stats;
     }, [allRecords, selectedMonth, stores]);
+
+    // 매장 데이터 로딩 (API 연동)
+    useEffect(() => {
+        const loadStores = async () => {
+            if (!user?.id) {
+                setLoadingStores(false);
+                return;
+            }
+
+            try {
+                setLoadingStores(true);
+                // storeService.getMasterStores()는 Store[] 타입 반환 예상
+                const storesData = await storeService.getMasterStores(user.id);
+
+                // API 응답을 Store 인터페이스에 맞게 변환
+                const mappedStores: Store[] = storesData.map((store: any) => ({
+                    id: String(store.id),
+                    name: store.storeName,
+                    color: store.color || '#0066CC', // 기본 색상
+                    hourlyWage: store.storeStandardHourWage || 10000,
+                }));
+
+                setStores(mappedStores);
+
+                // 첫 번째 매장을 기본 선택
+                if (mappedStores.length > 0) {
+                    setSelectedStoreId(mappedStores[0].id);
+                    setManualRecord(prev => ({ ...prev, storeId: mappedStores[0].id }));
+                }
+            } catch (error) {
+                console.error('매장 로딩 실패:', error);
+                Alert.alert('오류', '매장 정보를 불러올 수 없습니다.');
+            } finally {
+                setLoadingStores(false);
+            }
+        };
+
+        loadStores();
+    }, [user?.id]);
 
     // 현재 시간 업데이트
     useEffect(() => {

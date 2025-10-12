@@ -3,10 +3,12 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../features/home/screens/HomeScreen';
 import SubscribeScreen from '../features/subscription/screens/SubscribeScreen';
 import QnAScreen from '../features/qna/screens/QnAScreen';
+import InfoListScreen from '../features/info/screens/InfoListScreen';
 import LaborInfoDetailScreen from '../features/info/screens/LaborInfoDetailScreen';
 import PolicyDetailScreen from '../features/info/screens/PolicyDetailScreen';
 import TaxInfoDetailScreen from '../features/info/screens/TaxInfoDetailScreen';
 import TipsDetailScreen from '../features/info/screens/TipsDetailScreen';
+import SalaryListScreen from '../features/salary/screens/SalaryListScreen';
 import EmployeeMyPageRNScreen from '../features/myPage/screens/EmployeeMyPageRNScreen';
 import MasterMyPageScreen from '../features/myPage/screens/MasterMyPageScreen';
 import ManagerMyPageScreen from '../features/myPage/screens/ManagerMyPageScreen';
@@ -23,6 +25,8 @@ export type HomeStackParamList = {
     Home: undefined;
     Subscribe: undefined;
     QnA: undefined;
+    InfoList: undefined;
+    SalaryList: undefined;
     LaborInfoDetail: { laborInfoId: number };
     PolicyDetail: { policyId: number };
     TaxInfoDetail: { taxInfoId: number };
@@ -68,6 +72,7 @@ const HomeNavigator: React.FC<HomeNavigatorProps> = ({ initialScreen }) => {
 
             <Stack.Screen name="Subscribe" component={SubscribeScreen} options={{ title: '구독하기' }} />
             <Stack.Screen name="QnA" component={QnAScreen} options={{ title: 'Q&A' }} />
+            <Stack.Screen name="InfoList" component={InfoListScreen} options={{ title: '정보 서비스' }} />
 
             <Stack.Screen name="LaborInfoDetail" component={LaborInfoDetailScreen} options={{ title: '노동 정보 상세' }} />
             <Stack.Screen name="PolicyDetail" component={PolicyDetailScreen} options={{ title: '정책 상세' }} />
@@ -77,6 +82,11 @@ const HomeNavigator: React.FC<HomeNavigatorProps> = ({ initialScreen }) => {
                 name="Attendance"
                 component={AttendanceScreen}
                 options={{ headerShown: true, title: '출퇴근 관리' }}
+            />
+            <Stack.Screen
+                name="SalaryList"
+                component={SalaryListScreen}
+                options={{ headerShown: true, title: '급여 내역' }}
             />
 
             <Stack.Screen
