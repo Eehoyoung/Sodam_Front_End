@@ -276,11 +276,17 @@ const attendanceService = {
             }
             const payload = { employeeId: employeeIdNum, storeId: storeIdNum, latitude, longitude };
             try {
-                const response = await api.post<{ success: boolean; distance?: number; message?: string }>(
+                const response = await api.post<any>(
                     '/api/attendance/verify/location',
                     payload
                 );
-                return response.data;
+                const raw = response.data;
+                const data = raw?.data ?? raw;
+                return {
+                    success: !!data?.success,
+                    distance: data?.distance,
+                    message: data?.message ?? data?.reason,
+                };
             } catch (err) {
                 // Legacy location-verify fallback removed per Phase 0 AC (2025-10-02)
                 throw err;

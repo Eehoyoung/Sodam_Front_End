@@ -8,8 +8,7 @@ import {
     StatusBar,
     Dimensions,
 } from 'react-native';
-import { LinearGradient } from 'react-native-linear-gradient';
-import WelcomeMainScreen from "./WelcomeMainScreen.tsx";
+import LinearGradient from 'react-native-linear-gradient';
 
 Dimensions.get('window');
 
@@ -19,7 +18,7 @@ interface UsageSelectionScreenProps {
 
 const UsageSelectionScreen: React.FC<UsageSelectionScreenProps> = ({ navigation }) => {
     const handleSelection = () => {
-        navigation.navigate('WelcomeMain', {screen:WelcomeMainScreen});
+        navigation.navigate('WelcomeMain');
     };
 
 

@@ -64,6 +64,7 @@
         maybeImpl(":react-native-gesture-handler")
         maybeImpl(":react-native-vector-icons")
         maybeImpl(":react-native-linear-gradient")
+        maybeImpl(":react-native-community_datetimepicker")
     }
 
     apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

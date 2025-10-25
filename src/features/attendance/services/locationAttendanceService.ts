@@ -23,11 +23,18 @@ export const verifyCheckInByLocation = async (
     request: LocationVerifyRequest
 ): Promise<LocationVerifyResponse> => {
     try {
-        const response = await api.post<LocationVerifyResponse>(
+        const response = await api.post<any>(
             '/api/attendance/verify/location',
             request
         );
-        return response.data;
+        const raw = response.data;
+        const data = raw?.data ?? raw; // ApiResponse 래핑/비래핑 모두 허용
+        return {
+            success: !!data?.success,
+            distance: data?.distance,
+            message: data?.message ?? data?.reason,
+            timestamp: data?.timestamp,
+        };
     } catch (error) {
         console.error('위치 기반 출근 인증 실패:', error);
         return {
@@ -47,14 +54,21 @@ export const verifyCheckOutByLocation = async (
 ): Promise<LocationVerifyResponse> => {
     try {
         // 출근과 동일한 엔드포인트를 사용하지만, 퇴근 플래그 추가
-        const response = await api.post<LocationVerifyResponse>(
+        const response = await api.post<any>(
             '/api/attendance/verify/location',
             {
                 ...request,
                 isCheckOut: true
             }
         );
-        return response.data;
+        const raw = response.data;
+        const data = raw?.data ?? raw; // ApiResponse 래핑/비래핑 모두 허용
+        return {
+            success: !!data?.success,
+            distance: data?.distance,
+            message: data?.message ?? data?.reason,
+            timestamp: data?.timestamp,
+        };
     } catch (error) {
         console.error('위치 기반 퇴근 인증 실패:', error);
         return {

@@ -9,6 +9,7 @@ import PolicyDetailScreen from '../features/info/screens/PolicyDetailScreen';
 import TaxInfoDetailScreen from '../features/info/screens/TaxInfoDetailScreen';
 import TipsDetailScreen from '../features/info/screens/TipsDetailScreen';
 import SalaryListScreen from '../features/salary/screens/SalaryListScreen';
+import SalaryDetailScreen from '../features/salary/screens/SalaryDetailScreen';
 import EmployeeMyPageRNScreen from '../features/myPage/screens/EmployeeMyPageRNScreen';
 import MasterMyPageScreen from '../features/myPage/screens/MasterMyPageScreen';
 import ManagerMyPageScreen from '../features/myPage/screens/ManagerMyPageScreen';
@@ -27,6 +28,7 @@ export type HomeStackParamList = {
     QnA: undefined;
     InfoList: undefined;
     SalaryList: undefined;
+    SalaryDetail: { payrollId: number };
     LaborInfoDetail: { laborInfoId: number };
     PolicyDetail: { policyId: number };
     TaxInfoDetail: { taxInfoId: number };
@@ -87,6 +89,11 @@ const HomeNavigator: React.FC<HomeNavigatorProps> = ({ initialScreen }) => {
                 name="SalaryList"
                 component={SalaryListScreen}
                 options={{ headerShown: true, title: '급여 내역' }}
+            />
+            <Stack.Screen
+                name="SalaryDetail"
+                component={SalaryDetailScreen}
+                options={{ headerShown: true, title: '급여 상세' }}
             />
 
             <Stack.Screen

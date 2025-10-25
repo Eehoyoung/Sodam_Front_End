@@ -23,11 +23,17 @@ export const verifyCheckInByNFC = async (
     request: NFCVerifyRequest
 ): Promise<NFCVerifyResponse> => {
     try {
-        const response = await api.post<NFCVerifyResponse>(
+        const response = await api.post<any>(
             '/api/attendance/verify/nfc',
             request
         );
-        return response.data;
+        const raw = response.data;
+        const data = raw?.data ?? raw; // ApiResponse 래핑/비래핑 모두 허용
+        return {
+            success: !!data?.success,
+            message: data?.message ?? data?.reason,
+            timestamp: data?.timestamp,
+        };
     } catch (error) {
         console.error('NFC 태그 기반 출근 인증 실패:', error);
         // Legacy NFC verify endpoint fallback removed per Phase 0 AC (2025-10-02)
@@ -47,15 +53,21 @@ export const verifyCheckOutByNFC = async (
     request: NFCVerifyRequest
 ): Promise<NFCVerifyResponse> => {
     try {
-        // 출근과 동일한 엔드포인트를 사용하지만, 퇴근 플래그 추가
-        const response = await api.post<NFCVerifyResponse>(
+        // 출근과 동일한 엔드포인트를 사용하지만, 퇴근 플래그 추가(서버가 무시해도 무방)
+        const response = await api.post<any>(
             '/api/attendance/verify/nfc',
             {
                 ...request,
                 isCheckOut: true
             }
         );
-        return response.data;
+        const raw = response.data;
+        const data = raw?.data ?? raw; // ApiResponse 래핑/비래핑 모두 허용
+        return {
+            success: !!data?.success,
+            message: data?.message ?? data?.reason,
+            timestamp: data?.timestamp,
+        };
     } catch (error) {
         console.error('NFC 태그 기반 퇴근 인증 실패:', error);
         // Legacy NFC verify endpoint fallback removed per Phase 0 AC (2025-10-02)

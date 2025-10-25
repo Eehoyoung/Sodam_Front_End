@@ -15,8 +15,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-// TODO: Install @react-native-community/datetimepicker package
-// import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {Button, Card, MainLayout} from '../../../common/components';
 
 import salaryService from '../services/salaryService';
@@ -26,7 +25,7 @@ import {format} from 'date-fns';
 // 네비게이션 타입 정의
 type SalaryStackParamList = {
     SalaryList: undefined;
-    SalaryDetail: { salaryId: string };
+    SalaryDetail: { payrollId: number };
     SalaryForm: { salaryId?: string };
     SalaryPolicy: { workplaceId: string };
 };
@@ -196,9 +195,9 @@ const SalaryListScreen = () => {
     };
 
     // 급여 상세 화면으로 이동
-    const navigateToSalaryDetail = (salaryId: string) => {
-        navigation.navigate({name: 'SalaryDetail', params: {salaryId}});
-    };
+    const navigateToSalaryDetail = (payrollId: number) => {
+            navigation.navigate({name: 'SalaryDetail', params: {payrollId}});
+        };
 
     // 급여 정책 화면으로 이동
     const navigateToSalaryPolicy = () => {
@@ -301,7 +300,7 @@ const SalaryListScreen = () => {
 
             <TouchableOpacity
                 style={styles.salaryContent}
-                onPress={() => navigateToSalaryDetail(item.id)}
+                onPress={() => { const pid = Number(item.id); if (Number.isNaN(pid) || pid <= 0) { Alert.alert('오류', '급여 ID가 유효하지 않습니다.'); return; } navigateToSalaryDetail(pid); }}
             >
                 <View style={styles.salaryHeader}>
                     <Text style={styles.employeeName}>{item.employeeName}</Text>
@@ -386,7 +385,7 @@ const SalaryListScreen = () => {
                                 onPress={() => showDatePickerModal('startDate')}
                             >
                                 <Text style={styles.datePickerButtonText}>
-                                    {filter.startDate || '시작일 선택'}
+                                    {filter.startDate ?? '시작일 선택'}
                                 </Text>
                                 <Icon name="calendar-today" size={18} color="#666"/>
                             </TouchableOpacity>
@@ -398,7 +397,7 @@ const SalaryListScreen = () => {
                                 onPress={() => showDatePickerModal('endDate')}
                             >
                                 <Text style={styles.datePickerButtonText}>
-                                    {filter.endDate || '종료일 선택'}
+                                    {filter.endDate ?? '종료일 선택'}
                                 </Text>
                                 <Icon name="calendar-today" size={18} color="#666"/>
                             </TouchableOpacity>
@@ -484,15 +483,12 @@ const SalaryListScreen = () => {
             </View>
 
             {showDatePicker && (
-                <Text style={styles.placeholderText}>
-                    TODO: DateTimePicker component needs @react-native-community/datetimepicker package
-                </Text>
-                // <DateTimePicker
-                //     value={tempDate}
-                //     mode="date"
-                //     display="default"
-                //     onChange={handleDateChange}
-                // />
+                    <DateTimePicker
+                        value={tempDate}
+                        mode="date"
+                        display="default"
+                        onChange={handleDateChange}
+                    />
             )}
         </Modal>
     );
@@ -553,20 +549,17 @@ const SalaryListScreen = () => {
             </View>
 
             {showPaymentDatePicker && (
-                <Text style={styles.placeholderText}>
-                    TODO: DateTimePicker component needs @react-native-community/datetimepicker package
-                </Text>
-                // <DateTimePicker
-                //     value={paymentDate}
-                //     mode="date"
-                //     display="default"
-                //     onChange={(event: any, selectedDate: Date | undefined) => {
-                //         setShowPaymentDatePicker(false);
-                //         if (selectedDate) {
-                //             setPaymentDate(selectedDate);
-                //         }
-                //     }}
-                // />
+                    <DateTimePicker
+                        value={paymentDate}
+                        mode="date"
+                        display="default"
+                        onChange={(event: any, selectedDate: Date | undefined) => {
+                            setShowPaymentDatePicker(false);
+                            if (selectedDate) {
+                                setPaymentDate(selectedDate);
+                            }
+                        }}
+                    />
             )}
         </Modal>
     );
@@ -897,12 +890,6 @@ const styles = StyleSheet.create({
     },
     paymentDateButtonText: {
         color: '#666',
-    },
-    placeholderText: {
-        fontSize: 14,
-        color: '#666',
-        textAlign: 'center',
-        padding: 16,
     },
 });
 

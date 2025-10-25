@@ -13,8 +13,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp } from '@react-navigation/native';
 import SodamLogo from '../../../common/components/logo/SodamLogo';
 import { COLORS } from '../../../common/components/logo/Colors';
-import LoginScreen from "../../auth/screens/LoginScreen.tsx";
-import signupScreen from "../../auth/screens/SignupScreen.tsx";
 
 interface WelcomeMainScreenProps {
     navigation: NavigationProp<any>;
@@ -42,11 +40,11 @@ export default function WelcomeMainScreen({ navigation }: WelcomeMainScreenProps
     }, []);
 
     const handleLogin = () => {
-        navigation.navigate('Auth', {screen:LoginScreen});
+        navigation.navigate('Auth', { screen: 'Login' });
     };
 
     const handleSignup = () => {
-        navigation.navigate('Auth', {screen: signupScreen});
+        navigation.navigate('Auth', { screen: 'Signup' });
     };
 
     return (
